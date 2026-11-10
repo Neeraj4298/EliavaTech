@@ -14,6 +14,7 @@ import {
 import {
   MAX_CHAT_CONVERSATION_MESSAGES,
   MAX_CHAT_MESSAGE_LENGTH,
+  type ChatErrorType,
   type ChatTurn,
 } from "@/lib/gemini";
 import { SPRING_PLAYFUL, usePrefersReducedMotion } from "@/lib/motion";
@@ -52,6 +53,7 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
   const [input, setInput] = React.useState("");
   const [streaming, setStreaming] = React.useState(false);
   const [showFallback, setShowFallback] = React.useState(false);
+  const [errorType, setErrorType] = React.useState<ChatErrorType | null>(null);
   const [fallbackNote, setFallbackNote] = React.useState<string | null>(null);
 
   const [leadOpen, setLeadOpen] = React.useState(false);
@@ -84,6 +86,7 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
 
     if (nextMessages.length > MAX_CHAT_CONVERSATION_MESSAGES) {
       setShowFallback(true);
+      setErrorType("invalid_request");
       setFallbackNote(
         "Maximum conversation length reached. Please continue on WhatsApp or book a free consultation call."
       );
@@ -94,6 +97,7 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
     setInput("");
     setStreaming(true);
     setShowFallback(false);
+    setErrorType(null);
     setFallbackNote(null);
 
     try {
@@ -110,17 +114,33 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
       if (!res.ok || contentType.includes("application/json")) {
         const errData = (await res.json().catch(() => null)) as {
           error?: string;
+          errorType?: ChatErrorType;
         } | null;
+
+        const resolvedType: ChatErrorType =
+          errData?.errorType ||
+          (res.status === 429
+            ? "rate_limited"
+            : res.status === 400
+            ? "invalid_request"
+            : "unavailable");
+
+        setErrorType(resolvedType);
         setShowFallback(true);
         setFallbackNote(
           errData?.error ||
-            "Live AI response is unavailable right now. Reach us directly via WhatsApp or book a call below."
+            (resolvedType === "rate_limited"
+              ? "Too many messages sent in a short window. Please continue on WhatsApp or book a consultation below."
+              : resolvedType === "invalid_request"
+              ? "Please shorten or rephrase your question and try again."
+              : "Our AI assistant is temporarily unavailable. Reach us directly via WhatsApp or book a call below.")
         );
         setStreaming(false);
         return;
       }
 
       if (!res.body) {
+        setErrorType("unavailable");
         setShowFallback(true);
         setStreaming(false);
         return;
@@ -129,25 +149,35 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let assistantReply = "";
-
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+      let appended = false;
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        assistantReply += decoder.decode(value, { stream: true });
+        const chunkText = decoder.decode(value, { stream: true });
+        if (!chunkText) continue;
+
+        assistantReply += chunkText;
         const snapshot = assistantReply;
-        setMessages((prev) => {
-          const copy = [...prev];
-          copy[copy.length - 1] = { role: "assistant", content: snapshot };
-          return copy;
-        });
+
+        if (!appended) {
+          appended = true;
+          setMessages((prev) => [...prev, { role: "assistant", content: snapshot }]);
+        } else {
+          setMessages((prev) => {
+            const copy = [...prev];
+            copy[copy.length - 1] = { role: "assistant", content: snapshot };
+            return copy;
+          });
+        }
       }
 
       if (!assistantReply.trim()) {
+        setErrorType("unavailable");
         setShowFallback(true);
       }
     } catch {
+      setErrorType("unavailable");
       setShowFallback(true);
       setFallbackNote(
         "Connection interrupted. You can message us directly on WhatsApp or book a consultation below."
@@ -313,14 +343,46 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
         )}
 
         {showFallback && (
-          <div className="rounded-card border border-gold/40 bg-surface p-4 space-y-3">
+          <div
+            role="alert"
+            className={cn(
+              "rounded-card border bg-surface p-4 space-y-3",
+              errorType === "invalid_request"
+                ? "border-danger/40"
+                : "border-gold/40"
+            )}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <Badge
+                variant={
+                  errorType === "rate_limited"
+                    ? "gold"
+                    : errorType === "invalid_request"
+                    ? "danger"
+                    : "default"
+                }
+                size="sm"
+                dot
+              >
+                {errorType === "rate_limited"
+                  ? "Rate Limited"
+                  : errorType === "invalid_request"
+                  ? "Invalid Request"
+                  : "Assistant Unavailable"}
+              </Badge>
+            </div>
             <p className="text-xs text-text-muted">
-              {fallbackNote || "Connect with our founding team directly on WhatsApp or book a free consultation:"}
+              {fallbackNote ||
+                "Connect with our founding team directly on WhatsApp or book a free consultation:"}
             </p>
             <div className="flex flex-wrap items-center gap-2">
               <WhatsAppButton variant="inline" label="Chat on WhatsApp" />
               <Link href="/contact#main-content">
-                <Button variant="secondary" size="sm" leftIcon={<Calendar strokeWidth={1.5} className="h-3.5 w-3.5" />}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  leftIcon={<Calendar strokeWidth={1.5} className="h-3.5 w-3.5" />}
+                >
                   Book Consultation
                 </Button>
               </Link>

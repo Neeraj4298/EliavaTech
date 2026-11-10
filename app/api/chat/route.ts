@@ -3,8 +3,10 @@ import { z } from "zod";
 import {
   createGeminiStream,
   extractLeadDetailsFromConversation,
+  GeminiApiError,
   MAX_CHAT_CONVERSATION_MESSAGES,
   MAX_CHAT_MESSAGE_LENGTH,
+  type ChatErrorType,
 } from "@/lib/gemini";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { prisma } from "@/lib/db";
@@ -124,7 +126,9 @@ export async function POST(req: NextRequest) {
         {
           ok: false,
           fallback: true,
-          error: `Rate limit reached. Please continue on WhatsApp or book a call.`,
+          errorType: "rate_limited" satisfies ChatErrorType,
+          error:
+            "You have reached the message limit for now. Please continue on WhatsApp or book a free consultation call below.",
         },
         {
           status: 429,
@@ -140,7 +144,12 @@ export async function POST(req: NextRequest) {
       const firstIssue =
         parsed.error.issues[0]?.message || "Invalid chat message.";
       return NextResponse.json(
-        { ok: false, fallback: true, error: firstIssue },
+        {
+          ok: false,
+          fallback: false,
+          errorType: "invalid_request" satisfies ChatErrorType,
+          error: firstIssue,
+        },
         { status: 400 }
       );
     }
@@ -197,11 +206,45 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (err) {
-    console.error("[/api/chat] Fallback triggered:", err);
+    if (err instanceof GeminiApiError) {
+      console.error(
+        `[/api/chat] GeminiApiError status=${err.statusCode} type=${err.errorType} upstream=${err.upstreamStatus ?? "unknown"}: ${err.message}`
+      );
+
+      if (err.errorType === "rate_limited") {
+        return NextResponse.json(
+          {
+            ok: false,
+            fallback: true,
+            errorType: "rate_limited" satisfies ChatErrorType,
+            error:
+              "Our AI assistant is experiencing high demand right now. Please message us on WhatsApp or book a call below.",
+          },
+          { status: 429 }
+        );
+      }
+
+      if (err.errorType === "invalid_request") {
+        return NextResponse.json(
+          {
+            ok: false,
+            fallback: false,
+            errorType: "invalid_request" satisfies ChatErrorType,
+            error:
+              "We could not process that request. Please shorten or rephrase your question.",
+          },
+          { status: 400 }
+        );
+      }
+    } else {
+      console.error("[/api/chat] Unexpected error:", err);
+    }
+
     return NextResponse.json(
       {
         ok: false,
         fallback: true,
+        errorType: "unavailable" satisfies ChatErrorType,
         error:
           "Our AI assistant is temporarily unavailable. Please reach us directly on WhatsApp or book a free consultation call below.",
       },

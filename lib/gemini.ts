@@ -4,13 +4,34 @@ import { PROCESS_STEPS, HOME_FAQS } from "@/content/home";
 import { INDUSTRIES_DATA } from "@/content/industries";
 
 /**
- * Looked up from official Google AI Gemini API documentation
- * (https://ai.google.dev/gemini-api/docs/models):
- * - Stable recommended Flash model for general chat/agentic tasks: `gemini-3.6-flash`
- * - Latest alias fallback: `gemini-flash-latest`
+ * Verified against the official Google Gemini API models endpoint
+ * (`GET https://generativelanguage.googleapis.com/v1beta/models`):
+ * - Primary fast chat model: `gemini-3.6-flash` (configurable via `GEMINI_MODEL` env var)
+ * - Secondary fallback model: `gemini-2.5-flash`
  */
-export const RECOMMENDED_GEMINI_MODEL = "gemini-3.6-flash";
-export const FALLBACK_GEMINI_MODEL = "gemini-flash-latest";
+export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
+export const FALLBACK_GEMINI_MODEL = "gemini-2.5-flash";
+
+export type ChatErrorType = "rate_limited" | "unavailable" | "invalid_request";
+
+export class GeminiApiError extends Error {
+  public readonly statusCode: number;
+  public readonly errorType: ChatErrorType;
+  public readonly upstreamStatus?: string;
+
+  constructor(opts: {
+    message: string;
+    statusCode: number;
+    errorType: ChatErrorType;
+    upstreamStatus?: string;
+  }) {
+    super(opts.message);
+    this.name = "GeminiApiError";
+    this.statusCode = opts.statusCode;
+    this.errorType = opts.errorType;
+    this.upstreamStatus = opts.upstreamStatus;
+  }
+}
 
 export const MAX_CHAT_MESSAGE_LENGTH = 500;
 export const MAX_CHAT_CONVERSATION_MESSAGES = 12;
@@ -114,9 +135,17 @@ export function extractLeadDetailsFromConversation(messages: ChatTurn[]): {
 export async function createGeminiStream(
   messages: ChatTurn[]
 ): Promise<ReadableStream<Uint8Array>> {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) {
-    throw new Error("GEMINI_API_KEY is not configured");
+    console.error(
+      "[Gemini API Error] status=503 (MISSING_API_KEY): GEMINI_API_KEY is not set in server environment (.env.local)."
+    );
+    throw new GeminiApiError({
+      message: "GEMINI_API_KEY is not configured on the server.",
+      statusCode: 503,
+      errorType: "unavailable",
+      upstreamStatus: "MISSING_API_KEY",
+    });
   }
 
   const systemInstruction = buildEliavaSystemPrompt();
@@ -125,12 +154,11 @@ export async function createGeminiStream(
     parts: [{ text: m.content }],
   }));
 
-  const modelsToTry = [
-    process.env.GEMINI_MODEL || RECOMMENDED_GEMINI_MODEL,
-    FALLBACK_GEMINI_MODEL,
-  ];
+  const primaryModel = process.env.GEMINI_MODEL?.trim() || GEMINI_MODEL;
+  const modelsToTry = Array.from(new Set([primaryModel, FALLBACK_GEMINI_MODEL]));
 
   let response: Response | null = null;
+  let lastError: GeminiApiError | null = null;
 
   for (const modelName of modelsToTry) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:streamGenerateContent?alt=sse&key=${encodeURIComponent(
@@ -146,8 +174,11 @@ export async function createGeminiStream(
         },
         contents,
         generationConfig: {
-          temperature: 0.3,
-          maxOutputTokens: 450,
+          temperature: 0.25,
+          maxOutputTokens: 2048,
+          thinkingConfig: {
+            thinkingBudget: 0,
+          },
         },
       }),
     });
@@ -156,15 +187,85 @@ export async function createGeminiStream(
       response = res;
       break;
     }
+
+    // Parse and log real status code and message server-side without exposing to browser
+    const rawErrorText = await res.text().catch(() => "");
+    let upstreamMessage = rawErrorText.slice(0, 300) || res.statusText;
+    let upstreamStatus = String(res.status);
+
+    try {
+      const parsedErr = JSON.parse(rawErrorText) as {
+        error?: { code?: number; message?: string; status?: string };
+      };
+      if (parsedErr.error?.message) {
+        upstreamMessage = parsedErr.error.message;
+      }
+      if (parsedErr.error?.status) {
+        upstreamStatus = parsedErr.error.status;
+      }
+    } catch {
+      // Non-JSON upstream error body
+    }
+
+    console.error(
+      `[Gemini API Error] model=${modelName} status=${res.status} (${upstreamStatus}): ${upstreamMessage}`
+    );
+
+    const errorType: ChatErrorType =
+      res.status === 429
+        ? "rate_limited"
+        : res.status === 400
+        ? "invalid_request"
+        : "unavailable";
+
+    lastError = new GeminiApiError({
+      message: upstreamMessage,
+      statusCode: res.status,
+      errorType,
+      upstreamStatus,
+    });
+
+    // Do not retry fallback model on 400 invalid request or 429 rate limit
+    if (res.status === 400 || res.status === 429) {
+      break;
+    }
   }
 
   if (!response || !response.body) {
-    throw new Error("Gemini API request failed");
+    throw (
+      lastError ??
+      new GeminiApiError({
+        message: "Gemini API stream initialization failed.",
+        statusCode: 503,
+        errorType: "unavailable",
+      })
+    );
   }
 
   const upstreamBody = response.body;
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
+
+  const extractSSEText = (line: string): string => {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith("data:")) return "";
+    const jsonStr = trimmed.slice(5).trim();
+    if (!jsonStr || jsonStr === "[DONE]") return "";
+    try {
+      const parsed = JSON.parse(jsonStr) as {
+        candidates?: Array<{
+          content?: { parts?: Array<{ text?: string }> };
+        }>;
+      };
+      return (
+        parsed.candidates?.[0]?.content?.parts
+          ?.map((p) => p.text ?? "")
+          .join("") ?? ""
+      );
+    } catch {
+      return "";
+    }
+  };
 
   return new ReadableStream<Uint8Array>({
     async start(controller) {
@@ -181,30 +282,21 @@ export async function createGeminiStream(
           buffer = lines.pop() ?? "";
 
           for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed.startsWith("data:")) continue;
-            const jsonStr = trimmed.slice(5).trim();
-            if (!jsonStr || jsonStr === "[DONE]") continue;
-
-            try {
-              const parsed = JSON.parse(jsonStr) as {
-                candidates?: Array<{
-                  content?: { parts?: Array<{ text?: string }> };
-                }>;
-              };
-              const textChunk =
-                parsed.candidates?.[0]?.content?.parts
-                  ?.map((p) => p.text ?? "")
-                  .join("") ?? "";
-              if (textChunk) {
-                controller.enqueue(encoder.encode(textChunk));
-              }
-            } catch {
-              // Ignore malformed partial SSE frame
+            const textChunk = extractSSEText(line);
+            if (textChunk) {
+              controller.enqueue(encoder.encode(textChunk));
             }
           }
         }
+
+        if (buffer.trim()) {
+          const finalChunk = extractSSEText(buffer);
+          if (finalChunk) {
+            controller.enqueue(encoder.encode(finalChunk));
+          }
+        }
       } catch (streamErr) {
+        console.error("[Gemini API Stream Error]:", streamErr);
         controller.error(streamErr);
         return;
       } finally {
