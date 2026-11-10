@@ -2,35 +2,92 @@
 
 import * as React from "react";
 import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
-import { RoundedBox, Html, Environment, Lightformer } from "@react-three/drei";
+import { RoundedBox, Environment, Lightformer } from "@react-three/drei";
 import { useTheme } from "next-themes";
 import { Code2, MessageSquare, ShoppingCart, BarChart3 } from "lucide-react";
 import * as THREE from "three";
 import { ParticleField } from "./ParticleField";
 
-interface MonogramRigProps {
-  isDark: boolean;
-  exploded: boolean;
+if (typeof window !== "undefined") {
+  const origWarn = console.warn;
+  console.warn = (...args: unknown[]) => {
+    if (
+      typeof args[0] === "string" &&
+      args[0].includes("THREE.Clock: This module has been deprecated")
+    ) {
+      return;
+    }
+    origWarn.apply(console, args);
+  };
 }
 
 const ORBIT_TOKENS = [
-  { id: "code", label: "Websites", Icon: Code2, angle: 0, radius: 2.35, yOffset: 0.9 },
-  { id: "chat", label: "WhatsApp AI", Icon: MessageSquare, angle: Math.PI * 0.5, radius: 2.45, yOffset: 0.25 },
-  { id: "cart", label: "E-commerce", Icon: ShoppingCart, angle: Math.PI, radius: 2.35, yOffset: -0.45 },
-  { id: "chart", label: "CRM & ERP", Icon: BarChart3, angle: Math.PI * 1.5, radius: 2.45, yOffset: -0.95 },
+  { id: "code", label: "Websites", Icon: Code2, angle: 0, radius: 2.25, yOffset: 0.85 },
+  { id: "chat", label: "WhatsApp AI", Icon: MessageSquare, angle: Math.PI * 0.5, radius: 2.35, yOffset: 0.25 },
+  { id: "cart", label: "E-commerce", Icon: ShoppingCart, angle: Math.PI, radius: 2.25, yOffset: -0.4 },
+  { id: "chart", label: "CRM & ERP", Icon: BarChart3, angle: Math.PI * 1.5, radius: 2.35, yOffset: -0.9 },
 ] as const;
 
-function MonogramRig({ isDark, exploded }: MonogramRigProps) {
+const LAYER_LABELS = [
+  { id: "top", text: "03 · AI & Automation", tone: "gold" },
+  { id: "mid", text: "02 · Custom Software", tone: "primary" },
+  { id: "bot", text: "01 · Websites & E-commerce", tone: "default" },
+] as const;
+
+interface ScreenPoint {
+  x: number;
+  y: number;
+}
+
+interface MonogramRigProps {
+  isDark: boolean;
+  exploded: boolean;
+  onUpdateOverlays: (
+    tokens: Array<ScreenPoint | null>,
+    layers: Array<ScreenPoint | null>
+  ) => void;
+}
+
+function projectToScreen(
+  obj: THREE.Object3D | null,
+  camera: THREE.Camera,
+  width: number,
+  height: number,
+  offsetVec: THREE.Vector3,
+  scratchVec: THREE.Vector3
+): ScreenPoint | null {
+  if (!obj) return null;
+  scratchVec.copy(offsetVec);
+  obj.localToWorld(scratchVec);
+  scratchVec.project(camera);
+  return {
+    x: (scratchVec.x * 0.5 + 0.5) * width,
+    y: (-scratchVec.y * 0.5 + 0.5) * height,
+  };
+}
+
+function MonogramRig({
+  isDark,
+  exploded,
+  onUpdateOverlays,
+}: MonogramRigProps) {
   const rootGroup = React.useRef<THREE.Group>(null);
   const topSlab = React.useRef<THREE.Mesh>(null);
   const midSlab = React.useRef<THREE.Mesh>(null);
   const botSlab = React.useRef<THREE.Mesh>(null);
   const orbitGroup = React.useRef<THREE.Group>(null);
+  const tokenMeshRefs = React.useRef<Array<THREE.Group | null>>([]);
 
+  const elapsedRef = React.useRef(0);
   const dragging = React.useRef(false);
   const prevPointer = React.useRef({ x: 0, y: 0 });
   const dragVelocity = React.useRef({ x: 0, y: 0 });
   const dragAngle = React.useRef({ x: 0.12, y: -0.32 });
+
+  const scratchVec = React.useMemo(() => new THREE.Vector3(), []);
+  const zeroOffset = React.useMemo(() => new THREE.Vector3(0, 0, 0), []);
+  const rightEdgeOffset = React.useMemo(() => new THREE.Vector3(1.45, 0, 0), []);
+  const midRightOffset = React.useMemo(() => new THREE.Vector3(1.15, 0, 0), []);
 
   const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
@@ -57,7 +114,8 @@ function MonogramRig({ isDark, exploded }: MonogramRigProps) {
   };
 
   useFrame((state, delta) => {
-    const t = state.clock.elapsedTime;
+    elapsedRef.current += delta;
+    const t = elapsedRef.current;
     if (!dragging.current) {
       dragVelocity.current.x *= 0.92;
       dragVelocity.current.y *= 0.92;
@@ -81,8 +139,8 @@ function MonogramRig({ isDark, exploded }: MonogramRigProps) {
       rootGroup.current.position.y = Math.sin(t * 1.2) * 0.09;
     }
 
-    const topTargetY = exploded ? 1.28 : 0.85;
-    const botTargetY = exploded ? -1.28 : -0.85;
+    const topTargetY = exploded ? 1.25 : 0.85;
+    const botTargetY = exploded ? -1.25 : -0.85;
     if (topSlab.current) {
       topSlab.current.position.y = THREE.MathUtils.lerp(topSlab.current.position.y, topTargetY, 0.1);
     }
@@ -92,6 +150,29 @@ function MonogramRig({ isDark, exploded }: MonogramRigProps) {
     if (orbitGroup.current) {
       orbitGroup.current.rotation.y = t * 0.28;
     }
+
+    const { width, height } = state.size;
+    const tokenPositions = ORBIT_TOKENS.map((_, i) =>
+      projectToScreen(
+        tokenMeshRefs.current[i] ?? null,
+        state.camera,
+        width,
+        height,
+        zeroOffset,
+        scratchVec
+      )
+    );
+
+    const slabs = [
+      { mesh: topSlab.current, offset: rightEdgeOffset },
+      { mesh: midSlab.current, offset: midRightOffset },
+      { mesh: botSlab.current, offset: rightEdgeOffset },
+    ];
+    const layerPositions = slabs.map((item) =>
+      projectToScreen(item.mesh, state.camera, width, height, item.offset, scratchVec)
+    );
+
+    onUpdateOverlays(tokenPositions, layerPositions);
   });
 
   const goldColor = isDark ? "#F2B84B" : "#C98A12";
@@ -114,13 +195,6 @@ function MonogramRig({ isDark, exploded }: MonogramRigProps) {
           roughness={isDark ? 0.25 : 0.32}
           metalness={0.72}
         />
-        {exploded && (
-          <Html position={[1.55, 0, 0]} center distanceFactor={8}>
-            <div className="whitespace-nowrap rounded-pill border border-gold/60 bg-surface/95 px-2.5 py-1 font-mono text-[11px] font-medium text-gold shadow-md">
-              03 · AI &amp; Automation
-            </div>
-          </Html>
-        )}
       </RoundedBox>
 
       {/* Middle Slab: Shorter stepped bar */}
@@ -134,13 +208,6 @@ function MonogramRig({ isDark, exploded }: MonogramRigProps) {
           transmission={isDark ? 0.25 : 0.4}
           thickness={0.8}
         />
-        {exploded && (
-          <Html position={[1.25, 0, 0]} center distanceFactor={8}>
-            <div className="whitespace-nowrap rounded-pill border border-primary/60 bg-surface/95 px-2.5 py-1 font-mono text-[11px] font-medium text-primary shadow-md">
-              02 · Custom Software
-            </div>
-          </Html>
-        )}
       </RoundedBox>
 
       {/* Bottom Slab: Full width foundation */}
@@ -154,37 +221,30 @@ function MonogramRig({ isDark, exploded }: MonogramRigProps) {
           transmission={0.2}
           thickness={0.6}
         />
-        {exploded && (
-          <Html position={[1.55, 0, 0]} center distanceFactor={8}>
-            <div className="whitespace-nowrap rounded-pill border border-border bg-surface/95 px-2.5 py-1 font-mono text-[11px] font-medium text-text shadow-md">
-              01 · Websites &amp; E-commerce
-            </div>
-          </Html>
-        )}
       </RoundedBox>
 
-      {/* Four Orbiting Service Icon Tokens */}
+      {/* Four Orbiting Service Token Spheres (labels rendered in React overlay outside Canvas) */}
       <group ref={orbitGroup}>
-        {ORBIT_TOKENS.map(({ id, label, Icon, angle, radius, yOffset }) => {
+        {ORBIT_TOKENS.map(({ id, angle, radius, yOffset }, index) => {
           const x = Math.cos(angle) * radius;
           const z = Math.sin(angle) * radius;
           return (
-            <group key={id} position={[x, yOffset, z]}>
+            <group
+              key={id}
+              ref={(node) => {
+                tokenMeshRefs.current[index] = node;
+              }}
+              position={[x, yOffset, z]}
+            >
               <mesh>
                 <sphereGeometry args={[0.13, 16, 16]} />
                 <meshStandardMaterial
                   color={indigoColor}
                   emissive={indigoColor}
-                  emissiveIntensity={isDark ? 0.4 : 0.1}
-                  roughness={0.3}
+                  emissiveIntensity={isDark ? 0.45 : 0.12}
+                  roughness={0.28}
                 />
               </mesh>
-              <Html center distanceFactor={9}>
-                <div className="pointer-events-none flex items-center gap-1.5 rounded-pill border border-border bg-surface/90 px-2.5 py-1 text-[11px] font-medium text-text shadow-sm backdrop-blur-xs">
-                  <Icon strokeWidth={1.5} className="h-3 w-3 text-primary" />
-                  <span>{label}</span>
-                </div>
-              </Html>
             </group>
           );
         })}
@@ -202,12 +262,38 @@ export function HeroScene({ active = true }: HeroSceneProps) {
   const isDark = resolvedTheme !== "light";
   const [exploded, setExploded] = React.useState(false);
 
+  const tokenElRefs = React.useRef<Array<HTMLDivElement | null>>([]);
+  const layerElRefs = React.useRef<Array<HTMLDivElement | null>>([]);
+
+  const handleUpdateOverlays = React.useCallback(
+    (
+      tokens: Array<ScreenPoint | null>,
+      layers: Array<ScreenPoint | null>
+    ) => {
+      for (let i = 0; i < tokens.length; i++) {
+        const el = tokenElRefs.current[i];
+        const pos = tokens[i];
+        if (el && pos) {
+          el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) translate(-50%, -50%)`;
+        }
+      }
+      for (let i = 0; i < layers.length; i++) {
+        const el = layerElRefs.current[i];
+        const pos = layers[i];
+        if (el && pos) {
+          el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) translate(-50%, -50%)`;
+        }
+      }
+    },
+    []
+  );
+
   return (
     <div
       data-cursor-label="Drag"
       onMouseEnter={() => setExploded(true)}
       onMouseLeave={() => setExploded(false)}
-      className="relative h-[420px] sm:h-[480px] lg:h-[540px] w-full select-none cursor-grab active:cursor-grabbing rounded-card border border-border/60 bg-surface/35"
+      className="relative h-[420px] sm:h-[480px] lg:h-[540px] w-full overflow-hidden select-none cursor-grab active:cursor-grabbing rounded-card border border-border/60 bg-surface/35"
     >
       <Canvas
         dpr={[1, 1.75]}
@@ -228,8 +314,51 @@ export function HeroScene({ active = true }: HeroSceneProps) {
         </Environment>
 
         <ParticleField isDark={isDark} />
-        <MonogramRig isDark={isDark} exploded={exploded} />
+        <MonogramRig
+          isDark={isDark}
+          exploded={exploded}
+          onUpdateOverlays={handleUpdateOverlays}
+        />
       </Canvas>
+
+      {/* Pure React 2D Overlay for Orbiting Icon Tokens & Exploded Layer Labels (no nested React roots!) */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        {ORBIT_TOKENS.map(({ id, label, Icon }, index) => (
+          <div
+            key={id}
+            ref={(node) => {
+              tokenElRefs.current[index] = node;
+            }}
+            style={{ transform: "translate3d(-200px, -200px, 0)" }}
+            className="absolute left-0 top-0 flex items-center gap-1.5 rounded-pill border border-border bg-surface/90 px-2.5 py-1 text-[11px] font-medium text-text shadow-sm backdrop-blur-xs will-change-transform"
+          >
+            <Icon strokeWidth={1.5} className="h-3 w-3 text-primary" />
+            <span>{label}</span>
+          </div>
+        ))}
+
+        {LAYER_LABELS.map((layer, index) => (
+          <div
+            key={layer.id}
+            ref={(node) => {
+              layerElRefs.current[index] = node;
+            }}
+            style={{
+              transform: "translate3d(-200px, -200px, 0)",
+              opacity: exploded ? 1 : 0,
+            }}
+            className={`absolute left-0 top-0 whitespace-nowrap rounded-pill border bg-surface/95 px-2.5 py-1 font-mono text-[11px] font-medium shadow-md transition-opacity duration-200 will-change-[transform,opacity] ${
+              layer.tone === "gold"
+                ? "border-gold/60 text-gold"
+                : layer.tone === "primary"
+                ? "border-primary/60 text-primary"
+                : "border-border text-text"
+            }`}
+          >
+            {layer.text}
+          </div>
+        ))}
+      </div>
 
       <div className="pointer-events-none absolute bottom-3 left-4 right-4 flex items-center justify-between text-[11px] font-mono text-text-muted">
         <span>{exploded ? "Exploded layer view active" : "Hover to inspect layers · Drag to rotate"}</span>
@@ -240,4 +369,5 @@ export function HeroScene({ active = true }: HeroSceneProps) {
 }
 
 export default HeroScene;
+
 

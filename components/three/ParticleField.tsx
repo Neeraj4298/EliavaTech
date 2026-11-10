@@ -44,10 +44,13 @@ export function ParticleField({ count = 110, isDark }: ParticleFieldProps) {
   const pointsRef = React.useRef<THREE.Points>(null);
   const { positions } = React.useMemo(() => createParticleBuffers(count), [count]);
 
-  useFrame((state, delta) => {
+  const elapsedRef = React.useRef(0);
+
+  useFrame((_, delta) => {
     if (!pointsRef.current) return;
+    elapsedRef.current += delta;
     pointsRef.current.rotation.y += delta * 0.045;
-    pointsRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.2) * 0.06;
+    pointsRef.current.rotation.x = Math.sin(elapsedRef.current * 0.2) * 0.06;
   });
 
   const color = isDark ? "#9A8DFF" : "#4B3FE0";
