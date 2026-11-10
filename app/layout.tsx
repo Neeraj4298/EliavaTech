@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Sora, Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/brand/ThemeProvider";
+import { Cursor } from "@/components/brand/Cursor";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { SmoothScroll } from "@/components/layout/SmoothScroll";
+import { ScrollProgress } from "@/components/layout/ScrollProgress";
 import "./globals.css";
 
 const sora = Sora({
@@ -45,9 +50,26 @@ export default function RootLayout({
       className={`${sora.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bg text-text font-sans selection:bg-primary/20 selection:text-text">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[80] focus:rounded-pill focus:bg-primary focus:px-4 focus:py-2 focus:text-small focus:font-medium focus:text-white"
+          >
+            Skip to content
+          </a>
+          <ScrollProgress />
+          <Cursor />
+          <Navbar />
+          <SmoothScroll>
+            <main id="main-content" className="flex-1 flex flex-col pt-20">
+              {children}
+            </main>
+            <Footer />
+          </SmoothScroll>
+        </ThemeProvider>
       </body>
     </html>
   );
 }
+
 
