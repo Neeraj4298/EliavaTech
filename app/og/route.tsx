@@ -1,8 +1,6 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 
-export const runtime = "edge";
-
 /**
  * Section 9 — Dynamic Open Graph Image Route (`/og?title=...&subtitle=...&tag=...`)
  * Built with `next/og` matching EliavaTech's deep ink (#060912), indigo (#7C6CFF),
