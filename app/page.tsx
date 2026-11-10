@@ -1,40 +1,47 @@
-import { SERVICE_ITEMS, INDUSTRY_ITEMS, CONCEPT_PROJECTS } from "@/content/navigation";
-import { PlaceholderPageShell } from "@/components/sections/PlaceholderPageShell";
+import { HeroSection } from "@/components/sections/home/HeroSection";
+import { ProblemStripSection } from "@/components/sections/home/ProblemStripSection";
+import { ServicesOverviewSection } from "@/components/sections/home/ServicesOverviewSection";
+import { ProcessTimelineSection } from "@/components/sections/home/ProcessTimelineSection";
+import { IndustriesShowcaseSection } from "@/components/sections/home/IndustriesShowcaseSection";
+import { WhatsAppDemoSection } from "@/components/sections/home/WhatsAppDemoSection";
+import { WhyEliavaSection } from "@/components/sections/home/WhyEliavaSection";
+import { WorkPreviewSection } from "@/components/sections/home/WorkPreviewSection";
+import { FoundersPreviewSection } from "@/components/sections/home/FoundersPreviewSection";
+import { FAQSection } from "@/components/sections/home/FAQSection";
+import { CTABandSection } from "@/components/sections/home/CTABandSection";
 
+/**
+ * Section 4.2 — Home Page:
+ * Renders all 11 specified sections in exact order:
+ * 1. Hero (with interactive 3D scene)
+ * 2. Problem strip (5 cards)
+ * 3. Services overview (5 cards + capabilities stack)
+ * 4. How we work (4-step GSAP timeline)
+ * 5. Industries showcase (7 industries + bundles)
+ * 6. Interactive WhatsApp demo
+ * 7. Why EliavaTech (4 animated counters)
+ * 8. Work preview (3 concept projects with device mockups)
+ * 9. Founders preview (3 neutral illustrated avatars)
+ * 10. FAQ accordion (6 questions)
+ * 11. Final CTA band
+ */
 export default function HomePage() {
   return (
-    <PlaceholderPageShell
-      eyebrow="Digital solutions for growing businesses"
-      title="Building What's Next."
-      description="We design websites, automate operations and build custom software for businesses that want to grow without a technical team."
-      primaryCta={{ label: "Book a Free Consultation", href: "/contact" }}
-      secondaryCta={{ label: "See Our Work", href: "/work" }}
-      cards={[
-        ...SERVICE_ITEMS.map((s) => ({
-          title: s.title,
-          subtitle: s.startingPrice,
-          description: s.description,
-          href: s.href,
-          badge: "Service Line",
-        })),
-        {
-          title: `${INDUSTRY_ITEMS.length} Industry Bundles`,
-          subtitle: "Clinics · Real Estate · Retail & more",
-          description:
-            "Explore industry-specific bundles combining websites, WhatsApp automation, and custom workflows.",
-          href: "/industries",
-          badge: "Industries",
-        },
-        ...CONCEPT_PROJECTS.map((p) => ({
-          title: p.title,
-          subtitle: p.industry,
-          description: p.summary,
-          href: p.href,
-          badge: "Concept project",
-        })),
-      ]}
-    />
+    <div className="flex flex-col">
+      <HeroSection />
+      <ProblemStripSection />
+      <ServicesOverviewSection />
+      <ProcessTimelineSection />
+      <IndustriesShowcaseSection />
+      <WhatsAppDemoSection />
+      <WhyEliavaSection />
+      <WorkPreviewSection />
+      <FoundersPreviewSection />
+      <FAQSection />
+      <CTABandSection />
+    </div>
   );
 }
+
 
 
