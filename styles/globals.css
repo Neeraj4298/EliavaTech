@@ -14,7 +14,9 @@
   --primary: #4B3FE0;
   --primary-hover: #3A2FC4;
   --gold: #C98A12;
+  --gold-text: #855808;
   --success: #0F9D6B;
+  --success-text: #0A6E4B;
   --danger: #D64545;
   --on-primary: var(--surface);
 
@@ -38,7 +40,9 @@
   --primary: #7C6CFF;
   --primary-hover: #9A8DFF;
   --gold: #F2B84B;
+  --gold-text: #F2B84B;
   --success: #34D399;
+  --success-text: #34D399;
   --danger: #F87171;
   --on-primary: var(--text);
 
@@ -130,6 +134,12 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--text);
+}
+
+/* WCAG 2.2 AA Global Focus Appearance (SC 2.4.7 & 2.4.11) */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 code, pre, kbd, samp {

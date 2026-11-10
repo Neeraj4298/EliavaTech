@@ -7,6 +7,8 @@ import { Footer } from "@/components/layout/Footer";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { ScrollProgress } from "@/components/layout/ScrollProgress";
 import { ChatWidget } from "@/components/chat/ChatWidget";
+import { CookieBanner } from "@/components/overlays/CookieBanner";
+import { GoogleAnalytics } from "@/components/overlays/GoogleAnalytics";
 import "./globals.css";
 
 const sora = Sora({
@@ -88,7 +90,9 @@ export default function RootLayout({
             </main>
             <Footer />
           </SmoothScroll>
+          <CookieBanner />
           <ChatWidget mode="floating" />
+          <GoogleAnalytics />
         </ThemeProvider>
       </body>
     </html>

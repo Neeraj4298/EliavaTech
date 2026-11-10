@@ -34,6 +34,7 @@ export function ConceptProjectDemo({ demoType, demoUrl }: ConceptProjectDemoProp
               <button
                 key={s}
                 type="button"
+                aria-pressed={slot === s}
                 onClick={() => { setSlot(s); setBooked(false); }}
                 className={`rounded-input border p-3 text-left text-xs font-medium ${
                   slot === s ? "border-primary bg-primary/15 text-primary" : "border-border bg-surface text-text"
@@ -81,6 +82,8 @@ export function ConceptProjectDemo({ demoType, demoUrl }: ConceptProjectDemoProp
                 <button
                   key={n}
                   type="button"
+                  aria-pressed={qty === n}
+                  aria-label={`Quantity ${n}`}
                   onClick={() => { setQty(n); setOrderPlaced(false); }}
                   className={`h-8 w-8 rounded-pill border font-mono text-xs ${
                     qty === n ? "border-primary bg-primary text-white" : "border-border bg-surface-2 text-text"
@@ -126,6 +129,7 @@ export function ConceptProjectDemo({ demoType, demoUrl }: ConceptProjectDemoProp
             <button
               key={st}
               type="button"
+              aria-pressed={crmStage === st}
               onClick={() => setCrmStage(st)}
               className={`rounded-input border p-2.5 text-left text-xs font-medium ${
                 crmStage === st ? "border-primary bg-primary text-white" : "border-border bg-surface text-text-muted"

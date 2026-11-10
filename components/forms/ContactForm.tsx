@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { WhatsAppButton } from "@/components/overlays/WhatsAppButton";
+import { trackFormSubmission } from "@/lib/analytics";
 
 declare global {
   interface Window {
@@ -97,6 +98,7 @@ export function ContactForm() {
         return;
       }
 
+      trackFormSubmission("contact_form", values.service);
       setSubmittedData({
         name: values.name,
         email: values.email,

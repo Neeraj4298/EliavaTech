@@ -1,22 +1,33 @@
 import type { Metadata } from "next";
-import { PlaceholderPageShell } from "@/components/sections/PlaceholderPageShell";
-import { buildPageMetadata } from "@/lib/seo";
+import { PRIVACY_SECTIONS } from "@/content/legal";
+import { buildBreadcrumbSchema, buildPageMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { LegalPageLayout } from "@/components/sections/LegalPageLayout";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Privacy Policy",
-  description: "EliavaTech Privacy Policy placeholder for legal review.",
+  description:
+    "How EliavaTech collects, uses, and protects personal data in compliance with India's Digital Personal Data Protection Act (DPDP Act).",
   path: "/privacy",
-  ogTag: "Legal · Privacy Policy",
+  ogTag: "Legal · Privacy Policy [PLACEHOLDER]",
 });
 
 export default function PrivacyPage() {
+  const breadcrumb = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Privacy Policy", path: "/privacy" },
+  ]);
+
   return (
-    <PlaceholderPageShell
-      eyebrow="Legal · [PLACEHOLDER for Legal Review]"
-      title="Privacy Policy"
-      description="This page outlines how EliavaTech collects, uses, and protects personal data in accordance with India's Digital Personal Data Protection Act (DPDP Act). Replace this placeholder text after qualified legal review before launch."
-      primaryCta={{ label: "Contact Us", href: "/contact" }}
-      secondaryCta={{ label: "Cookie Policy", href: "/cookies" }}
-    />
+    <>
+      <JsonLd data={breadcrumb} />
+      <LegalPageLayout
+        eyebrow="Legal · [PLACEHOLDER for Legal Review]"
+        title="Privacy Policy"
+        subtitle="How EliavaTech collects, uses, stores, and protects personal data in accordance with India's Digital Personal Data Protection Act, 2023 (DPDP Act)."
+        sections={PRIVACY_SECTIONS}
+      />
+    </>
   );
 }
+

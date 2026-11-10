@@ -47,9 +47,9 @@ export function PrimitivesShowcase({ themeScope }: PrimitivesShowcaseProps) {
       {/* 1. Buttons */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="font-heading text-lg font-semibold text-text">
+          <h3 className="font-heading text-lg font-semibold text-text">
             1. Button (primary, secondary, ghost)
-          </h4>
+          </h3>
           <span className="font-mono text-xs text-text-muted">999px pill</span>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -80,7 +80,7 @@ export function PrimitivesShowcase({ themeScope }: PrimitivesShowcaseProps) {
       {/* 2. Badges */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="font-heading text-lg font-semibold text-text">2. Badge</h4>
+          <h3 className="font-heading text-lg font-semibold text-text">2. Badge</h3>
           <span className="font-mono text-xs text-text-muted">999px pill</span>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
@@ -96,9 +96,9 @@ export function PrimitivesShowcase({ themeScope }: PrimitivesShowcaseProps) {
       {/* 3. Inputs, Textarea & Select */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="font-heading text-lg font-semibold text-text">
+          <h3 className="font-heading text-lg font-semibold text-text">
             3. Input, Textarea &amp; Select
-          </h4>
+          </h3>
           <span className="font-mono text-xs text-text-muted">12px radius</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -148,9 +148,9 @@ export function PrimitivesShowcase({ themeScope }: PrimitivesShowcaseProps) {
       {/* 4. Cards */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="font-heading text-lg font-semibold text-text">
+          <h3 className="font-heading text-lg font-semibold text-text">
             4. Card (default, elevated, interactive)
-          </h4>
+          </h3>
           <span className="font-mono text-xs text-text-muted">12px radius</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -195,9 +195,9 @@ export function PrimitivesShowcase({ themeScope }: PrimitivesShowcaseProps) {
       {/* 5. Tabs, Tooltip & Modal */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-3">
-          <h4 className="font-heading text-lg font-semibold text-text">
+          <h3 className="font-heading text-lg font-semibold text-text">
             5. Tabs (WAI-ARIA)
-          </h4>
+          </h3>
           <Tabs
             defaultValue="discover"
             items={[
@@ -233,9 +233,9 @@ export function PrimitivesShowcase({ themeScope }: PrimitivesShowcaseProps) {
         </div>
 
         <div className="space-y-3">
-          <h4 className="font-heading text-lg font-semibold text-text">
+          <h3 className="font-heading text-lg font-semibold text-text">
             6. Tooltip &amp; Modal
-          </h4>
+          </h3>
           <Card variant="default" padding="sm">
             <div className="flex flex-wrap items-center gap-3">
               <Tooltip content="Prices depend on scope; third-party fees billed separately.">

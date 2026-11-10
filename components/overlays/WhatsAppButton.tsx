@@ -4,6 +4,7 @@ import * as React from "react";
 import { usePathname } from "next/navigation";
 import { MessageCircle } from "lucide-react";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { trackWhatsAppClick } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 export interface WhatsAppButtonProps {
@@ -45,11 +46,15 @@ export function WhatsAppButton({
 }: WhatsAppButtonProps) {
   const pathname = usePathname();
   const href = getWhatsAppHref(message, pathname);
+  const handleTrackClick = () => {
+    trackWhatsAppClick(variant, pathname ?? "/");
+  };
 
   if (variant === "compact") {
     return (
       <a
         href={href}
+        onClick={handleTrackClick}
         target="_blank"
         rel="noopener noreferrer"
         className={cn(
@@ -67,6 +72,7 @@ export function WhatsAppButton({
     return (
       <a
         href={href}
+        onClick={handleTrackClick}
         target="_blank"
         rel="noopener noreferrer"
         className={cn(
@@ -84,6 +90,7 @@ export function WhatsAppButton({
     <Tooltip content="WhatsApp us" placement="left">
       <a
         href={href}
+        onClick={handleTrackClick}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="WhatsApp us"

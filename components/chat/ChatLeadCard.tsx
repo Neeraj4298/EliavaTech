@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { EASE_STANDARD, MOTION_DURATION, usePrefersReducedMotion } from "@/lib/motion";
+import { trackFormSubmission } from "@/lib/analytics";
 
 export interface ChatLeadCardProps {
   onClose: () => void;
@@ -59,6 +60,7 @@ export function ChatLeadCard({ onClose, onSuccess }: ChatLeadCardProps) {
         setSubmitting(false);
         return;
       }
+      trackFormSubmission("chat_lead_card", "custom-software");
       setSubmitted(true);
       setSubmitting(false);
       onSuccess({ name: name.trim(), email: email.trim(), need: need.trim() });
@@ -111,7 +113,7 @@ export function ChatLeadCard({ onClose, onSuccess }: ChatLeadCardProps) {
       className="rounded-card border border-border bg-surface-2 p-4 space-y-3"
     >
       <div className="flex items-center justify-between gap-2">
-        <h4 className="font-heading text-small font-semibold text-text">Request a Custom Quote</h4>
+        <h3 className="font-heading text-small font-semibold text-text">Request a Custom Quote</h3>
         <button type="button" onClick={onClose} aria-label="Close quote form" className="inline-flex h-7 w-7 items-center justify-center rounded-full text-text-muted hover:bg-surface hover:text-text">
           <X strokeWidth={1.5} className="h-4 w-4" />
         </button>

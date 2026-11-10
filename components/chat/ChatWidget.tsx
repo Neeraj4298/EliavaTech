@@ -10,6 +10,7 @@ import {
   type ChatErrorType,
 } from "@/lib/gemini";
 import { EASE_STANDARD, SPRING_PLAYFUL, usePrefersReducedMotion } from "@/lib/motion";
+import { trackChatStart } from "@/lib/analytics";
 import { ChatHeader } from "./ChatHeader";
 import {
   ChatMessageList,
@@ -139,6 +140,10 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
   const sendMessage = async (textOverride?: string, isRetry = false) => {
     const text = (textOverride ?? input).trim();
     if (!text || streaming) return;
+
+    if (!messages.some((m) => m.role === "user")) {
+      trackChatStart(mode === "floating" ? "floating_widget" : "contact_page_widget");
+    }
 
     if (/\b(quote|estimate|proposal)\b/i.test(text)) {
       setLeadOpen(true);

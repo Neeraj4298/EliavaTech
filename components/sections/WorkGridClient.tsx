@@ -51,9 +51,10 @@ export function WorkGridClient() {
             <button
               key={f}
               type="button"
+              aria-pressed={serviceFilter === f}
               onClick={() => setServiceFilter(f)}
               className={cn(
-                "rounded-pill border px-3.5 py-1.5 text-xs font-medium transition-colors",
+                "rounded-pill border px-3.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 serviceFilter === f
                   ? "border-primary bg-primary text-white"
                   : "border-border bg-surface-2 text-text-muted hover:text-text"
@@ -72,9 +73,10 @@ export function WorkGridClient() {
             <button
               key={f}
               type="button"
+              aria-pressed={industryFilter === f}
               onClick={() => setIndustryFilter(f)}
               className={cn(
-                "rounded-pill border px-3.5 py-1.5 text-xs font-medium transition-colors",
+                "rounded-pill border px-3.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 industryFilter === f
                   ? "border-primary bg-primary text-white"
                   : "border-border bg-surface-2 text-text-muted hover:text-text"

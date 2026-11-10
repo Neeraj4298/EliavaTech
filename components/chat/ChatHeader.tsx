@@ -33,9 +33,9 @@ export function ChatHeader({ mode, onReset, onClose }: ChatHeaderProps) {
 
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <h3 className="truncate whitespace-nowrap font-heading text-small font-semibold text-text">
+            <h2 className="truncate whitespace-nowrap font-heading text-small font-semibold text-text">
               EliavaTech Assistant
-            </h3>
+            </h2>
             <Tooltip
               content="Answers are based on EliavaTech's services and pricing"
               placement="bottom"

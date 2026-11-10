@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
+import { trackFormSubmission } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 export function PricingPageClient() {
@@ -121,6 +122,7 @@ export function PricingPageClient() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
+                trackFormSubmission("pricing_custom_quote");
                 setQuoteSent(true);
               }}
               className="grid grid-cols-1 sm:grid-cols-2 gap-4"
