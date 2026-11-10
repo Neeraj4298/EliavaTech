@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// Section 8.3 — Phase 1 Models
+// ============================================================================
+
+enum LeadSource {
+  form
+  chat
+  booking
+}
+
+enum LeadStatus {
+  new
+  contacted
+  won
+  lost
+}
+
+model Lead {
+  id           String        @id @default(cuid())
+  name         String
+  email        String
+  phone        String?
+  company      String?
+  service      String?
+  budgetRange  String?
+  message      String        @db.Text
+  source       LeadSource    @default(form)
+  status       LeadStatus    @default(new)
+  createdAt    DateTime      @default(now())
+  chatSessions ChatSession[]
+
+  @@index([email])
+  @@index([status, createdAt])
+}
+
+model ChatSession {
+  id        String        @id @default(cuid())
+  leadId    String?
+  lead      Lead?         @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  messages  ChatMessage[]
+  createdAt DateTime      @default(now())
+
+  @@index([leadId])
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      String
+  content   String      @db.Text
+  createdAt DateTime    @default(now())
+
+  @@index([sessionId, createdAt])
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  consent   Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// ============================================================================
+// Section 8.3 & Section 11 — Phase 2 Client Portal Additions
+// ============================================================================
+
+enum UserRole {
+  admin
+  team
+  client
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String?
+  email     String    @unique
+  role      UserRole  @default(client)
+  accounts  Account[]
+  sessions  Session[]
+  clientId  String?
+  client    Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  createdAt DateTime  @default(now())
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires      DateTime
+}
+
+model Client {
+  id        String          @id @default(cuid())
+  name      String
+  company   String?
+  email     String          @unique
+  phone     String?
+  users     User[]
+  projects  Project[]
+  invoices  Invoice[]
+  tickets   SupportTicket[]
+  createdAt DateTime        @default(now())
+}
+
+model Project {
+  id        String      @id @default(cuid())
+  clientId  String
+  client    Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  title     String
+  status    String      @default("discovery")
+  summary   String?     @db.Text
+  files     FileAsset[]
+  createdAt DateTime    @default(now())
+}
+
+model Invoice {
+  id         String   @id @default(cuid())
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  amountInr  Int
+  status     String   @default("pending")
+  paymentUrl String?
+  dueDate    DateTime?
+  createdAt  DateTime @default(now())
+}
+
+model SupportTicket {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  subject   String
+  message   String   @db.Text
+  status    String   @default("open")
+  createdAt DateTime @default(now())
+}
+
+model FileAsset {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name      String
+  key       String
+  sizeBytes Int
+  mimeType  String
+  createdAt DateTime @default(now())
+}
