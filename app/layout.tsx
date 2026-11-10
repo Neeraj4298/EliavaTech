@@ -31,12 +31,33 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://eliavatech.com"
+  ),
   title: {
     default: "EliavaTech | Building What's Next.",
     template: "%s | EliavaTech",
   },
   description:
     "Websites, software and AI automation that help growing businesses operate smarter.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "EliavaTech | Building What's Next.",
+    description:
+      "Websites, software and AI automation that help growing businesses operate smarter.",
+    url: "/",
+    siteName: "EliavaTech",
+    locale: "en_IN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EliavaTech | Building What's Next.",
+    description:
+      "Websites, software and AI automation that help growing businesses operate smarter.",
+  },
 };
 
 export default function RootLayout({

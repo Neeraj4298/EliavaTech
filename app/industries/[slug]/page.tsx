@@ -12,6 +12,12 @@ import { Card } from "@/components/ui/Card";
 import { SplitHeading } from "@/components/motion/SplitHeading";
 import { DashboardPreview } from "@/components/sections/DashboardPreview";
 import { CTABandSection } from "@/components/sections/home/CTABandSection";
+import {
+  buildBreadcrumbSchema,
+  buildPageMetadata,
+  buildServiceSchema,
+} from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 export function generateStaticParams() {
   return INDUSTRIES_DATA.map((item) => ({ slug: item.slug }));
@@ -21,7 +27,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const industry = INDUSTRIES_DATA.find((item) => item.slug === slug);
   if (!industry) return { title: "Industry Not Found" };
-  return { title: `${industry.title} Solutions`, description: industry.summary };
+  return buildPageMetadata({
+    title: `${industry.title} Digital Solutions`,
+    description: industry.summary,
+    path: `/industries/${industry.slug}`,
+    ogTag: `Industry Bundle · ${industry.title}`,
+  });
 }
 
 export default async function IndustryDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -30,9 +41,22 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
   if (!industry) notFound();
 
   const conceptProject = WORK_PROJECTS.find((p) => p.slug === industry.conceptProjectSlug) ?? WORK_PROJECTS[0];
+  const schemas = [
+    buildServiceSchema({
+      name: `${industry.title} Digital Bundle`,
+      description: industry.summary,
+      path: `/industries/${industry.slug}`,
+    }),
+    buildBreadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "Industries", path: "/industries" },
+      { name: industry.title, path: `/industries/${industry.slug}` },
+    ]),
+  ];
 
   return (
     <div className="flex flex-col">
+      <JsonLd data={schemas} />
       <Section className="border-b border-border/60">
         <div className="max-w-3xl space-y-5">
           <Link href="/industries" className="inline-flex items-center gap-1.5 text-small text-text-muted hover:text-primary">

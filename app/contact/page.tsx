@@ -8,16 +8,26 @@ import { ContactForm } from "@/components/forms/ContactForm";
 import { BookingEmbed } from "@/components/forms/BookingEmbed";
 import { WhatsAppButton } from "@/components/overlays/WhatsAppButton";
 import { ChatWidget } from "@/components/chat/ChatWidget";
+import { buildBreadcrumbSchema, buildPageMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Contact & Consultation Booking",
   description:
     "Book a free consultation call or send us your project brief. We reply within one business day.",
-};
+  path: "/contact",
+  ogTag: "We reply within one business day",
+});
 
 export default function ContactPage() {
+  const breadcrumb = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Contact", path: "/contact" },
+  ]);
+
   return (
     <div className="flex flex-col">
+      <JsonLd data={breadcrumb} />
       <Section className="border-b border-border/60">
         <div className="max-w-3xl space-y-5">
           <Badge variant="gold" size="md" dot>

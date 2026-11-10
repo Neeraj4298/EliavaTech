@@ -8,15 +8,26 @@ import { SplitHeading } from "@/components/motion/SplitHeading";
 import { StaggerGroup, StaggerItem } from "@/components/motion/StaggerGroup";
 import { ProcessTimelineSection } from "@/components/sections/home/ProcessTimelineSection";
 import { CTABandSection } from "@/components/sections/home/CTABandSection";
+import { buildBreadcrumbSchema, buildPageMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
 
-export const metadata: Metadata = {
-  title: "About Us",
-  description: "Learn about EliavaTech's story, the meaning of Eliava, our values, and our three co-founders.",
-};
+export const metadata: Metadata = buildPageMetadata({
+  title: "About Us — Heritage, Mission & Founding Team",
+  description:
+    "Learn about EliavaTech's story, the meaning of Eliava, our four core values, and our three co-founders.",
+  path: "/about",
+  ogTag: "About EliavaTech · Building What's Next.",
+});
 
 export default function AboutPage() {
+  const breadcrumb = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "About", path: "/about" },
+  ]);
+
   return (
     <div className="flex flex-col">
+      <JsonLd data={breadcrumb} />
       <Section className="border-b border-border/60">
         <div className="max-w-3xl space-y-5">
           <Badge variant="primary" size="md" dot>{ABOUT_CONTENT.hero.eyebrow}</Badge>

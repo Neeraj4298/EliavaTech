@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { PlaceholderPageShell } from "@/components/sections/PlaceholderPageShell";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Terms of Service",
   description: "EliavaTech Terms of Service placeholder for legal review.",
-};
+  path: "/terms",
+  ogTag: "Legal · Terms of Service",
+});
 
 export default function TermsPage() {
   return (

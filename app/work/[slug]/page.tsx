@@ -11,6 +11,8 @@ import { Card } from "@/components/ui/Card";
 import { SplitHeading } from "@/components/motion/SplitHeading";
 import { ConceptProjectDemo } from "@/components/sections/ConceptProjectDemo";
 import { CTABandSection } from "@/components/sections/home/CTABandSection";
+import { buildBreadcrumbSchema, buildPageMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 export function generateStaticParams() {
   return WORK_PROJECTS.map((project) => ({ slug: project.slug }));
@@ -20,21 +22,28 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const project = WORK_PROJECTS.find((item) => item.slug === slug);
   if (!project) return { title: "Project Not Found" };
-  return { title: `${project.title} (${project.label})`, description: project.summary };
+  return buildPageMetadata({
+    title: `${project.title} (${project.label})`,
+    description: project.summary,
+    path: `/work/${project.slug}`,
+    ogTag: `${project.label} · ${project.industryFilter}`,
+  });
 }
 
-/**
- * Section 4.5 — Work Detail Page:
- * Labelled "Concept project". Sections: challenge, solution, interactive working demo,
- * features, tech, capabilities proven (no invented metrics), and CTA.
- */
 export default async function WorkDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const project = WORK_PROJECTS.find((item) => item.slug === slug);
   if (!project) notFound();
 
+  const breadcrumb = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Work", path: "/work" },
+    { name: project.title, path: `/work/${project.slug}` },
+  ]);
+
   return (
     <div className="flex flex-col">
+      <JsonLd data={breadcrumb} />
       <Section className="border-b border-border/60">
         <div className="max-w-3xl space-y-5">
           <Link href="/work" className="inline-flex items-center gap-1.5 text-small text-text-muted hover:text-primary">

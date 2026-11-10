@@ -9,20 +9,26 @@ import { Reveal } from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/StaggerGroup";
 import { TiltCard } from "@/components/motion/TiltCard";
 import { CTABandSection } from "@/components/sections/home/CTABandSection";
+import { buildBreadcrumbSchema, buildPageMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
 
-export const metadata: Metadata = {
-  title: "Industries",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Industries — Digital Bundles for Indian SMBs",
   description:
-    "Website, booking, WhatsApp automation, and CRM bundles tailored for seven SMB sectors in India.",
-};
+    "Website, booking, WhatsApp automation, and CRM bundles tailored for clinics, real estate, restaurants, education, retail, manufacturing, and professional services.",
+  path: "/industries",
+  ogTag: "Seven Industry Sectors",
+});
 
-/**
- * Section 4.4 — Industries Overview Page:
- * Grid of seven industry tiles linking to detail pages.
- */
 export default function IndustriesPage() {
+  const breadcrumb = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Industries", path: "/industries" },
+  ]);
+
   return (
     <div className="flex flex-col">
+      <JsonLd data={breadcrumb} />
       <Section className="border-b border-border/60">
         <div className="max-w-3xl space-y-5">
           <Reveal>

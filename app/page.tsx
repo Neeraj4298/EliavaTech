@@ -1,3 +1,12 @@
+import type { Metadata } from "next";
+import { HOME_FAQS } from "@/content/home";
+import {
+  buildFaqSchema,
+  buildOrganizationSchema,
+  buildPageMetadata,
+  buildWebSiteSchema,
+} from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { HeroSection } from "@/components/sections/home/HeroSection";
 import { ProblemStripSection } from "@/components/sections/home/ProblemStripSection";
 import { ServicesOverviewSection } from "@/components/sections/home/ServicesOverviewSection";
@@ -10,24 +19,36 @@ import { FoundersPreviewSection } from "@/components/sections/home/FoundersPrevi
 import { FAQSection } from "@/components/sections/home/FAQSection";
 import { CTABandSection } from "@/components/sections/home/CTABandSection";
 
+export const metadata: Metadata = buildPageMetadata({
+  title: "Websites, Software & AI Automation for Growing Businesses",
+  description:
+    "We design websites, automate operations and build custom software for businesses that want to grow without a technical team.",
+  path: "/",
+  ogTag: "Digital solutions for growing businesses",
+  keywords: [
+    "website development company India",
+    "custom software development",
+    "WhatsApp automation service",
+    "ecommerce website development",
+    "AI chatbot for business",
+    "CRM development for small business",
+  ],
+});
+
 /**
- * Section 4.2 — Home Page:
- * Renders all 11 specified sections in exact order:
- * 1. Hero (with interactive 3D scene)
- * 2. Problem strip (5 cards)
- * 3. Services overview (5 cards + capabilities stack)
- * 4. How we work (4-step GSAP timeline)
- * 5. Industries showcase (7 industries + bundles)
- * 6. Interactive WhatsApp demo
- * 7. Why EliavaTech (4 animated counters)
- * 8. Work preview (3 concept projects with device mockups)
- * 9. Founders preview (3 neutral illustrated avatars)
- * 10. FAQ accordion (6 questions)
- * 11. Final CTA band
+ * Section 4.2 & Section 9 — Home Page:
+ * Includes Organization, WebSite, and FAQPage JSON-LD schemas and all 11 Home sections.
  */
 export default function HomePage() {
+  const schemas = [
+    buildOrganizationSchema(),
+    buildWebSiteSchema(),
+    buildFaqSchema(HOME_FAQS),
+  ];
+
   return (
     <div className="flex flex-col">
+      <JsonLd data={schemas} />
       <HeroSection />
       <ProblemStripSection />
       <ServicesOverviewSection />
@@ -42,6 +63,7 @@ export default function HomePage() {
     </div>
   );
 }
+
 
 
 

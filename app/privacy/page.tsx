@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { PlaceholderPageShell } from "@/components/sections/PlaceholderPageShell";
+import { buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Privacy Policy",
   description: "EliavaTech Privacy Policy placeholder for legal review.",
-};
+  path: "/privacy",
+  ogTag: "Legal · Privacy Policy",
+});
 
 export default function PrivacyPage() {
   return (

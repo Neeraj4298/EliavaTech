@@ -12,6 +12,13 @@ import { FAQAccordion } from "@/components/ui/FAQAccordion";
 import { SplitHeading } from "@/components/motion/SplitHeading";
 import { DashboardPreview } from "@/components/sections/DashboardPreview";
 import { CTABandSection } from "@/components/sections/home/CTABandSection";
+import {
+  buildBreadcrumbSchema,
+  buildFaqSchema,
+  buildPageMetadata,
+  buildServiceSchema,
+} from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 export function generateStaticParams() {
   return SERVICES_DATA.map((item) => ({ slug: item.slug }));
@@ -21,7 +28,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const service = SERVICES_DATA.find((item) => item.slug === slug);
   if (!service) return { title: "Service Not Found" };
-  return { title: service.title, description: service.outcome };
+  return buildPageMetadata({
+    title: `${service.title} (${service.startingPrice})`,
+    description: service.outcome,
+    path: `/services/${service.slug}`,
+    ogTag: `${service.shortTitle} · ${service.startingPrice}`,
+  });
 }
 
 export default async function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -29,8 +41,24 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const service = SERVICES_DATA.find((item) => item.slug === slug);
   if (!service) notFound();
 
+  const schemas = [
+    buildServiceSchema({
+      name: service.title,
+      description: service.outcome,
+      path: `/services/${service.slug}`,
+      startingPrice: service.startingPrice,
+    }),
+    buildFaqSchema(service.faqs),
+    buildBreadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "Services", path: "/services" },
+      { name: service.title, path: `/services/${service.slug}` },
+    ]),
+  ];
+
   return (
     <div className="flex flex-col">
+      <JsonLd data={schemas} />
       <Section className="border-b border-border/60">
         <div className="space-y-5 max-w-3xl">
           <Link href="/services" className="inline-flex items-center gap-1.5 text-small text-text-muted hover:text-primary">

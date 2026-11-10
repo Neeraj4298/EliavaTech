@@ -11,11 +11,22 @@ import { StaggerGroup, StaggerItem } from "@/components/motion/StaggerGroup";
 import { TiltCard } from "@/components/motion/TiltCard";
 import { DashboardPreview } from "@/components/sections/DashboardPreview";
 import { CTABandSection } from "@/components/sections/home/CTABandSection";
+import { buildBreadcrumbSchema, buildPageMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
 
-export const metadata: Metadata = {
-  title: "Services",
-  description: "Web development, e-commerce, WhatsApp and AI automation, custom software, and cloud support.",
-};
+export const metadata: Metadata = buildPageMetadata({
+  title: "Services — Websites, E-commerce, WhatsApp AI & Custom Software",
+  description:
+    "Web development, e-commerce, WhatsApp and AI automation, custom software, and cloud support built for growing Indian businesses.",
+  path: "/services",
+  ogTag: "Five Integrated Service Lines",
+  keywords: [
+    "website development company India",
+    "ecommerce website development",
+    "WhatsApp automation service",
+    "custom software development",
+  ],
+});
 
 const iconMap: Record<ServiceDetailData["icon"], React.ComponentType<{ className?: string; strokeWidth?: number }>> = {
   Globe,
@@ -26,8 +37,14 @@ const iconMap: Record<ServiceDetailData["icon"], React.ComponentType<{ className
 };
 
 export default function ServicesPage() {
+  const breadcrumb = buildBreadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "Services", path: "/services" },
+  ]);
+
   return (
     <div className="flex flex-col">
+      <JsonLd data={breadcrumb} />
       <Section className="border-b border-border/60">
         <div className="max-w-3xl space-y-5">
           <Reveal><Badge variant="primary" size="md" dot>Five Integrated Service Lines</Badge></Reveal>
