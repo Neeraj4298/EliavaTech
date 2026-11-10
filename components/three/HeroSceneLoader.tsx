@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import dynamic from "next/dynamic";
-import { Pause, Play } from "lucide-react";
+import { Pause, Play, Box } from "lucide-react";
 import { usePrefersReducedMotion } from "@/lib/motion";
 import { SceneFallback } from "./SceneFallback";
 
@@ -14,10 +14,12 @@ const DynamicHeroScene = dynamic(
   }
 );
 
-function detectCanRunWebGL(): boolean {
+function detectShouldAutoLoad3D(): boolean {
   if (typeof window === "undefined") return false;
   try {
-    // Low-power / small phone heuristic per Section 5.2
+    // Section 5.2: Show SceneFallback on small phones (<768px) or low-power devices
+    if (window.innerWidth < 768) return false;
+
     const nav = window.navigator as Navigator & {
       deviceMemory?: number;
       connection?: { saveData?: boolean };
@@ -26,7 +28,7 @@ function detectCanRunWebGL(): boolean {
     if (typeof nav.hardwareConcurrency === "number" && nav.hardwareConcurrency <= 2) {
       return false;
     }
-    if (typeof nav.deviceMemory === "number" && nav.deviceMemory < 2) {
+    if (typeof nav.deviceMemory === "number" && nav.deviceMemory < 4) {
       return false;
     }
 
@@ -45,24 +47,31 @@ const emptySubscribe = () => () => {};
 
 /**
  * Section 5.2 & 5.8 — HeroSceneLoader:
- * - Dynamically imports the 3D scene with `ssr: false` so hero text paints first.
- * - Pauses rendering when off-screen (IntersectionObserver) or when tab is hidden.
- * - Provides a visible Pause/Play button per Section 5.8.
- * - Falls back to `SceneFallback` when WebGL is unavailable, on low-power devices,
+ * - Code-splits Three.js (`ssr: false`) and defers mounting until after initial paint.
+ * - Shows `SceneFallback` automatically when WebGL is unavailable, on small/low-power phones,
  *   or when `prefers-reduced-motion` is enabled.
  */
 export function HeroSceneLoader() {
   const prefersReducedMotion = usePrefersReducedMotion();
   const containerRef = React.useRef<HTMLDivElement>(null);
 
-  const canRender3D = React.useSyncExternalStore(
+  const shouldAuto3D = React.useSyncExternalStore(
     emptySubscribe,
-    detectCanRunWebGL,
-    () => true
+    detectShouldAutoLoad3D,
+    () => false
   );
+
+  const [readyFor3D, setReadyFor3D] = React.useState(false);
+  const [force3DOnMobile, setForce3DOnMobile] = React.useState(false);
   const [inView, setInView] = React.useState(true);
   const [tabVisible, setTabVisible] = React.useState(true);
   const [pausedByUser, setPausedByUser] = React.useState(false);
+
+  React.useEffect(() => {
+    if (prefersReducedMotion || (!shouldAuto3D && !force3DOnMobile)) return;
+    const timer = window.setTimeout(() => setReadyFor3D(true), 180);
+    return () => window.clearTimeout(timer);
+  }, [prefersReducedMotion, shouldAuto3D, force3DOnMobile]);
 
   React.useEffect(() => {
     const el = containerRef.current;
@@ -86,13 +95,26 @@ export function HeroSceneLoader() {
     return () => document.removeEventListener("visibilitychange", onVisibilityChange);
   }, []);
 
-  const showFallback = prefersReducedMotion || canRender3D === false;
+  const show3D = !prefersReducedMotion && (shouldAuto3D || force3DOnMobile) && readyFor3D;
   const isSceneActive = inView && tabVisible && !pausedByUser;
 
   return (
     <div ref={containerRef} className="relative w-full">
-      {showFallback ? (
-        <SceneFallback />
+      {!show3D ? (
+        <div className="relative">
+          <SceneFallback />
+          {!prefersReducedMotion && !shouldAuto3D && !force3DOnMobile && (
+            <button
+              type="button"
+              onClick={() => setForce3DOnMobile(true)}
+              aria-label="Enable interactive 3D view"
+              className="absolute right-3 top-3 z-20 inline-flex items-center gap-1.5 rounded-pill border border-border bg-surface/90 px-3 py-1.5 text-xs font-medium text-text backdrop-blur-xs transition-colors hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <Box strokeWidth={1.5} className="h-3.5 w-3.5 text-primary" />
+              <span>Interactive 3D</span>
+            </button>
+          )}
+        </div>
       ) : (
         <>
           <DynamicHeroScene active={isSceneActive} />
@@ -121,3 +143,4 @@ export function HeroSceneLoader() {
 }
 
 export default HeroSceneLoader;
+

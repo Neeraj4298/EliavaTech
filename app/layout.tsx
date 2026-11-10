@@ -6,7 +6,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { ScrollProgress } from "@/components/layout/ScrollProgress";
-import { ChatWidget } from "@/components/chat/ChatWidget";
+import { LazyChatWidget } from "@/components/chat/LazyChatWidget";
 import { CookieBanner } from "@/components/overlays/CookieBanner";
 import { GoogleAnalytics } from "@/components/overlays/GoogleAnalytics";
 import "./globals.css";
@@ -91,7 +91,7 @@ export default function RootLayout({
             <Footer />
           </SmoothScroll>
           <CookieBanner />
-          <ChatWidget mode="floating" />
+          <LazyChatWidget mode="floating" />
           <GoogleAnalytics />
         </ThemeProvider>
       </body>

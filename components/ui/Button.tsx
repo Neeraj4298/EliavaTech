@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,11 +17,12 @@ export interface ButtonProps
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   fullWidth?: boolean;
+  href?: string;
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-white border border-transparent hover:bg-primary-hover shadow-[var(--glow-primary)] hover:shadow-[0_10px_28px_-4px_var(--primary)]",
+    "bg-primary text-on-primary border border-transparent hover:bg-primary-hover shadow-[var(--glow-primary)] hover:shadow-[0_10px_28px_-4px_var(--primary)]",
   secondary:
     "bg-surface text-text border border-border hover:bg-surface-2 hover:border-primary/40 shadow-[var(--shadow-card)]",
   ghost:
@@ -36,7 +38,7 @@ const sizeClasses: Record<ButtonSize, string> = {
 /**
  * Section 6 Primitive — Button (primary, secondary, ghost)
  * - Radius: 999px (rounded-pill) per Section 2.5
- * - Micro-interactions: arrow slides on hover, subtle press scale per Section 5.6
+ * - Renders a Next.js `<Link>` when `href` is provided so `<button>` is never nested inside `<a>`.
  */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
@@ -48,6 +50,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       leftIcon,
       rightIcon,
       fullWidth = false,
+      href,
       disabled,
       className,
       children,
@@ -57,23 +60,20 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const isDisabled = disabled || isLoading;
 
-    return (
-      <button
-        ref={ref}
-        disabled={isDisabled}
-        className={cn(
-          "group relative inline-flex items-center justify-center rounded-pill font-medium select-none",
-          "transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
-          "active:scale-[0.98]",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
-          "disabled:pointer-events-none disabled:opacity-50",
-          variantClasses[variant],
-          sizeClasses[size],
-          fullWidth && "w-full",
-          className
-        )}
-        {...props}
-      >
+    const sharedClassName = cn(
+      "group relative inline-flex items-center justify-center rounded-pill font-medium select-none",
+      "transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+      "active:scale-[0.98]",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
+      "disabled:pointer-events-none disabled:opacity-50",
+      variantClasses[variant],
+      sizeClasses[size],
+      fullWidth && "w-full",
+      className
+    );
+
+    const innerContent = (
+      <>
         {isLoading && (
           <Loader2
             strokeWidth={1.5}
@@ -95,6 +95,25 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             aria-hidden="true"
           />
         )}
+      </>
+    );
+
+    if (href) {
+      return (
+        <Link href={href} className={sharedClassName}>
+          {innerContent}
+        </Link>
+      );
+    }
+
+    return (
+      <button
+        ref={ref}
+        disabled={isDisabled}
+        className={sharedClassName}
+        {...props}
+      >
+        {innerContent}
       </button>
     );
   }
@@ -103,3 +122,4 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button";
 
 export default Button;
+

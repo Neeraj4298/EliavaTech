@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { Section } from "@/components/layout/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -51,11 +50,9 @@ export function WhatsAppDemoSection() {
 
           <Reveal delay={0.16}>
             <div className="pt-2">
-              <Link href="/services/whatsapp-ai-automation">
-                <Button variant="primary" size="md" withArrow>
-                  Explore WhatsApp &amp; AI Automation
-                </Button>
-              </Link>
+              <Button href="/services/whatsapp-ai-automation" variant="primary" size="md" withArrow>
+                Explore WhatsApp &amp; AI Automation
+              </Button>
             </div>
           </Reveal>
         </div>

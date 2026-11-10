@@ -25,11 +25,9 @@ export function WorkPreviewSection() {
           title="Interactive demonstrations built to production standards."
           description="Explore three working concept projects showing how we engineer clinic booking systems, retail e-commerce, and real estate CRM pipelines."
           action={
-            <Link href="/work">
-              <Button variant="secondary" size="md" withArrow>
-                View All Demos
-              </Button>
-            </Link>
+            <Button href="/work" variant="secondary" size="md" withArrow>
+              View All Demos
+            </Button>
           }
         />
 

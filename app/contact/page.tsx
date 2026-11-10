@@ -7,7 +7,7 @@ import { SplitHeading } from "@/components/motion/SplitHeading";
 import { ContactForm } from "@/components/forms/ContactForm";
 import { BookingEmbed } from "@/components/forms/BookingEmbed";
 import { WhatsAppButton } from "@/components/overlays/WhatsAppButton";
-import { ChatWidget } from "@/components/chat/ChatWidget";
+import { LazyChatWidget } from "@/components/chat/LazyChatWidget";
 import { buildBreadcrumbSchema, buildPageMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 
@@ -56,7 +56,7 @@ export default function ContactPage() {
               <h2 className="text-h3">
                 Have a quick question about pricing, scope, or timelines?
               </h2>
-              <ChatWidget mode="full" />
+              <LazyChatWidget mode="full" />
             </div>
           </div>
 

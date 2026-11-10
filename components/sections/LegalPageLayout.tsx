@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { AlertTriangle, CheckCircle2, ShieldCheck } from "lucide-react";
 import { LEGAL_REVIEW_BANNER, type LegalSection } from "@/content/legal";
 import {
@@ -124,10 +123,10 @@ export function LegalPageLayout({
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Link href="/privacy"><Button variant="ghost" size="sm">Privacy</Button></Link>
-              <Link href="/terms"><Button variant="ghost" size="sm">Terms</Button></Link>
-              <Link href="/cookies"><Button variant="ghost" size="sm">Cookies</Button></Link>
-              <Link href="/contact"><Button variant="primary" size="sm" withArrow>Contact Us</Button></Link>
+              <Button href="/privacy" variant="ghost" size="sm">Privacy</Button>
+              <Button href="/terms" variant="ghost" size="sm">Terms</Button>
+              <Button href="/cookies" variant="ghost" size="sm">Cookies</Button>
+              <Button href="/contact" variant="primary" size="sm" withArrow>Contact Us</Button>
             </div>
           </Card>
         </div>

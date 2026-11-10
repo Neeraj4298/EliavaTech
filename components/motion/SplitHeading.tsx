@@ -34,7 +34,8 @@ export function SplitHeading({
   const prefersReducedMotion = usePrefersReducedMotion();
   const words = React.useMemo(() => text.trim().split(/\s+/), [text]);
 
-  if (prefersReducedMotion) {
+  // Render H1 immediately visible on SSR for instant mobile LCP (<2.5s)
+  if (prefersReducedMotion || Tag === "h1") {
     return <Tag className={className}>{text}</Tag>;
   }
 

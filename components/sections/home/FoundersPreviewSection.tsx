@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { FOUNDERS_PLACEHOLDER } from "@/content/home";
 import { Section } from "@/components/layout/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -23,11 +22,9 @@ export function FoundersPreviewSection() {
           title="Led directly by three co-founders."
           description="Every project is scoped, designed, and engineered by the founders—not handed off to junior account managers."
           action={
-            <Link href="/about">
-              <Button variant="secondary" size="md" withArrow>
-                More About EliavaTech
-              </Button>
-            </Link>
+            <Button href="/about" variant="secondary" size="md" withArrow>
+              More About EliavaTech
+            </Button>
           }
         />
 

@@ -109,11 +109,9 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-3">
             <ThemeToggle />
             <MagneticButton strength={0.22}>
-              <Link href="/contact">
-                <Button variant="primary" size="md" withArrow>
-                  Book a Free Consultation
-                </Button>
-              </Link>
+              <Button href="/contact" variant="primary" size="md" withArrow>
+                Book a Free Consultation
+              </Button>
             </MagneticButton>
           </div>
 

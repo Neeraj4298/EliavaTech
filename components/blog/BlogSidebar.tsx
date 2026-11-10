@@ -46,11 +46,9 @@ export function BlogAuthorCard({ author, authorRole }: BlogAuthorCardProps) {
           </p>
         </div>
       </div>
-      <Link href="/contact" className="shrink-0">
-        <Button variant="primary" size="sm" withArrow>
-          Discuss Your Project
-        </Button>
-      </Link>
+      <Button href="/contact" variant="primary" size="sm" withArrow className="shrink-0">
+        Discuss Your Project
+      </Button>
     </Card>
   );
 }

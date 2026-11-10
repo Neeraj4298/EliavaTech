@@ -141,11 +141,16 @@ export function MobileMenu({ open, onClose, currentPath }: MobileMenuProps) {
           </motion.nav>
 
           <div className="border-t border-border pt-6">
-            <Link href="/contact" onClick={onClose} className="block">
-              <Button variant="primary" size="lg" fullWidth withArrow>
-                Book a Free Consultation
-              </Button>
-            </Link>
+            <Button
+              href="/contact"
+              onClick={onClose}
+              variant="primary"
+              size="lg"
+              fullWidth
+              withArrow
+            >
+              Book a Free Consultation
+            </Button>
           </div>
         </motion.div>
       )}

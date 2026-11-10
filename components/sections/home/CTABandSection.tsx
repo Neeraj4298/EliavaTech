@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { FINAL_CTA_CONTENT } from "@/content/home";
 import { Section } from "@/components/layout/Section";
 import { Badge } from "@/components/ui/Badge";
@@ -49,19 +48,15 @@ export function CTABandSection() {
           <Reveal delay={0.18}>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <MagneticButton cursorLabel="Book">
-                <Link href={FINAL_CTA_CONTENT.primaryCta.href}>
-                  <Button variant="primary" size="lg" withArrow>
-                    {FINAL_CTA_CONTENT.primaryCta.label}
-                  </Button>
-                </Link>
+                <Button href={FINAL_CTA_CONTENT.primaryCta.href} variant="primary" size="lg" withArrow>
+                  {FINAL_CTA_CONTENT.primaryCta.label}
+                </Button>
               </MagneticButton>
 
               <MagneticButton>
-                <Link href={FINAL_CTA_CONTENT.secondaryCta.href}>
-                  <Button variant="secondary" size="lg">
-                    {FINAL_CTA_CONTENT.secondaryCta.label}
-                  </Button>
-                </Link>
+                <Button href={FINAL_CTA_CONTENT.secondaryCta.href} variant="secondary" size="lg">
+                  {FINAL_CTA_CONTENT.secondaryCta.label}
+                </Button>
               </MagneticButton>
             </div>
           </Reveal>

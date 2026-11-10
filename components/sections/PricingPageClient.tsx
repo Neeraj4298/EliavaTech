@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { Check, CheckCircle2 } from "lucide-react";
 import { PRICING_HEADER, PRICING_TIERS } from "@/content/pricing";
 import { Badge } from "@/components/ui/Badge";
@@ -88,11 +87,17 @@ export function PricingPageClient() {
                 ))}
               </ul>
             </div>
-            <Link href="/contact" className="block pt-2">
-              <Button variant={tier.highlighted ? "primary" : "secondary"} size="md" fullWidth withArrow>
+            <div className="pt-2">
+              <Button
+                href="/contact"
+                variant={tier.highlighted ? "primary" : "secondary"}
+                size="md"
+                fullWidth
+                withArrow
+              >
                 Choose {tier.name}
               </Button>
-            </Link>
+            </div>
           </Card>
         ))}
       </div>

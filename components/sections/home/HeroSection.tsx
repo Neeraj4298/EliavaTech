@@ -1,12 +1,10 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { HERO_CONTENT } from "@/content/home";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Reveal } from "@/components/motion/Reveal";
 import { SplitHeading } from "@/components/motion/SplitHeading";
 import { MagneticButton } from "@/components/motion/MagneticButton";
 import { HeroSceneLoader } from "@/components/three/HeroSceneLoader";
@@ -48,11 +46,11 @@ export function HeroSection() {
       <div className="container-max relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         {/* Left Column */}
         <div className="lg:col-span-6 space-y-6">
-          <Reveal>
+          <div>
             <Badge variant="primary" size="md" dot>
               {HERO_CONTENT.label}
             </Badge>
-          </Reveal>
+          </div>
 
           <SplitHeading
             text={HERO_CONTENT.title}
@@ -60,40 +58,30 @@ export function HeroSection() {
             className="text-h1 block"
           />
 
-          <Reveal delay={0.1}>
-            <p className="text-body text-text-muted max-w-xl">
-              {HERO_CONTENT.subtext}
+          <p className="text-body text-text-muted max-w-xl">
+            {HERO_CONTENT.subtext}
+          </p>
+
+          <div className="flex flex-wrap items-center gap-4 pt-2">
+            <MagneticButton cursorLabel="Book">
+              <Button href={HERO_CONTENT.primaryCta.href} variant="primary" size="lg" withArrow>
+                {HERO_CONTENT.primaryCta.label}
+              </Button>
+            </MagneticButton>
+
+            <MagneticButton>
+              <Button href={HERO_CONTENT.secondaryCta.href} variant="secondary" size="lg">
+                {HERO_CONTENT.secondaryCta.label}
+              </Button>
+            </MagneticButton>
+          </div>
+
+          <div className="pt-4 border-t border-border/60 flex items-center gap-3">
+            <span className="h-2 w-2 rounded-full bg-gold shrink-0" aria-hidden="true" />
+            <p className="font-mono text-xs sm:text-small text-text-muted tracking-wide">
+              {HERO_CONTENT.trustLine}
             </p>
-          </Reveal>
-
-          <Reveal delay={0.18}>
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              <MagneticButton cursorLabel="Book">
-                <Link href={HERO_CONTENT.primaryCta.href}>
-                  <Button variant="primary" size="lg" withArrow>
-                    {HERO_CONTENT.primaryCta.label}
-                  </Button>
-                </Link>
-              </MagneticButton>
-
-              <MagneticButton>
-                <Link href={HERO_CONTENT.secondaryCta.href}>
-                  <Button variant="secondary" size="lg">
-                    {HERO_CONTENT.secondaryCta.label}
-                  </Button>
-                </Link>
-              </MagneticButton>
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.25}>
-            <div className="pt-4 border-t border-border/60 flex items-center gap-3">
-              <span className="h-2 w-2 rounded-full bg-gold shrink-0" aria-hidden="true" />
-              <p className="font-mono text-xs sm:text-small text-text-muted tracking-wide">
-                {HERO_CONTENT.trustLine}
-              </p>
-            </div>
-          </Reveal>
+          </div>
         </div>
 
         {/* Right Column: Interactive 3D Scene */}

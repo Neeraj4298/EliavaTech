@@ -12,19 +12,29 @@ export interface PageTransitionProps {
   children: React.ReactNode;
 }
 
+// Track whether the app has completed its initial SSR/hydration paint
+let hasHydratedOnce = false;
+
 /**
  * Section 5.5 — Page transitions:
- * - Used by `app/template.tsx` so every route change plays an enter animation:
+ * - Used by `app/template.tsx` so route changes play an enter animation:
  *   a quick primary-colored wipe panel (~500 ms) followed by content fading up.
+ * - On initial SSR load, renders content immediately visible so mobile FCP & LCP
+ *   are never blocked waiting for JS hydration.
  * - Keeps the navbar fixed during transitions.
  * - Animates only transform (scaleY, y) and opacity.
  * - Respects `prefers-reduced-motion` per Section 5.8.
  */
 export function PageTransition({ children }: PageTransitionProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const [animateMount] = React.useState(() => hasHydratedOnce);
 
-  if (prefersReducedMotion) {
-    return <>{children}</>;
+  React.useEffect(() => {
+    hasHydratedOnce = true;
+  }, []);
+
+  if (prefersReducedMotion || !animateMount) {
+    return <div className="relative flex-1 flex flex-col">{children}</div>;
   }
 
   return (
@@ -60,3 +70,4 @@ export function PageTransition({ children }: PageTransitionProps) {
 }
 
 export default PageTransition;
+

@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { ArrowRight, Check } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 import { INDUSTRY_ITEMS } from "@/content/navigation";
 import { Section } from "@/components/layout/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -28,11 +27,9 @@ export function IndustriesShowcaseSection() {
           title="Built for how Indian SMBs actually operate."
           description="Select your sector to see the exact website, booking, and automation bundle we deploy."
           action={
-            <Link href="/industries">
-              <Button variant="secondary" size="md" withArrow>
-                All 7 Industries
-              </Button>
-            </Link>
+            <Button href="/industries" variant="secondary" size="md" withArrow>
+              All 7 Industries
+            </Button>
           }
         />
 
@@ -75,16 +72,12 @@ export function IndustriesShowcaseSection() {
               {activeIndustry.summary}
             </p>
             <div className="pt-2 flex flex-wrap items-center gap-3">
-              <Link href={activeIndustry.href}>
-                <Button variant="primary" size="md" withArrow>
-                  Explore {activeIndustry.title} Bundle
-                </Button>
-              </Link>
-              <Link href="/contact">
-                <Button variant="secondary" size="md">
-                  Request Custom Scope
-                </Button>
-              </Link>
+              <Button href={activeIndustry.href} variant="primary" size="md" withArrow>
+                Explore {activeIndustry.title} Bundle
+              </Button>
+              <Button href="/contact" variant="secondary" size="md">
+                Request Custom Scope
+              </Button>
             </div>
           </div>
 

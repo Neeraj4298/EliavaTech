@@ -35,14 +35,12 @@ export function Footer() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <Link href="/contact">
-              <Button variant="primary" size="lg" withArrow>
-                Book a Free Consultation
-              </Button>
-            </Link>
-            <Link href="/pricing">
-              <Button variant="secondary" size="lg">View Pricing</Button>
-            </Link>
+            <Button href="/contact" variant="primary" size="lg" withArrow>
+              Book a Free Consultation
+            </Button>
+            <Button href="/pricing" variant="secondary" size="lg">
+              View Pricing
+            </Button>
           </div>
         </div>
 

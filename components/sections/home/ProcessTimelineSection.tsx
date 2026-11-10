@@ -1,8 +1,6 @@
 "use client";
 
 import * as React from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CheckCircle2 } from "lucide-react";
 import { PROCESS_STEPS } from "@/content/home";
 import { Section } from "@/components/layout/Section";
@@ -14,8 +12,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Section 4.2 #4 & Section 5.4 — How We Work (ProcessTimeline):
- * Four-step horizontal timeline (Discover, Design, Build, Support)
- * where the progress line draws and steps activate in sequence via GSAP ScrollTrigger.
+ * Dynamically imports GSAP + ScrollTrigger so GSAP is code-split out of the initial JS bundle.
  */
 export function ProcessTimelineSection() {
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -27,33 +24,48 @@ export function ProcessTimelineSection() {
     if (prefersReducedMotion) return;
     if (typeof window === "undefined" || !containerRef.current || !lineRef.current) return;
 
-    gsap.registerPlugin(ScrollTrigger);
+    let cancelled = false;
+    let revertFn: (() => void) | undefined;
 
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        lineRef.current,
-        { scaleX: 0 },
-        {
-          scaleX: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 72%",
-            end: "bottom 42%",
-            scrub: 0.4,
-            onUpdate: (self) => {
-              const idx = Math.min(
-                PROCESS_STEPS.length - 1,
-                Math.floor(self.progress * PROCESS_STEPS.length)
-              );
-              setActiveStep(idx);
-            },
-          },
-        }
-      );
-    }, containerRef);
+    Promise.all([import("gsap"), import("gsap/ScrollTrigger")])
+      .then(([gsapMod, stMod]) => {
+        if (cancelled || !containerRef.current || !lineRef.current) return;
+        const gsap = gsapMod.default;
+        const { ScrollTrigger } = stMod;
+        gsap.registerPlugin(ScrollTrigger);
 
-    return () => ctx.revert();
+        const ctx = gsap.context(() => {
+          gsap.fromTo(
+            lineRef.current,
+            { scaleX: 0 },
+            {
+              scaleX: 1,
+              ease: "none",
+              scrollTrigger: {
+                trigger: containerRef.current,
+                start: "top 72%",
+                end: "bottom 42%",
+                scrub: 0.4,
+                onUpdate: (self) => {
+                  const idx = Math.min(
+                    PROCESS_STEPS.length - 1,
+                    Math.floor(self.progress * PROCESS_STEPS.length)
+                  );
+                  setActiveStep(idx);
+                },
+              },
+            }
+          );
+        }, containerRef);
+
+        revertFn = () => ctx.revert();
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+      revertFn?.();
+    };
   }, [prefersReducedMotion]);
 
   return (

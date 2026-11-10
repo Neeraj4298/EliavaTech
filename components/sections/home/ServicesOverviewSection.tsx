@@ -39,11 +39,9 @@ export function ServicesOverviewSection() {
           title="Everything you need to run a modern digital business."
           description="From your first search-ready website to automated WhatsApp customer flows and custom CRM dashboards."
           action={
-            <Link href="/services">
-              <Button variant="secondary" size="md" withArrow>
-                Compare All Services
-              </Button>
-            </Link>
+            <Button href="/services" variant="secondary" size="md" withArrow>
+              Compare All Services
+            </Button>
           }
         />
 
