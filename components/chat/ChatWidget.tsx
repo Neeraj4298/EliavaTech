@@ -3,38 +3,39 @@
 import * as React from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Sparkles,
-  Send,
-  X,
-  UserCheck,
-  Calendar,
-  RotateCcw,
-} from "lucide-react";
+import { Send } from "lucide-react";
 import {
   MAX_CHAT_CONVERSATION_MESSAGES,
   MAX_CHAT_MESSAGE_LENGTH,
   type ChatErrorType,
-  type ChatTurn,
 } from "@/lib/gemini";
-import { SPRING_PLAYFUL, usePrefersReducedMotion } from "@/lib/motion";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { WhatsAppButton } from "@/components/overlays/WhatsAppButton";
+import { EASE_STANDARD, SPRING_PLAYFUL, usePrefersReducedMotion } from "@/lib/motion";
+import { ChatHeader } from "./ChatHeader";
+import {
+  ChatMessageList,
+  type InlineChatError,
+  type TimedChatMessage,
+} from "./ChatMessageList";
+import {
+  FollowUpChipsBar,
+  getContextualFollowUpChips,
+} from "./ChatWelcomeAndChips";
+import { ChatLauncherGroup } from "./ChatLauncherGroup";
 import { cn } from "@/lib/utils";
 
-const INITIAL_ASSISTANT_MESSAGE: ChatTurn = {
-  role: "assistant",
-  content:
-    "Hello! I am the EliavaTech assistant. Ask me about our services, founding client pricing, 4-step process, or timelines—or share your name, email, and need for a custom quote.",
-};
+function formatNowTime(): string {
+  try {
+    return new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return "Just now";
+  }
+}
 
-const QUICK_PROMPTS = [
-  "What are your website prices?",
-  "How does WhatsApp automation work?",
-  "How long does a typical launch take?",
-  "I want a custom quote",
-] as const;
+const GREETING_TEXT =
+  "Hello! I am the EliavaTech assistant. Ask me about our services, founding client pricing, 4-step process, or timelines.";
 
 export interface ChatWidgetProps {
   mode?: "floating" | "full";
@@ -42,63 +43,136 @@ export interface ChatWidgetProps {
 }
 
 export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
-  const prefersReducedMotion = usePrefersReducedMotion();
+  const reduced = usePrefersReducedMotion();
   const [open, setOpen] = React.useState(mode === "full");
   const [sessionId] = React.useState(
     () => `chat_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
   );
-  const [messages, setMessages] = React.useState<ChatTurn[]>([
-    INITIAL_ASSISTANT_MESSAGE,
+  const [messages, setMessages] = React.useState<TimedChatMessage[]>(() => [
+    { id: "greeting", role: "assistant", content: GREETING_TEXT, time: "Now" },
   ]);
   const [input, setInput] = React.useState("");
   const [streaming, setStreaming] = React.useState(false);
-  const [showFallback, setShowFallback] = React.useState(false);
-  const [errorType, setErrorType] = React.useState<ChatErrorType | null>(null);
-  const [fallbackNote, setFallbackNote] = React.useState<string | null>(null);
-
+  const [waitingFirstToken, setWaitingFirstToken] = React.useState(false);
+  const [inlineError, setInlineError] = React.useState<InlineChatError | null>(null);
   const [leadOpen, setLeadOpen] = React.useState(false);
-  const [leadName, setLeadName] = React.useState("");
-  const [leadEmail, setLeadEmail] = React.useState("");
-  const [leadNeed, setLeadNeed] = React.useState("");
-  const [leadSaved, setLeadSaved] = React.useState(false);
+  const [cookieOffset, setCookieOffset] = React.useState(0);
 
-  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const launcherRef = React.useRef<HTMLButtonElement>(null);
 
   React.useEffect(() => {
-    const el = scrollRef.current;
-    if (el) {
-      el.scrollTop = el.scrollHeight;
-    }
-  }, [messages, streaming, showFallback, leadOpen]);
+    if (typeof window === "undefined") return;
+    const measureBanner = () => {
+      const banner = document.querySelector<HTMLElement>("[data-cookie-banner]");
+      setCookieOffset(banner && banner.offsetHeight > 0 ? banner.offsetHeight + 12 : 0);
+    };
+    measureBanner();
+    const observer = new MutationObserver(measureBanner);
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+    window.addEventListener("resize", measureBanner);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measureBanner);
+    };
+  }, []);
 
-  const sendMessage = async (textToSend?: string) => {
-    const text = (textToSend ?? input).trim();
+  React.useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 96)}px`;
+  }, [input]);
+
+  React.useEffect(() => {
+    if (mode !== "floating" || !open) return;
+    const focusTimer = window.setTimeout(() => textareaRef.current?.focus(), 40);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setOpen(false);
+        window.setTimeout(() => launcherRef.current?.focus(), 20);
+        return;
+      }
+      if (e.key === "Tab" && panelRef.current) {
+        const focusable = Array.from(
+          panelRef.current.querySelectorAll<HTMLElement>(
+            'button:not(:disabled), [href], input:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])'
+          )
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.clearTimeout(focusTimer);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [mode, open]);
+
+  const closeAndReturnFocus = () => {
+    setOpen(false);
+    window.setTimeout(() => launcherRef.current?.focus(), 20);
+  };
+
+  const resetChat = () => {
+    setMessages([
+      { id: "greeting", role: "assistant", content: GREETING_TEXT, time: formatNowTime() },
+    ]);
+    setInlineError(null);
+    setLeadOpen(false);
+    setInput("");
+  };
+
+  const sendMessage = async (textOverride?: string, isRetry = false) => {
+    const text = (textOverride ?? input).trim();
     if (!text || streaming) return;
 
-    if (text === "I want a custom quote") {
+    if (/\b(quote|estimate|proposal)\b/i.test(text)) {
       setLeadOpen(true);
     }
 
-    const nextMessages: ChatTurn[] = [
-      ...messages,
-      { role: "user", content: text.slice(0, MAX_CHAT_MESSAGE_LENGTH) },
-    ];
+    const nextMessages: TimedChatMessage[] = isRetry
+      ? messages
+      : [
+          ...messages,
+          {
+            id: `u_${Date.now()}`,
+            role: "user",
+            content: text.slice(0, MAX_CHAT_MESSAGE_LENGTH),
+            time: formatNowTime(),
+          },
+        ];
 
-    if (nextMessages.length > MAX_CHAT_CONVERSATION_MESSAGES) {
-      setShowFallback(true);
-      setErrorType("invalid_request");
-      setFallbackNote(
-        "Maximum conversation length reached. Please continue on WhatsApp or book a free consultation call."
-      );
+    if (nextMessages.length > MAX_CHAT_CONVERSATION_MESSAGES + 1) {
+      setMessages(nextMessages);
+      setInput("");
+      setInlineError({
+        type: "invalid_request",
+        message:
+          "You have reached the 12-message conversation limit. Please continue on WhatsApp or book a free consultation call.",
+        failedPrompt: text,
+      });
       return;
     }
 
     setMessages(nextMessages);
-    setInput("");
+    if (!isRetry) setInput("");
     setStreaming(true);
-    setShowFallback(false);
-    setErrorType(null);
-    setFallbackNote(null);
+    setWaitingFirstToken(true);
+    setInlineError(null);
 
     try {
       const res = await fetch("/api/chat", {
@@ -106,7 +180,9 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sessionId,
-          messages: nextMessages.slice(1), // exclude initial greeting
+          messages: nextMessages
+            .slice(1)
+            .map(({ role, content }) => ({ role, content })),
         }),
       });
 
@@ -125,314 +201,223 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
             ? "invalid_request"
             : "unavailable");
 
-        setErrorType(resolvedType);
-        setShowFallback(true);
-        setFallbackNote(
-          errData?.error ||
-            (resolvedType === "rate_limited"
-              ? "Too many messages sent in a short window. Please continue on WhatsApp or book a consultation below."
-              : resolvedType === "invalid_request"
-              ? "Please shorten or rephrase your question and try again."
-              : "Our AI assistant is temporarily unavailable. Reach us directly via WhatsApp or book a call below.")
-        );
+        const friendlyCopy =
+          resolvedType === "rate_limited"
+            ? "You have sent several questions quickly. Please wait a moment and retry, or message us on WhatsApp."
+            : resolvedType === "invalid_request"
+            ? errData?.error || "Please shorten or rephrase your question and try again."
+            : "Our assistant is momentarily unreachable. You can retry or connect with our team directly below.";
+
+        setInlineError({
+          type: resolvedType,
+          message: friendlyCopy,
+          failedPrompt: text,
+        });
+        setWaitingFirstToken(false);
         setStreaming(false);
         return;
       }
 
       if (!res.body) {
-        setErrorType("unavailable");
-        setShowFallback(true);
+        setInlineError({
+          type: "unavailable",
+          message: "No stream received. Please retry or chat with us on WhatsApp.",
+          failedPrompt: text,
+        });
+        setWaitingFirstToken(false);
         setStreaming(false);
         return;
       }
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
-      let assistantReply = "";
-      let appended = false;
+      let replyText = "";
+      let assistantId = "";
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        const chunkText = decoder.decode(value, { stream: true });
-        if (!chunkText) continue;
+        const chunk = decoder.decode(value, { stream: true });
+        if (!chunk) continue;
 
-        assistantReply += chunkText;
-        const snapshot = assistantReply;
+        replyText += chunk;
+        const snapshot = replyText;
 
-        if (!appended) {
-          appended = true;
-          setMessages((prev) => [...prev, { role: "assistant", content: snapshot }]);
+        if (!assistantId) {
+          assistantId = `a_${Date.now()}`;
+          setWaitingFirstToken(false);
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: assistantId,
+              role: "assistant",
+              content: snapshot,
+              time: formatNowTime(),
+            },
+          ]);
         } else {
           setMessages((prev) => {
             const copy = [...prev];
-            copy[copy.length - 1] = { role: "assistant", content: snapshot };
+            copy[copy.length - 1] = {
+              ...copy[copy.length - 1],
+              content: snapshot,
+            };
             return copy;
           });
         }
       }
 
-      if (!assistantReply.trim()) {
-        setErrorType("unavailable");
-        setShowFallback(true);
+      if (!replyText.trim()) {
+        setInlineError({
+          type: "unavailable",
+          message: "Our assistant returned an empty response. Please retry.",
+          failedPrompt: text,
+        });
       }
     } catch {
-      setErrorType("unavailable");
-      setShowFallback(true);
-      setFallbackNote(
-        "Connection interrupted. You can message us directly on WhatsApp or book a consultation below."
-      );
+      setInlineError({
+        type: "unavailable",
+        message: "Connection interrupted. Please retry or message us on WhatsApp.",
+        failedPrompt: text,
+      });
     } finally {
+      setWaitingFirstToken(false);
       setStreaming(false);
     }
   };
 
-  const handleLeadSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!leadName.trim() || !leadEmail.trim() || !leadNeed.trim()) return;
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId,
-          messages: [{ role: "user", content: leadNeed.slice(0, 400) }],
-          leadCapture: {
-            name: leadName.trim(),
-            email: leadEmail.trim(),
-            need: leadNeed.trim(),
-          },
-        }),
-      });
-      if (res.ok) {
-        setLeadSaved(true);
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: `Thank you, ${leadName.trim()}. I have saved your details (${leadEmail.trim()}) for our founding team. We will reply within one business day.`,
-          },
-        ]);
-      } else {
-        setShowFallback(true);
+  const assistantReplies = messages.filter((m) => m.role === "assistant");
+  const hasAssistantReplyAfterUser =
+    messages.some((m) => m.role === "user") && assistantReplies.length > 1;
+  const lastAssistantText =
+    assistantReplies[assistantReplies.length - 1]?.content || "";
+  const followUpChips =
+    hasAssistantReplyAfterUser && !streaming
+      ? getContextualFollowUpChips(lastAssistantText)
+      : [];
+
+  const canSend = !streaming && input.trim().length > 0;
+  const nearCharLimit = input.length >= 400;
+
+  const handleTextareaKeyDown = (
+    e: React.KeyboardEvent<HTMLTextAreaElement>
+  ) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (canSend) {
+        sendMessage();
       }
-    } catch {
-      setShowFallback(true);
     }
   };
 
   const panelContent = (
     <div
+      ref={panelRef}
+      role={mode === "floating" ? "dialog" : "region"}
+      aria-modal={mode === "floating" ? "true" : undefined}
+      aria-label="EliavaTech AI Assistant"
       className={cn(
-        "flex flex-col overflow-hidden rounded-card border border-border bg-surface text-text shadow-[var(--shadow-card-hover)]",
-        mode === "full" ? "w-full" : "w-[350px] sm:w-[390px] max-w-[calc(100vw-2rem)]",
+        "glass-surface flex flex-col overflow-hidden border border-border text-text shadow-[var(--shadow-card-hover)] dark:shadow-[var(--glow-primary)]",
+        mode === "full"
+          ? "w-full h-[540px] rounded-[16px]"
+          : "w-full h-[85dvh] max-h-[85dvh] rounded-t-[20px] rounded-b-none pb-[env(safe-area-inset-bottom)] sm:w-[400px] sm:h-[580px] sm:max-h-[calc(100dvh-120px)] sm:rounded-[16px] sm:pb-0",
         className
       )}
     >
-      <div className="flex items-center justify-between gap-3 border-b border-border bg-surface-2 px-4 py-3.5">
-        <div className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-primary">
-            <Sparkles strokeWidth={1.5} className="h-4 w-4" />
-          </span>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-heading text-small font-semibold text-text">
-                EliavaTech Assistant
-              </span>
-              <Badge variant="primary" size="sm" dot>AI Grounded</Badge>
-            </div>
-            <p className="text-[11px] text-text-muted">Services, founding pricing &amp; timelines</p>
-          </div>
-        </div>
+      {mode === "floating" && (
+        <button
+          type="button"
+          onClick={closeAndReturnFocus}
+          aria-label="Drag or tap to close assistant"
+          className="sm:hidden flex w-full items-center justify-center pt-2.5 pb-1 bg-surface-2/80"
+        >
+          <span className="h-1.5 w-12 rounded-pill bg-border" />
+        </button>
+      )}
 
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => setLeadOpen((v) => !v)}
-            className="inline-flex items-center gap-1 rounded-pill border border-border bg-surface px-2.5 py-1 text-[11px] font-medium text-primary hover:bg-surface-2"
-          >
-            <UserCheck strokeWidth={1.5} className="h-3 w-3" />
-            <span>Get Quote</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setMessages([INITIAL_ASSISTANT_MESSAGE]);
-              setShowFallback(false);
-              setFallbackNote(null);
-            }}
-            aria-label="Reset conversation"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-pill text-text-muted hover:text-text"
-          >
-            <RotateCcw strokeWidth={1.5} className="h-3.5 w-3.5" />
-          </button>
-          {mode === "floating" && (
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              aria-label="Close chat assistant"
-              className="inline-flex h-7 w-7 items-center justify-center rounded-pill text-text-muted hover:text-text"
-            >
-              <X strokeWidth={1.5} className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-      </div>
+      <ChatHeader mode={mode} onReset={resetChat} onClose={closeAndReturnFocus} />
 
-      <div
-        ref={scrollRef}
-        className={cn(
-          "flex flex-col gap-3 overflow-y-auto bg-bg p-4",
-          mode === "full" ? "h-[340px]" : "h-[320px]"
-        )}
-      >
-        {messages.map((m, idx) => (
-          <div
-            key={idx}
-            className={cn(
-              "max-w-[86%] rounded-card px-3.5 py-2.5 text-xs sm:text-small leading-relaxed whitespace-pre-wrap",
-              m.role === "assistant"
-                ? "mr-auto border border-border bg-surface text-text"
-                : "ml-auto bg-primary text-white"
-            )}
-          >
-            {m.content}
-          </div>
-        ))}
+      <ChatMessageList
+        messages={messages}
+        streaming={streaming}
+        waitingFirstToken={waitingFirstToken}
+        inlineError={inlineError}
+        onRetry={(failedPrompt) => sendMessage(failedPrompt, true)}
+        onSelectSuggestion={(prompt) => sendMessage(prompt)}
+        leadOpen={leadOpen}
+        onCloseLead={() => setLeadOpen(false)}
+        onLeadSuccess={() => {}}
+      />
 
-        {streaming && (
-          <div className="mr-auto inline-flex items-center gap-1.5 rounded-pill border border-border bg-surface px-3.5 py-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce" />
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce [animation-delay:120ms]" />
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce [animation-delay:240ms]" />
-          </div>
-        )}
-
-        {leadOpen && !leadSaved && (
-          <form onSubmit={handleLeadSubmit} className="rounded-card border border-primary/40 bg-surface p-3.5 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="font-heading text-xs font-semibold text-primary">Request a Quote</span>
-              <button type="button" onClick={() => setLeadOpen(false)} className="text-xs text-text-muted">Close</button>
-            </div>
-            <input
-              type="text"
-              required
-              placeholder="Your Name *"
-              value={leadName}
-              onChange={(e) => setLeadName(e.target.value)}
-              className="w-full rounded-input border border-border bg-bg px-3 py-1.5 text-xs text-text"
-            />
-            <input
-              type="email"
-              required
-              placeholder="Business Email *"
-              value={leadEmail}
-              onChange={(e) => setLeadEmail(e.target.value)}
-              className="w-full rounded-input border border-border bg-bg px-3 py-1.5 text-xs text-text"
-            />
-            <input
-              type="text"
-              required
-              placeholder="Project Need *"
-              value={leadNeed}
-              onChange={(e) => setLeadNeed(e.target.value)}
-              className="w-full rounded-input border border-border bg-bg px-3 py-1.5 text-xs text-text"
-            />
-            <Button type="submit" variant="primary" size="sm" fullWidth>Submit Details</Button>
-          </form>
-        )}
-
-        {showFallback && (
-          <div
-            role="alert"
-            className={cn(
-              "rounded-card border bg-surface p-4 space-y-3",
-              errorType === "invalid_request"
-                ? "border-danger/40"
-                : "border-gold/40"
-            )}
-          >
-            <div className="flex items-center justify-between gap-2">
-              <Badge
-                variant={
-                  errorType === "rate_limited"
-                    ? "gold"
-                    : errorType === "invalid_request"
-                    ? "danger"
-                    : "default"
-                }
-                size="sm"
-                dot
-              >
-                {errorType === "rate_limited"
-                  ? "Rate Limited"
-                  : errorType === "invalid_request"
-                  ? "Invalid Request"
-                  : "Assistant Unavailable"}
-              </Badge>
-            </div>
-            <p className="text-xs text-text-muted">
-              {fallbackNote ||
-                "Connect with our founding team directly on WhatsApp or book a free consultation:"}
-            </p>
-            <div className="flex flex-wrap items-center gap-2">
-              <WhatsAppButton variant="inline" label="Chat on WhatsApp" />
-              <Link href="/contact#main-content">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  leftIcon={<Calendar strokeWidth={1.5} className="h-3.5 w-3.5" />}
-                >
-                  Book Consultation
-                </Button>
-              </Link>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="flex items-center gap-1.5 overflow-x-auto border-t border-border bg-surface-2/60 px-3 py-2">
-        {QUICK_PROMPTS.map((q) => (
-          <button
-            key={q}
-            type="button"
-            onClick={() => sendMessage(q)}
-            disabled={streaming}
-            className="shrink-0 rounded-pill border border-border bg-surface px-2.5 py-1 text-[11px] text-text-muted hover:text-text"
-          >
-            {q}
-          </button>
-        ))}
-      </div>
+      <FollowUpChipsBar
+        chips={followUpChips}
+        showQuoteButton={hasAssistantReplyAfterUser}
+        onSelectChip={(prompt) => sendMessage(prompt)}
+        onOpenQuote={() => setLeadOpen(true)}
+        disabled={streaming}
+      />
 
       <form
         onSubmit={(e) => {
           e.preventDefault();
           sendMessage();
         }}
-        className="border-t border-border bg-surface p-3 space-y-2"
+        className="border-t border-border bg-surface/90 p-3 space-y-2"
       >
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
+        <div className="relative flex items-end gap-2 rounded-input border border-border bg-bg px-3 py-2 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/25">
+          <textarea
+            ref={textareaRef}
+            rows={1}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) =>
+              setInput(e.target.value.slice(0, MAX_CHAT_MESSAGE_LENGTH))
+            }
+            onKeyDown={handleTextareaKeyDown}
             maxLength={MAX_CHAT_MESSAGE_LENGTH}
             placeholder="Ask about services, pricing, or timelines..."
-            aria-label="Ask the EliavaTech AI assistant"
-            className="flex-1 rounded-pill border border-border bg-bg px-3.5 py-2 text-xs text-text placeholder:text-text-muted focus:border-primary focus:outline-none"
+            aria-label="Message EliavaTech Assistant"
+            className="thin-scrollbar max-h-[96px] min-h-[24px] flex-1 resize-none bg-transparent text-[15px] leading-[1.5] text-text placeholder:text-text-muted focus:outline-none"
           />
-          <button
-            type="submit"
-            disabled={streaming || !input.trim()}
-            aria-label="Send message"
-            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-pill bg-primary text-white disabled:opacity-45 hover:bg-primary-hover"
-          >
-            <Send strokeWidth={1.5} className="h-4 w-4" />
-          </button>
+
+          <div className="flex shrink-0 items-center gap-2">
+            {nearCharLimit && (
+              <span
+                aria-live="polite"
+                className={cn(
+                  "font-mono text-[11px]",
+                  input.length >= MAX_CHAT_MESSAGE_LENGTH
+                    ? "text-danger"
+                    : "text-text-muted"
+                )}
+              >
+                {input.length}/{MAX_CHAT_MESSAGE_LENGTH}
+              </span>
+            )}
+
+            <button
+              type="submit"
+              disabled={!canSend}
+              aria-label="Send message"
+              className={cn(
+                "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                canSend
+                  ? "bg-primary text-on-primary hover:bg-primary-hover hover:scale-105 active:scale-95 shadow-xs"
+                  : "bg-surface-2 text-text-muted opacity-50 cursor-not-allowed"
+              )}
+            >
+              <Send strokeWidth={1.5} className="h-4 w-4" />
+            </button>
+          </div>
         </div>
-        <p className="text-[10px] text-center text-text-muted">
-          Conversations may be stored to improve our service.
+
+        <p className="text-[11px] text-center text-text-muted">
+          Conversations may be stored to improve our service.{" "}
+          <Link
+            href="/privacy"
+            className="underline underline-offset-2 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xs"
+          >
+            Privacy Policy
+          </Link>
         </p>
       </form>
     </div>
@@ -443,36 +428,60 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
   }
 
   return (
-    <div className="fixed bottom-20 right-5 z-40 flex flex-col items-end gap-3">
+    <>
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, scale: 0.9, y: 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.9, y: 16 }}
-            transition={SPRING_PLAYFUL}
-            style={{ transformOrigin: "bottom right" }}
-          >
-            {panelContent}
-          </motion.div>
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: EASE_STANDARD }}
+            onClick={closeAndReturnFocus}
+            aria-hidden="true"
+            className="sm:hidden fixed inset-0 z-40 bg-bg/60 backdrop-blur-xs"
+          />
         )}
       </AnimatePresence>
 
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        aria-label="Toggle EliavaTech AI assistant"
-        className="glass-surface inline-flex items-center gap-2.5 rounded-pill border border-primary/50 px-4 py-3 text-small font-medium text-text shadow-[var(--shadow-card-hover)] transition-all duration-200 hover:-translate-y-0.5 hover:border-primary"
+      <div
+        style={{ bottom: `${20 + cookieOffset}px` }}
+        className="fixed right-5 z-50 flex flex-col items-end gap-3"
       >
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-white">
-          <Sparkles strokeWidth={1.5} className="h-4 w-4" />
-        </span>
-        <span className="hidden sm:inline text-xs font-medium text-text">
-          {open ? "Close Assistant" : "AI Assistant"}
-        </span>
-      </button>
-    </div>
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              initial={
+                reduced
+                  ? { opacity: 1 }
+                  : { opacity: 0, scale: 0.94, y: 12 }
+              }
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={
+                reduced
+                  ? { opacity: 0 }
+                  : {
+                      opacity: 0,
+                      scale: 0.94,
+                      y: 12,
+                      transition: { duration: 0.2, ease: EASE_STANDARD },
+                    }
+              }
+              transition={SPRING_PLAYFUL}
+              style={{ transformOrigin: "bottom right" }}
+              className="fixed inset-x-0 bottom-0 z-50 sm:static sm:z-auto"
+            >
+              {panelContent}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <ChatLauncherGroup
+          open={open}
+          onToggle={() => (open ? closeAndReturnFocus() : setOpen(true))}
+          launcherRef={launcherRef}
+        />
+      </div>
+    </>
   );
 }
 
