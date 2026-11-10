@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { ScrollProgress } from "@/components/layout/ScrollProgress";
 import { WhatsAppButton } from "@/components/overlays/WhatsAppButton";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 import "./globals.css";
 
 const sora = Sora({
@@ -67,6 +68,7 @@ export default function RootLayout({
             </main>
             <Footer />
           </SmoothScroll>
+          <ChatWidget mode="floating" />
           <WhatsAppButton />
         </ThemeProvider>
       </body>
