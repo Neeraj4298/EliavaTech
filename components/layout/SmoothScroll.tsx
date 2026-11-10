@@ -32,6 +32,8 @@ export function SmoothScroll({ children }: SmoothScrollProps) {
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
       touchMultiplier: 1.5,
+      prevent: (node: HTMLElement) =>
+        Boolean(node.closest?.("[data-lenis-prevent]")),
     });
 
     lenisRef.current = lenis;

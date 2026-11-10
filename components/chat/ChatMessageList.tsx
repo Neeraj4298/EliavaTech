@@ -68,9 +68,14 @@ export function ChatMessageList({
   return (
     <div
       ref={scrollRef}
+      data-lenis-prevent
+      data-lenis-prevent-wheel
+      data-lenis-prevent-touch
       onScroll={handleScroll}
+      onWheel={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
       aria-live="polite"
-      className="thin-scrollbar chat-messages-mask flex-1 overflow-y-auto px-4 py-4 space-y-4"
+      className="thin-scrollbar chat-messages-mask min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 space-y-4"
     >
       {messages.map((msg, idx) => {
         const isAssistant = msg.role === "assistant";

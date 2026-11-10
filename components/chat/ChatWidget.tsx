@@ -313,11 +313,16 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
   const panelContent = (
     <div
       ref={panelRef}
+      data-lenis-prevent
+      data-lenis-prevent-wheel
+      data-lenis-prevent-touch
+      onWheel={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
       role={mode === "floating" ? "dialog" : "region"}
       aria-modal={mode === "floating" ? "true" : undefined}
       aria-label="EliavaTech AI Assistant"
       className={cn(
-        "glass-surface flex flex-col overflow-hidden border border-border text-text shadow-[var(--shadow-card-hover)] dark:shadow-[var(--glow-primary)]",
+        "glass-surface flex flex-col overflow-hidden overscroll-contain border border-border text-text shadow-[var(--shadow-card-hover)] dark:shadow-[var(--glow-primary)]",
         mode === "full"
           ? "w-full h-[540px] rounded-[16px]"
           : "w-full h-[85dvh] max-h-[85dvh] rounded-t-[20px] rounded-b-none pb-[env(safe-area-inset-bottom)] sm:w-[400px] sm:h-[580px] sm:max-h-[calc(100dvh-120px)] sm:rounded-[16px] sm:pb-0",
@@ -367,6 +372,7 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
         <div className="relative flex items-end gap-2 rounded-input border border-border bg-bg px-3 py-2 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/25">
           <textarea
             ref={textareaRef}
+            data-lenis-prevent
             rows={1}
             value={input}
             onChange={(e) =>
@@ -376,7 +382,7 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
             maxLength={MAX_CHAT_MESSAGE_LENGTH}
             placeholder="Ask about services, pricing, or timelines..."
             aria-label="Message EliavaTech Assistant"
-            className="thin-scrollbar max-h-[96px] min-h-[24px] flex-1 resize-none bg-transparent text-[15px] leading-[1.5] text-text placeholder:text-text-muted focus:outline-none"
+            className="thin-scrollbar overscroll-contain max-h-[96px] min-h-[24px] flex-1 resize-none bg-transparent text-[15px] leading-[1.5] text-text placeholder:text-text-muted focus:outline-none"
           />
 
           <div className="flex shrink-0 items-center gap-2">

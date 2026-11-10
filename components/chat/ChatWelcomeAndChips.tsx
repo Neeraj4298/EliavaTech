@@ -134,13 +134,14 @@ export function FollowUpChipsBar({
 
   return (
     <motion.div
+      data-lenis-prevent
       initial={reduced ? false : "hidden"}
       animate="visible"
       variants={{
         hidden: {},
         visible: { transition: { staggerChildren: 0.06 } },
       }}
-      className="no-scrollbar chips-edge-mask flex items-center gap-2 overflow-x-auto border-t border-border bg-surface/60 px-4 py-2.5 pr-7"
+      className="no-scrollbar chips-edge-mask flex items-center gap-2 overflow-x-auto overscroll-contain border-t border-border bg-surface/60 px-4 py-2.5 pr-7"
     >
       {showQuoteButton && (
         <motion.button
