@@ -1,0 +1,215 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Section 2.3 — Color Tokens (Light Default on :root & [data-theme='light']) */
+:root,
+[data-theme="light"] {
+  --bg: #F7F8FB;
+  --surface: #FFFFFF;
+  --surface-2: #EEF0F6;
+  --border: #DDE1EC;
+  --text: #0B1020;
+  --text-muted: #55607A;
+  --primary: #4B3FE0;
+  --primary-hover: #3A2FC4;
+  --gold: #C98A12;
+  --success: #0F9D6B;
+  --danger: #D64545;
+
+  --shadow-card: 0 4px 20px -2px rgba(11, 16, 32, 0.05), 0 2px 6px -1px rgba(11, 16, 32, 0.03);
+  --shadow-card-hover: 0 12px 32px -4px rgba(75, 63, 224, 0.10), 0 4px 12px -2px rgba(11, 16, 32, 0.05);
+  --glow-primary: 0 8px 24px -4px rgba(75, 63, 224, 0.18);
+  --gradient-primary: linear-gradient(135deg, #4B3FE0 0%, #6355F5 100%);
+  --glass-bg: rgba(255, 255, 255, 0.78);
+  --glass-border: rgba(221, 225, 236, 0.85);
+  color-scheme: light;
+}
+
+/* Section 2.3 — Color Tokens (Dark Theme on [data-theme='dark']) */
+[data-theme="dark"] {
+  --bg: #060912;
+  --surface: #0D1322;
+  --surface-2: #141C31;
+  --border: #222C47;
+  --text: #EEF1F8;
+  --text-muted: #9AA6C3;
+  --primary: #7C6CFF;
+  --primary-hover: #9A8DFF;
+  --gold: #F2B84B;
+  --success: #34D399;
+  --danger: #F87171;
+
+  --shadow-card: 0 0 0 1px rgba(34, 44, 71, 0.6);
+  --shadow-card-hover: 0 0 28px -4px rgba(124, 108, 255, 0.25);
+  --glow-primary: 0 0 28px -4px rgba(124, 108, 255, 0.32);
+  --gradient-primary: linear-gradient(135deg, #7C6CFF 0%, #5E72EB 100%);
+  --glass-bg: rgba(13, 19, 34, 0.76);
+  --glass-border: rgba(34, 44, 71, 0.85);
+  color-scheme: dark;
+}
+
+/* Section 2.4, 2.5 & 5.3 — Spacing, Shape, Typography & Motion Tokens */
+:root {
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-5: 2.5rem;
+  --space-6: 3rem;
+  --space-8: 4rem;
+  --space-9: 4.5rem;
+  --space-10: 5rem;
+  --space-12: 6rem;
+  --space-15: 7.5rem;
+
+  --section-py-mobile: 4.5rem;
+  --section-py-desktop: 7.5rem;
+  --container-max: 75rem;
+
+  --radius-card: 0.75rem;
+  --radius-input: 0.75rem;
+  --radius-pill: 999px;
+
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --duration-hero: 800ms;
+  --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Tailwind CSS v4 Theme Mapping */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-gold: var(--gold);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+
+  --font-heading: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --radius-card: var(--radius-card);
+  --radius-input: var(--radius-input);
+  --radius-pill: var(--radius-pill);
+
+  --container-content: var(--container-max);
+
+  --shadow-surface: var(--shadow-card);
+  --shadow-surface-hover: var(--shadow-card-hover);
+  --shadow-glow: var(--glow-primary);
+
+  --spacing-section-mobile: var(--section-py-mobile);
+  --spacing-section-desktop: var(--section-py-desktop);
+}
+
+html,
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.75rem;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+code, pre, kbd, samp {
+  font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+.text-h1 {
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.5rem, 1.6429rem + 3.6571vw, 4rem);
+  line-height: clamp(2.75rem, 1.9786rem + 3.2914vw, 4.25rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.text-h2 {
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.875rem, 1.375rem + 2.1333vw, 2.75rem);
+  line-height: clamp(2.25rem, 1.75rem + 2.1333vw, 3.125rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.text-h3 {
+  font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.375rem, 1.1607rem + 0.9143vw, 1.75rem);
+  line-height: clamp(1.875rem, 1.6607rem + 0.9143vw, 2.25rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.text-body {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.75rem;
+  font-weight: 400;
+}
+
+.text-small {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+  font-weight: 400;
+}
+
+.section-spacing {
+  padding-top: var(--section-py-mobile);
+  padding-bottom: var(--section-py-mobile);
+}
+
+@media (min-width: 768px) {
+  .section-spacing {
+    padding-top: var(--section-py-desktop);
+    padding-bottom: var(--section-py-desktop);
+  }
+}
+
+.container-max {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.glass-surface {
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-color: var(--glass-border);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
