@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { PlaceholderPageShell } from "@/components/sections/PlaceholderPageShell";
+import { PRICING_HEADER } from "@/content/pricing";
+import { Section } from "@/components/layout/Section";
+import { Badge } from "@/components/ui/Badge";
+import { SplitHeading } from "@/components/motion/SplitHeading";
+import { PricingPageClient } from "@/components/sections/PricingPageClient";
+import { FAQSection } from "@/components/sections/home/FAQSection";
+import { CTABandSection } from "@/components/sections/home/CTABandSection";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -7,56 +13,37 @@ export const metadata: Metadata = {
     "Founding client pricing for websites, e-commerce, WhatsApp automation, custom software, and monthly care plans.",
 };
 
+/**
+ * Section 4.6 — Pricing Page:
+ * Founding client pricing, One-time vs Monthly toggle, exact packages,
+ * third-party fees note, and Request a custom quote form.
+ */
 export default function PricingPage() {
   return (
-    <PlaceholderPageShell
-      eyebrow="Founding Client Pricing"
-      title="Transparent launch pricing built for growing businesses."
-      description="Prices start from the amounts shown and depend on scope. Third-party fees (WhatsApp API, payment gateways, hosting) are billed separately."
-      cards={[
-        {
-          title: "Starter Website",
-          subtitle: "From ₹9,999",
-          description: "Up to 5 pages, responsive design, contact form, and foundational SEO.",
-          href: "/contact",
-          badge: "Websites",
-        },
-        {
-          title: "Business Website",
-          subtitle: "From ₹24,999",
-          description: "Up to 10 pages, CMS, booking or enquiry integration, and analytics.",
-          href: "/contact",
-          badge: "Websites",
-        },
-        {
-          title: "E-commerce Store",
-          subtitle: "From ₹34,999",
-          description: "Product catalogue, Razorpay checkout, order management, and GST invoices.",
-          href: "/contact",
-          badge: "Websites",
-        },
-        {
-          title: "WhatsApp & AI Automation",
-          subtitle: "From ₹12,999 setup",
-          description: "WhatsApp Business flows, lead capture, and AI customer-support assistant (from ₹14,999).",
-          href: "/contact",
-          badge: "Automation",
-        },
-        {
-          title: "Custom CRM or Dashboard",
-          subtitle: "From ₹49,999",
-          description: "Tailored internal tools, billing, or CRM modules quoted after discovery.",
-          href: "/contact",
-          badge: "Custom Software",
-        },
-        {
-          title: "Monthly Care Plans",
-          subtitle: "₹1,499 – ₹5,999/month",
-          description: "Essential (₹1,499/mo), Growth (₹2,999/mo), and Pro (₹5,999/mo) care plans.",
-          href: "/contact",
-          badge: "Monthly Care",
-        },
-      ]}
-    />
+    <div className="flex flex-col">
+      <Section className="border-b border-border/60">
+        <div className="max-w-3xl space-y-5">
+          <Badge variant="gold" size="md" dot>
+            {PRICING_HEADER.badge}
+          </Badge>
+          <SplitHeading
+            text={PRICING_HEADER.title}
+            as="h1"
+            className="text-h1 block"
+          />
+          <p className="text-body text-text-muted">
+            {PRICING_HEADER.description}
+          </p>
+        </div>
+      </Section>
+
+      <Section>
+        <PricingPageClient />
+      </Section>
+
+      <FAQSection />
+      <CTABandSection />
+    </div>
   );
 }
+
