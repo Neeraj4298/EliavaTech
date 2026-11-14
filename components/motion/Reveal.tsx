@@ -31,7 +31,7 @@ export function Reveal({
   yOffset = 24,
   duration = MOTION_DURATION.slow,
   once = true,
-  amount = 0.2,
+  amount = 0.05,
 }: RevealProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
 
@@ -43,7 +43,7 @@ export function Reveal({
     <motion.div
       initial={{ opacity: 0, y: yOffset }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once, amount }}
+      viewport={{ once, amount, margin: "0px 0px 40px 0px" }}
       transition={{
         duration,
         delay,

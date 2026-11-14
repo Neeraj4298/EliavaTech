@@ -28,9 +28,9 @@ export function StaggerGroup({
   children,
   className,
   stagger = STAGGER_SIBLINGS,
-  delayChildren = 0,
+  delayChildren = 0.05,
   once = true,
-  amount = 0.2,
+  amount = 0.05,
 }: StaggerGroupProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
 
@@ -42,7 +42,7 @@ export function StaggerGroup({
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once, amount }}
+      viewport={{ once, amount, margin: "0px 0px 40px 0px" }}
       variants={{
         hidden: {},
         visible: {
