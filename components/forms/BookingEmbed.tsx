@@ -18,8 +18,15 @@ export interface BookingEmbedProps {
  */
 export function BookingEmbed({ className }: BookingEmbedProps) {
   const { resolvedTheme } = useTheme();
-  const calLinkRaw = (process.env.NEXT_PUBLIC_CAL_LINK || "").trim();
-  const cleanCalPath = calLinkRaw
+  const envCalLink = (process.env.NEXT_PUBLIC_CAL_LINK || "").trim();
+  const calLinkRaw =
+    !envCalLink || envCalLink === "supporteliavatech/30min"
+      ? "eliava-tech-icmfdj/30min"
+      : envCalLink;
+  const normalizedCalLink = calLinkRaw.includes("@")
+    ? "eliava-tech-icmfdj/30min"
+    : calLinkRaw;
+  const cleanCalPath = normalizedCalLink
     .replace(/^https?:\/\/(www\.)?cal\.com\//i, "")
     .replace(/^\/+/, "");
 

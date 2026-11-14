@@ -56,11 +56,15 @@ export function Footer() {
             <ul className="space-y-2 pt-2 text-xs text-text-muted">
               <li className="flex items-center gap-2">
                 <Mail strokeWidth={1.5} className="h-4 w-4 text-primary shrink-0" />
-                <span>hello@eliavatech.com [PLACEHOLDER]</span>
+                <a href="mailto:supporteliavatech@gmail.com" className="hover:text-primary">
+                  supporteliavatech@gmail.com
+                </a>
               </li>
               <li className="flex items-center gap-2">
                 <Phone strokeWidth={1.5} className="h-4 w-4 text-primary shrink-0" />
-                <span>+91 90000 00000 [PLACEHOLDER]</span>
+                <a href="tel:+917075466449" className="hover:text-primary">
+                  +91 70754 66449
+                </a>
               </li>
               <li className="flex items-center gap-2">
                 <MapPin strokeWidth={1.5} className="h-4 w-4 text-primary shrink-0" />

@@ -139,6 +139,9 @@ export async function POST(req: NextRequest) {
       budgetRange: data.budgetRange,
       message: data.message,
     });
+    if (emailResult.error) {
+      console.warn("[/api/contact] Email warning:", emailResult.error);
+    }
 
     // 3. Call N8N_WEBHOOK_URL if set
     const webhookUrl = process.env.N8N_WEBHOOK_URL;
@@ -171,11 +174,25 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    if (!emailResult.sent) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            emailResult.error ||
+            "Could not send confirmation email. Please check email configuration.",
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({
       ok: true,
       leadId: savedLeadId ?? null,
       dbSaved,
       emailSent: emailResult.sent,
+      teamEmailSent: emailResult.teamEmailSent,
+      userEmailSent: emailResult.userEmailSent,
       webhookSent,
       message: "Thank you. We have received your enquiry and will reply within one business day.",
     });

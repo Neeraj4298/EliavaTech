@@ -119,7 +119,7 @@ export function LegalPageLayout({
                 Questions about privacy or data removal?
               </h2>
               <p className="text-xs text-text-muted">
-                Contact our Data Fiduciary team at hello@eliavatech.com [PLACEHOLDER].
+                Contact our Data Fiduciary team at supporteliavatech@gmail.com.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">

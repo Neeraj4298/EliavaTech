@@ -15,8 +15,67 @@ import { cn } from "@/lib/utils";
 export function PricingPageClient() {
   const [billingMode, setBillingMode] = React.useState<"one-time" | "monthly">("one-time");
   const [quoteSent, setQuoteSent] = React.useState(false);
+  const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [service, setService] = React.useState("bundle");
+  const [budgetRange, setBudgetRange] = React.useState("25k-50k");
+  const [message, setMessage] = React.useState("");
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [submitError, setSubmitError] = React.useState<string | null>(null);
+  const [submittedEmail, setSubmittedEmail] = React.useState("");
 
   const visibleTiers = PRICING_TIERS.filter((tier) => tier.billingMode === billingMode);
+
+  const handleQuoteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    setSubmitError(null);
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          service,
+          budgetRange,
+          message: message.trim(),
+          website: "",
+        }),
+      });
+
+      const payload = (await res.json().catch(() => null)) as {
+        ok?: boolean;
+        error?: string;
+        fieldErrors?: Record<string, string[] | undefined>;
+      } | null;
+
+      if (!res.ok || !payload?.ok) {
+        const firstFieldError = payload?.fieldErrors
+          ? Object.values(payload.fieldErrors).flat().find(Boolean)
+          : undefined;
+        setSubmitError(
+          firstFieldError ||
+            payload?.error ||
+            "Could not submit your quote request right now. Please try again."
+        );
+        setIsSubmitting(false);
+        return;
+      }
+
+      trackFormSubmission("pricing_custom_quote", service);
+      setSubmittedEmail(email.trim());
+      setQuoteSent(true);
+      setIsSubmitting(false);
+    } catch {
+      setSubmitError(
+        "Network error while sending your quote request. Please check your connection and try again."
+      );
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="space-y-14">
@@ -120,23 +179,34 @@ export function PricingPageClient() {
                 <span>Custom quote request received</span>
               </div>
               <p className="text-small text-text-muted">
-                Thank you. A co-founder will review your scope and reply within one business day.
+                Thank you, <span className="font-medium text-text">{name}</span>. We have notified the EliavaTech team and sent a confirmation email to{" "}
+                <span className="font-medium text-text">{submittedEmail}</span>. A co-founder will review your scope and reply within one business day.
               </p>
             </div>
           ) : (
             <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                trackFormSubmission("pricing_custom_quote");
-                setQuoteSent(true);
-              }}
+              onSubmit={handleQuoteSubmit}
               className="grid grid-cols-1 sm:grid-cols-2 gap-4"
             >
-              <Input label="Your Name" required placeholder="Aarav Sharma" />
-              <Input label="Business Email" type="email" required placeholder="aarav@company.in" />
+              <Input
+                label="Your Name"
+                required
+                placeholder="Aarav Sharma"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <Input
+                label="Business Email"
+                type="email"
+                required
+                placeholder="aarav@company.in"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
               <Select
                 label="Package / Service"
-                defaultValue="bundle"
+                value={service}
+                onChange={(e) => setService(e.target.value)}
                 options={[
                   { value: "bundle", label: "Website + WhatsApp Automation Bundle" },
                   { value: "ecommerce", label: "E-commerce Store (from ₹34,999)" },
@@ -146,7 +216,8 @@ export function PricingPageClient() {
               />
               <Select
                 label="Estimated Budget Range"
-                defaultValue="25k-50k"
+                value={budgetRange}
+                onChange={(e) => setBudgetRange(e.target.value)}
                 options={[
                   { value: "10k-25k", label: "₹10,000 – ₹25,000" },
                   { value: "25k-50k", label: "₹25,000 – ₹50,000" },
@@ -160,10 +231,23 @@ export function PricingPageClient() {
                   rows={3}
                   required
                   placeholder="Tell us about your business and what you want to launch or automate..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
                 />
               </div>
+              {submitError && (
+                <p role="alert" className="sm:col-span-2 text-xs text-danger">
+                  {submitError}
+                </p>
+              )}
               <div className="sm:col-span-2 flex justify-end">
-                <Button type="submit" variant="primary" size="md" withArrow>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="md"
+                  isLoading={isSubmitting}
+                  withArrow
+                >
                   Request a Custom Quote
                 </Button>
               </div>

@@ -21,8 +21,8 @@ function formatPageName(pathname: string | null): string {
 
 export function getWhatsAppHref(customMessage?: string, pathname?: string | null): string {
   const rawNumber =
-    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919000000000";
-  const cleanNumber = rawNumber.replace(/[^\d]/g, "") || "919000000000";
+    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "917075466449";
+  const cleanNumber = rawNumber.replace(/[^\d]/g, "") || "917075466449";
   const pageContext = formatPageName(pathname ?? null);
   const text =
     customMessage ||

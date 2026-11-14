@@ -78,13 +78,13 @@ export default function ContactPage() {
                   <Mail strokeWidth={1.5} className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <div>
                     <p className="font-mono text-xs text-text-muted uppercase">
-                      Business Email [PLACEHOLDER]
+                      Business Email
                     </p>
                     <a
-                      href="mailto:hello@eliavatech.com"
+                      href="mailto:supporteliavatech@gmail.com"
                       className="font-heading text-base font-semibold text-text hover:text-primary"
                     >
-                      hello@eliavatech.com
+                      supporteliavatech@gmail.com
                     </a>
                   </div>
                 </div>
@@ -93,13 +93,13 @@ export default function ContactPage() {
                   <Phone strokeWidth={1.5} className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <div>
                     <p className="font-mono text-xs text-text-muted uppercase">
-                      Phone &amp; WhatsApp [PLACEHOLDER]
+                      Phone &amp; WhatsApp
                     </p>
                     <a
-                      href="tel:+919000000000"
+                      href="tel:+917075466449"
                       className="font-heading text-base font-semibold text-text hover:text-primary"
                     >
-                      +91 90000 00000
+                      +91 70754 66449
                     </a>
                   </div>
                 </div>

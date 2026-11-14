@@ -52,7 +52,7 @@ export const contactFormSchema = z.object({
   message: z
     .string()
     .trim()
-    .min(10, "Please share a short summary of your business need (at least 10 characters).")
+    .min(3, "Please share a short summary of your project scope or need.")
     .max(2000, "Message must be under 2,000 characters."),
   // Honeypot spam field — must remain empty
   website: z.string().max(0, "Spam detected.").optional().or(z.literal("")),

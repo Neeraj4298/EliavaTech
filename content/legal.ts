@@ -14,7 +14,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     heading: "1. Overview & Data Fiduciary Details [PLACEHOLDER]",
     paragraphs: [
       "EliavaTech ('we', 'us', or 'our') respects your privacy and is committed to protecting personal data in accordance with India's Digital Personal Data Protection Act, 2023 (DPDP Act).",
-      "Data Fiduciary Contact [PLACEHOLDER]: EliavaTech · Remote-first, serving India [PLACEHOLDER address] · Email: hello@eliavatech.com [PLACEHOLDER].",
+      "Data Fiduciary Contact: EliavaTech · Remote-first, serving India · Email: supporteliavatech@gmail.com · Phone: +91 70754 66449.",
     ],
   },
   {
@@ -58,7 +58,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     heading: "5. Your Rights & Data Removal Requests (DPDP Act)",
     paragraphs: [
       "Under the Digital Personal Data Protection Act, 2023, you have the right to request access to, correction of, or erasure of your personal data, and to withdraw consent at any time.",
-      "To request data removal or exercise any privacy right, email hello@eliavatech.com [PLACEHOLDER] with the subject line 'Privacy Request'. We respond within 7 business days [PLACEHOLDER].",
+      "To request data removal or exercise any privacy right, email supporteliavatech@gmail.com with the subject line 'Privacy Request'. We respond within 7 business days.",
     ],
   },
 ];
