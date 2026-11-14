@@ -7,7 +7,6 @@ import { SplitHeading } from "@/components/motion/SplitHeading";
 import { ContactForm } from "@/components/forms/ContactForm";
 import { BookingEmbed } from "@/components/forms/BookingEmbed";
 import { WhatsAppButton } from "@/components/overlays/WhatsAppButton";
-import { LazyChatWidget } from "@/components/chat/LazyChatWidget";
 import { buildBreadcrumbSchema, buildPageMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 
@@ -49,15 +48,6 @@ export default function ContactPage() {
           <div className="lg:col-span-7 space-y-8">
             <ContactForm />
             <BookingEmbed />
-            <div className="space-y-3">
-              <Badge variant="primary" size="sm" dot>
-                Instant AI Assistant
-              </Badge>
-              <h2 className="text-h3">
-                Have a quick question about pricing, scope, or timelines?
-              </h2>
-              <LazyChatWidget mode="full" />
-            </div>
           </div>
 
           <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
