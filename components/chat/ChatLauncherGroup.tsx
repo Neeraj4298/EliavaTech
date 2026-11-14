@@ -85,15 +85,15 @@ export function ChatLauncherGroup({
       </AnimatePresence>
 
       {/* Theme-matched vertical pill dock housing Call + WhatsApp + AI Assistant */}
-      <div className="glass-surface flex flex-col items-center gap-2.5 rounded-full border border-border bg-surface-2/90 p-2 shadow-[var(--shadow-card-hover)] backdrop-blur-xl">
+      <div className="glass-surface flex flex-col items-center gap-2.5 rounded-full border border-border p-2 shadow-[var(--shadow-card-hover)]">
         <div className={cn(open && "hidden sm:block")}>
           <Tooltip content="Call us (+91 70754 66449)" placement="left">
             <a
               href="tel:+917075466449"
               aria-label="Call EliavaTech (+91 70754 66449)"
-              className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gold text-[#0B1020] shadow-sm transition-all duration-200 hover:scale-105 hover:brightness-110 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+              className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-primary/25 bg-primary/12 text-primary transition-all duration-200 hover:scale-105 hover:border-primary hover:bg-primary hover:text-white active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
             >
-              <Phone strokeWidth={2} className="h-5 w-5 fill-current" />
+              <Phone strokeWidth={1.75} className="h-5 w-5" />
             </a>
           </Tooltip>
         </div>
