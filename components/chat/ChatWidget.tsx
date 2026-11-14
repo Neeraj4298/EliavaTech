@@ -387,7 +387,8 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
             maxLength={MAX_CHAT_MESSAGE_LENGTH}
             placeholder="Ask about services, pricing, or timelines..."
             aria-label="Message EliavaTech Assistant"
-            className="thin-scrollbar overscroll-contain max-h-[96px] min-h-[24px] flex-1 resize-none bg-transparent text-[15px] leading-[1.5] text-text placeholder:text-text-muted focus:outline-none"
+            style={{ outline: "none", boxShadow: "none" }}
+            className="thin-scrollbar overscroll-contain max-h-[96px] min-h-[24px] flex-1 resize-none border-0 bg-transparent py-0.5 text-[15px] leading-[1.5] text-text placeholder:text-text-muted outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0"
           />
 
           <div className="flex shrink-0 items-center gap-2">
@@ -410,13 +411,13 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
               disabled={!canSend}
               aria-label="Send message"
               className={cn(
-                "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 canSend
-                  ? "bg-primary text-on-primary hover:bg-primary-hover hover:scale-105 active:scale-95 shadow-xs"
-                  : "bg-surface-2 text-text-muted opacity-50 cursor-not-allowed"
+                  ? "bg-primary text-white shadow-[var(--glow-primary)] hover:bg-primary-hover hover:scale-105 active:scale-95"
+                  : "border border-primary/35 bg-primary/15 text-primary cursor-not-allowed"
               )}
             >
-              <Send strokeWidth={1.5} className="h-4 w-4" />
+              <Send strokeWidth={1.85} className="h-4 w-4 -ml-0.5" />
             </button>
           </div>
         </div>
