@@ -34,7 +34,7 @@ export class GeminiApiError extends Error {
 }
 
 export const MAX_CHAT_MESSAGE_LENGTH = 500;
-export const MAX_CHAT_CONVERSATION_MESSAGES = 12;
+export const MAX_CHAT_CONVERSATION_MESSAGES = 30;
 
 export interface ChatTurn {
   role: "user" | "assistant";

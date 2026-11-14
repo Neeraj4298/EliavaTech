@@ -161,18 +161,6 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
           },
         ];
 
-    if (nextMessages.length > MAX_CHAT_CONVERSATION_MESSAGES + 1) {
-      setMessages(nextMessages);
-      setInput("");
-      setInlineError({
-        type: "invalid_request",
-        message:
-          "You have reached the 12-message conversation limit. Please continue on WhatsApp or book a free consultation call.",
-        failedPrompt: text,
-      });
-      return;
-    }
-
     setMessages(nextMessages);
     if (!isRetry) setInput("");
     setStreaming(true);
@@ -180,14 +168,23 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
     setInlineError(null);
 
     try {
+      const historyForApi = nextMessages
+        .slice(1)
+        .slice(-MAX_CHAT_CONVERSATION_MESSAGES)
+        .map(({ role, content }) => ({
+          role,
+          content:
+            role === "user"
+              ? content.slice(0, MAX_CHAT_MESSAGE_LENGTH)
+              : content.slice(0, 8000),
+        }));
+
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sessionId,
-          messages: nextMessages
-            .slice(1)
-            .map(({ role, content }) => ({ role, content })),
+          messages: historyForApi,
         }),
       });
 

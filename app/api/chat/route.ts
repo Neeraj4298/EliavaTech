@@ -12,22 +12,32 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import { prisma } from "@/lib/db";
 import { sendLeadNotificationEmail } from "@/lib/email";
 
+const chatMessageSchema = z.discriminatedUnion("role", [
+  z.object({
+    role: z.literal("user"),
+    content: z
+      .string()
+      .trim()
+      .min(1, "Message cannot be empty.")
+      .max(
+        MAX_CHAT_MESSAGE_LENGTH,
+        `Each message must be under ${MAX_CHAT_MESSAGE_LENGTH} characters.`
+      ),
+  }),
+  z.object({
+    role: z.literal("assistant"),
+    content: z
+      .string()
+      .trim()
+      .min(1, "Message cannot be empty.")
+      .max(8000, "Assistant message too long."),
+  }),
+]);
+
 const chatRequestSchema = z.object({
   sessionId: z.string().max(100).optional(),
   messages: z
-    .array(
-      z.object({
-        role: z.enum(["user", "assistant"]),
-        content: z
-          .string()
-          .trim()
-          .min(1, "Message cannot be empty.")
-          .max(
-            MAX_CHAT_MESSAGE_LENGTH,
-            `Each message must be under ${MAX_CHAT_MESSAGE_LENGTH} characters.`
-          ),
-      })
-    )
+    .array(chatMessageSchema)
     .min(1, "At least one message is required.")
     .max(
       MAX_CHAT_CONVERSATION_MESSAGES,
