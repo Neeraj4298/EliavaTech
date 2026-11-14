@@ -101,7 +101,7 @@ export function MobileMenu({ open, onClose, currentPath }: MobileMenuProps) {
                       href={link.href}
                       onClick={onClose}
                       className={cn(
-                        "flex-1 flex items-center justify-between font-heading text-2xl font-semibold py-2",
+                        "flex-1 flex items-center justify-between font-heading text-lg md:text-2xl font-semibold py-2",
                         active ? "text-primary" : "text-text"
                       )}
                     >

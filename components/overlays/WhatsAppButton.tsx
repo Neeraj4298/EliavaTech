@@ -118,12 +118,12 @@ export function WhatsAppButton({
         rel="noopener noreferrer"
         aria-label="WhatsApp us"
         className={cn(
-          "inline-flex h-12 w-12 items-center justify-center rounded-full border border-success/30 bg-success/14 text-[var(--success-text)] transition-all duration-200 hover:scale-105 hover:border-success hover:bg-success hover:text-white active:scale-95",
+          "inline-flex h-9 w-9 md:h-12 md:w-12 items-center justify-center rounded-full border border-success/30 bg-success/14 text-[var(--success-text)] transition-all duration-200 hover:scale-105 hover:border-success hover:bg-success hover:text-white active:scale-95",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
           className
         )}
       >
-        <WhatsAppIcon className="h-5 w-5" />
+        <WhatsAppIcon className="h-4 w-4 md:h-5 md:w-5" />
       </a>
     </Tooltip>
   );

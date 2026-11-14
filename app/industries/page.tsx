@@ -58,7 +58,7 @@ export default function IndustriesPage() {
                   <div className="flex h-full flex-col justify-between gap-6">
                     <div className="space-y-4">
                       <Badge variant="default" size="sm">Industry Bundle</Badge>
-                      <h2 className="font-heading text-2xl font-semibold text-text group-hover:text-primary transition-colors">
+                      <h2 className="font-heading text-lg md:text-2xl font-semibold text-text group-hover:text-primary transition-colors">
                         {industry.title}
                       </h2>
                       <p className="text-small text-text-muted leading-relaxed">

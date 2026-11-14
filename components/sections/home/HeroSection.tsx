@@ -31,7 +31,7 @@ export function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden py-14 md:py-24 lg:py-28 border-b border-border/60"
+      className="relative overflow-hidden py-8 md:py-24 lg:py-28 border-b border-border/60"
     >
       {/* Subtle architectural background radial glow */}
       <div
@@ -43,9 +43,9 @@ export function HeroSection() {
         }}
       />
 
-      <div className="container-max relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <div className="container-max relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-7 lg:gap-12 items-center">
         {/* Left Column */}
-        <div className="lg:col-span-6 space-y-6">
+        <div className="lg:col-span-6 space-y-4 md:space-y-6">
           <div>
             <Badge variant="primary" size="md" dot>
               {HERO_CONTENT.label}

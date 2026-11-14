@@ -85,15 +85,15 @@ export function ChatLauncherGroup({
       </AnimatePresence>
 
       {/* Theme-matched vertical pill dock housing Call + WhatsApp + AI Assistant */}
-      <div className="glass-surface flex flex-col items-center gap-2.5 rounded-full border border-border p-2 shadow-[var(--shadow-card-hover)]">
+      <div className="glass-surface flex flex-col items-center gap-1.5 p-1.5 md:gap-2.5 md:p-2 rounded-full border border-border shadow-[var(--shadow-card-hover)]">
         <div className={cn(open && "hidden sm:block")}>
           <Tooltip content="Call us (+91 70754 66449)" placement="left">
             <a
               href="tel:+917075466449"
               aria-label="Call EliavaTech (+91 70754 66449)"
-              className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-primary/25 bg-primary/12 text-primary transition-all duration-200 hover:scale-105 hover:border-primary hover:bg-primary hover:text-white active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+              className="inline-flex h-9 w-9 md:h-12 md:w-12 items-center justify-center rounded-full border border-primary/25 bg-primary/12 text-primary transition-all duration-200 hover:scale-105 hover:border-primary hover:bg-primary hover:text-white active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
             >
-              <Phone strokeWidth={1.75} className="h-5 w-5" />
+              <Phone strokeWidth={1.75} className="h-4 w-4 md:h-5 md:w-5" />
             </a>
           </Tooltip>
         </div>
@@ -122,13 +122,13 @@ export function ChatLauncherGroup({
             aria-haspopup="dialog"
             aria-label={open ? "Close EliavaTech assistant" : "Open EliavaTech assistant"}
             style={{ backgroundImage: "var(--gradient-primary)" }}
-            className="relative inline-flex h-12 w-12 items-center justify-center rounded-full text-white shadow-[var(--glow-primary)] transition-transform duration-200 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+            className="relative inline-flex h-9 w-9 md:h-12 md:w-12 items-center justify-center rounded-full text-white shadow-[var(--glow-primary)] transition-transform duration-200 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
           >
-            <span className="relative flex h-5 w-5 items-center justify-center">
+            <span className="relative flex h-4 w-4 md:h-5 md:w-5 items-center justify-center">
               <Sparkles
                 strokeWidth={1.75}
                 className={cn(
-                  "absolute h-5 w-5 text-white transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                  "absolute h-4 w-4 md:h-5 md:w-5 text-white transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
                   open ? "rotate-90 scale-0 opacity-0" : "rotate-0 scale-100 opacity-100"
                 )}
                 aria-hidden="true"
@@ -136,7 +136,7 @@ export function ChatLauncherGroup({
               <X
                 strokeWidth={1.75}
                 className={cn(
-                  "absolute h-5 w-5 text-white transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                  "absolute h-4 w-4 md:h-5 md:w-5 text-white transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
                   open ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-0 opacity-0"
                 )}
                 aria-hidden="true"

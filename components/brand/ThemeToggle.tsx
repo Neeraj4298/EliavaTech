@@ -105,10 +105,10 @@ export function ThemeToggle({
       }
       className={cn(
         "relative inline-flex items-center justify-center gap-2 rounded-pill border border-border bg-surface text-text",
-        "h-10 px-3 text-small font-medium transition-all duration-200",
+        "h-9 md:h-10 px-2.5 md:px-3 text-small font-medium transition-all duration-200",
         "hover:bg-surface-2 hover:border-primary/40",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
-        ! showLabel && "w-10 px-0",
+        !showLabel && "w-9 md:w-10 px-0",
         className
       )}
       {...props}

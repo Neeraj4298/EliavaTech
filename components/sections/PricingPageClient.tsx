@@ -130,9 +130,9 @@ export function PricingPageClient() {
                 {tier.badge && <Badge variant="gold" size="sm">{tier.badge}</Badge>}
               </div>
               <div>
-                <h2 className="font-heading text-2xl font-semibold text-text">{tier.name}</h2>
-                <div className="mt-2 flex items-baseline gap-1.5">
-                  <span className="font-mono text-3xl font-semibold text-primary">{tier.price}</span>
+                <h2 className="font-heading text-lg md:text-2xl font-semibold text-text">{tier.name}</h2>
+                <div className="mt-1.5 md:mt-2 flex items-baseline gap-1.5">
+                  <span className="font-mono text-2xl md:text-3xl font-semibold text-primary">{tier.price}</span>
                   <span className="font-mono text-xs text-text-muted">{tier.unit}</span>
                 </div>
               </div>

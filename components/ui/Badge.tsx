@@ -36,8 +36,8 @@ const dotClasses: Record<BadgeVariant, string> = {
 };
 
 const sizeClasses: Record<BadgeSize, string> = {
-  sm: "px-2.5 py-0.5 text-xs gap-1.5",
-  md: "px-3 py-1 text-small gap-2",
+  sm: "px-2 py-0.5 text-[11px] gap-1 md:px-2.5 md:py-0.5 md:text-xs md:gap-1.5",
+  md: "px-2.5 py-0.5 text-xs gap-1.5 md:px-3 md:py-1 md:text-small md:gap-2",
 };
 
 /**

@@ -73,7 +73,7 @@ export default function ServicesPage() {
                           </span>
                           <Badge variant="gold" size="sm">{s.startingPrice}</Badge>
                         </div>
-                        <h2 className="font-heading text-2xl font-semibold text-text group-hover:text-primary transition-colors">{s.title}</h2>
+                        <h2 className="font-heading text-lg md:text-2xl font-semibold text-text group-hover:text-primary transition-colors">{s.title}</h2>
                         <p className="text-small text-text-muted">{s.outcome}</p>
                         <ul className="space-y-1.5 pt-1">
                           {s.includedChecklist.slice(0, 4).map((item) => (

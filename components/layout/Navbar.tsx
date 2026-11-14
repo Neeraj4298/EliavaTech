@@ -115,16 +115,16 @@ export function Navbar() {
             </MagneticButton>
           </div>
 
-          <div className="flex lg:hidden items-center gap-2">
+          <div className="flex lg:hidden items-center gap-1.5 md:gap-2">
             <ThemeToggle />
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
               aria-expanded={mobileMenuOpen}
               aria-label="Open navigation menu"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-pill border border-border bg-surface text-text hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="inline-flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-pill border border-border bg-surface text-text hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
-              <Menu strokeWidth={1.5} className="h-5 w-5" />
+              <Menu strokeWidth={1.5} className="h-4 w-4 md:h-5 md:w-5" />
             </button>
           </div>
         </div>

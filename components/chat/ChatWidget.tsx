@@ -455,8 +455,8 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
       </AnimatePresence>
 
       <div
-        style={{ bottom: `${20 + cookieOffset}px` }}
-        className="fixed right-5 z-50 flex flex-col items-end gap-3"
+        style={{ bottom: `${16 + cookieOffset}px` }}
+        className="fixed right-3 md:right-5 z-50 flex flex-col items-end gap-2 md:gap-3"
       >
         <AnimatePresence>
           {open && (

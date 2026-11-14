@@ -79,7 +79,7 @@ export function TiltCard({
         }
         transition={SPRING_PLAYFUL}
         style={{ transformStyle: "preserve-3d" }}
-        className="relative h-full overflow-hidden rounded-card border border-border bg-surface p-6 shadow-[var(--shadow-card)] transition-colors duration-250 hover:border-primary/50 will-change-transform"
+        className="relative h-full overflow-hidden rounded-card border border-border bg-surface p-4 md:p-6 shadow-[var(--shadow-card)] transition-colors duration-250 hover:border-primary/50 will-change-transform"
       >
         {/* Cursor-following glow translated via transform only */}
         {isEnabled && (

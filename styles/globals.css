@@ -205,6 +205,49 @@ code, pre, kbd, samp {
   padding-right: 1.5rem;
 }
 
+/* Mobile-only (<768px) App-Proportional Typography & Spacing (Webview >=768px unchanged) */
+@media (max-width: 767px) {
+  :root {
+    --section-py-mobile: 2.25rem;
+  }
+
+  html,
+  body {
+    font-size: 0.9375rem;
+    line-height: 1.45rem;
+  }
+
+  .text-h1 {
+    font-size: 1.75rem;
+    line-height: 2.125rem;
+  }
+
+  .text-h2 {
+    font-size: 1.375rem;
+    line-height: 1.75rem;
+  }
+
+  .text-h3 {
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+  }
+
+  .text-body {
+    font-size: 0.9375rem;
+    line-height: 1.45rem;
+  }
+
+  .text-small {
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+  }
+
+  .container-max {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
 .glass-surface {
   background-color: var(--glass-bg);
   backdrop-filter: blur(16px);

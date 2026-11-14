@@ -85,7 +85,7 @@ export default function RootLayout({
           <Cursor />
           <Navbar />
           <SmoothScroll>
-            <main id="main-content" className="flex-1 flex flex-col pt-20">
+            <main id="main-content" className="flex-1 flex flex-col pt-16 md:pt-20">
               {children}
             </main>
             <Footer />

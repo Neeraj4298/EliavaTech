@@ -23,9 +23,9 @@ const variantClasses: Record<CardVariant, string> = {
 
 const paddingClasses: Record<NonNullable<CardProps["padding"]>, string> = {
   none: "p-0",
-  sm: "p-4",
-  md: "p-6",
-  lg: "p-8",
+  sm: "p-3.5 md:p-4",
+  md: "p-4 md:p-6",
+  lg: "p-5 md:p-8",
 };
 
 /**

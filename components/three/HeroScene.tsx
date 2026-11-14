@@ -320,7 +320,7 @@ export function HeroScene({ active = true }: HeroSceneProps) {
       data-cursor-label="Drag"
       onMouseEnter={() => setExploded(true)}
       onMouseLeave={() => setExploded(false)}
-      className="relative h-[380px] sm:h-[460px] lg:h-[540px] w-full overflow-hidden select-none touch-pan-y cursor-grab active:cursor-grabbing rounded-card border border-border/60 bg-surface/35"
+      className="relative h-[300px] sm:h-[460px] lg:h-[540px] w-full overflow-hidden select-none touch-pan-y cursor-grab active:cursor-grabbing rounded-card border border-border/60 bg-surface/35"
     >
       <Canvas
         dpr={[1, 1.75]}
@@ -358,9 +358,9 @@ export function HeroScene({ active = true }: HeroSceneProps) {
               tokenElRefs.current[index] = node;
             }}
             style={{ transform: "translate3d(-200px, -200px, 0)" }}
-            className="absolute left-0 top-0 flex items-center gap-1.5 rounded-pill border border-border bg-surface/90 px-2.5 py-1 text-[11px] font-medium text-text shadow-sm backdrop-blur-xs will-change-transform"
+            className="absolute left-0 top-0 flex items-center gap-1 md:gap-1.5 rounded-pill border border-border bg-surface/90 px-2 py-0.5 md:px-2.5 md:py-1 text-[10px] md:text-[11px] font-medium text-text shadow-sm backdrop-blur-xs will-change-transform"
           >
-            <Icon strokeWidth={1.5} className="h-3 w-3 text-primary" />
+            <Icon strokeWidth={1.5} className="h-2.5 w-2.5 md:h-3 md:w-3 text-primary" />
             <span>{label}</span>
           </div>
         ))}
@@ -375,7 +375,7 @@ export function HeroScene({ active = true }: HeroSceneProps) {
               transform: "translate3d(-200px, -200px, 0)",
               opacity: exploded ? 1 : 0,
             }}
-            className={`absolute left-0 top-0 whitespace-nowrap rounded-pill border bg-surface/95 px-2.5 py-1 font-mono text-[11px] font-medium shadow-md transition-opacity duration-200 will-change-[transform,opacity] ${
+            className={`absolute left-0 top-0 whitespace-nowrap rounded-pill border bg-surface/95 px-2 py-0.5 md:px-2.5 md:py-1 font-mono text-[10px] md:text-[11px] font-medium shadow-md transition-opacity duration-200 will-change-[transform,opacity] ${
               layer.tone === "gold"
                 ? "border-gold/60 text-gold"
                 : layer.tone === "primary"

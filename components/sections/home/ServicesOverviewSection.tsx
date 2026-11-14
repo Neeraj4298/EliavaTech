@@ -67,7 +67,7 @@ export function ServicesOverviewSection() {
                             {service.startingPrice}
                           </Badge>
                         </div>
-                        <h3 className="font-heading text-2xl font-semibold text-text group-hover:text-primary transition-colors">
+                        <h3 className="font-heading text-lg md:text-2xl font-semibold text-text group-hover:text-primary transition-colors">
                           {service.title}
                         </h3>
                         <p className="text-small text-text-muted leading-relaxed">
