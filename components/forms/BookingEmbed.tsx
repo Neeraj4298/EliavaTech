@@ -29,7 +29,19 @@ export function BookingEmbed({ className }: BookingEmbedProps) {
   const overlayRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    const updateAperture = (clientX: number, clientY: number) => {
+    let settleTimer: number | null = null;
+
+    const closeAperture = () => {
+      if (settleTimer !== null) {
+        window.clearTimeout(settleTimer);
+        settleTimer = null;
+      }
+      if (overlayRef.current) {
+        overlayRef.current.style.clipPath = "none";
+      }
+    };
+
+    const openApertureAt = (clientX: number, clientY: number) => {
       const container = containerRef.current;
       const overlay = overlayRef.current;
       if (!container || !overlay) return;
@@ -48,7 +60,7 @@ export function BookingEmbed({ className }: BookingEmbedProps) {
 
       const x = Math.round(clientX - rect.left);
       const y = Math.round(clientY - rect.top);
-      const r = 3;
+      const r = 10;
       overlay.style.clipPath = `polygon(0px 0px, 100% 0px, 100% 100%, 0px 100%, 0px 0px, ${
         x - r
       }px ${y - r}px, ${x - r}px ${y + r}px, ${x + r}px ${y + r}px, ${
@@ -57,12 +69,20 @@ export function BookingEmbed({ className }: BookingEmbedProps) {
     };
 
     const handleMouseMove = (event: MouseEvent) => {
-      updateAperture(event.clientX, event.clientY);
+      closeAperture();
+      settleTimer = window.setTimeout(() => {
+        openApertureAt(event.clientX, event.clientY);
+      }, 90);
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("wheel", closeAperture, { passive: true, capture: true });
+    window.addEventListener("scroll", closeAperture, { passive: true });
     return () => {
+      if (settleTimer !== null) window.clearTimeout(settleTimer);
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("wheel", closeAperture, { capture: true });
+      window.removeEventListener("scroll", closeAperture);
     };
   }, []);
 

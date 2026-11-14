@@ -65,17 +65,26 @@ export function ChatMessageList({
 
   const hasUserStartedChatting = messages.some((m) => m.role === "user");
 
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const canScrollVertically = el.scrollHeight > el.clientHeight + 2;
+    if (!canScrollVertically) return;
+    const atTop = el.scrollTop <= 0 && e.deltaY < 0;
+    const atBottom =
+      el.scrollTop + el.clientHeight >= el.scrollHeight - 1 && e.deltaY > 0;
+    if (!atTop && !atBottom) {
+      e.stopPropagation();
+    }
+  };
+
   return (
     <div
       ref={scrollRef}
-      data-lenis-prevent
-      data-lenis-prevent-wheel
-      data-lenis-prevent-touch
       onScroll={handleScroll}
-      onWheel={(e) => e.stopPropagation()}
-      onTouchMove={(e) => e.stopPropagation()}
+      onWheel={handleWheel}
       aria-live="polite"
-      className="thin-scrollbar chat-messages-mask min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 space-y-4"
+      className="thin-scrollbar chat-messages-mask min-h-0 flex-1 overflow-y-auto overscroll-y-auto px-4 py-4 space-y-4"
     >
       {messages.map((msg, idx) => {
         const isAssistant = msg.role === "assistant";

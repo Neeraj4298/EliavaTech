@@ -71,9 +71,9 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${sora.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${sora.variable} ${inter.variable} ${jetbrainsMono.variable} min-h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-bg text-text font-sans selection:bg-primary/20 selection:text-text">
+      <body className="min-h-screen flex flex-col bg-bg text-text font-sans selection:bg-primary/20 selection:text-text">
         <ThemeProvider>
           <a
             href="#main-content"

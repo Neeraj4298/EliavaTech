@@ -28,15 +28,24 @@ export function SmoothScroll({ children }: SmoothScrollProps) {
     }
 
     const lenis = new Lenis({
+      content: document.body,
       duration: 1.05,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
+      allowNestedScroll: true,
       touchMultiplier: 1.5,
       prevent: (node: HTMLElement) =>
         Boolean(node.closest?.("[data-lenis-prevent]")),
     });
 
     lenisRef.current = lenis;
+
+    const mainEl = document.getElementById("main-content");
+    const resizeObserver = new ResizeObserver(() => {
+      lenis.resize();
+    });
+    resizeObserver.observe(document.body);
+    if (mainEl) resizeObserver.observe(mainEl);
 
     let rafId = 0;
     const raf = (time: number) => {
@@ -46,16 +55,22 @@ export function SmoothScroll({ children }: SmoothScrollProps) {
     rafId = window.requestAnimationFrame(raf);
 
     return () => {
+      resizeObserver.disconnect();
       window.cancelAnimationFrame(rafId);
       lenis.destroy();
       lenisRef.current = null;
     };
   }, [prefersReducedMotion]);
 
-  // Scroll to top on route changes per Section 5.5
+  // Scroll to top and recalculate page dimensions on route changes per Section 5.5
   React.useEffect(() => {
     if (lenisRef.current) {
-      lenisRef.current.scrollTo(0, { immediate: true });
+      lenisRef.current.resize();
+      lenisRef.current.scrollTo(0, { immediate: true, force: true });
+      const timer = window.setTimeout(() => {
+        lenisRef.current?.resize();
+      }, 250);
+      return () => window.clearTimeout(timer);
     } else if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
     }

@@ -312,16 +312,18 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
     }
   };
 
+  const isFloating = mode === "floating";
+
   const panelContent = (
     <div
       ref={panelRef}
-      data-lenis-prevent
-      data-lenis-prevent-wheel
-      data-lenis-prevent-touch
-      onWheel={(e) => e.stopPropagation()}
-      onTouchMove={(e) => e.stopPropagation()}
-      role={mode === "floating" ? "dialog" : "region"}
-      aria-modal={mode === "floating" ? "true" : undefined}
+      data-lenis-prevent={isFloating ? "" : undefined}
+      data-lenis-prevent-wheel={isFloating ? "" : undefined}
+      data-lenis-prevent-touch={isFloating ? "" : undefined}
+      onWheel={isFloating ? (e) => e.stopPropagation() : undefined}
+      onTouchMove={isFloating ? (e) => e.stopPropagation() : undefined}
+      role={isFloating ? "dialog" : "region"}
+      aria-modal={isFloating ? "true" : undefined}
       aria-label="EliavaTech AI Assistant"
       className={cn(
         "glass-surface flex flex-col overflow-hidden overscroll-contain border border-border text-text shadow-[var(--shadow-card-hover)] dark:shadow-[var(--glow-primary)]",

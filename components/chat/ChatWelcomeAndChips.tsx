@@ -134,7 +134,7 @@ export function FollowUpChipsBar({
 
   return (
     <motion.div
-      data-lenis-prevent
+      data-lenis-prevent-horizontal
       initial={reduced ? false : "hidden"}
       animate="visible"
       variants={{
