@@ -14,6 +14,29 @@ export interface WhatsAppButtonProps {
   label?: string;
 }
 
+function WhatsAppIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+      className={className}
+    >
+      <path
+        d="M12 2.75a9.25 9.25 0 0 0-7.97 13.94L3 21l4.45-1.01A9.25 9.25 0 1 0 12 2.75Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.35 8.6c-.2-.44-.41-.45-.6-.46h-.51c-.18 0-.47.07-.71.34-.25.27-.94.92-.94 2.24 0 1.32.96 2.6 1.1 2.78.13.18 1.86 2.97 4.59 4.04 2.27.89 2.73.71 3.22.67.49-.05 1.59-.65 1.81-1.28.23-.63.23-1.17.16-1.28-.07-.11-.25-.18-.52-.31-.27-.14-1.59-.79-1.84-.88-.24-.09-.42-.13-.6.14-.18.27-.7.88-.85 1.06-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.71-1.34-1.59-1.5-1.86-.16-.27-.02-.42.12-.55.12-.12.27-.32.4-.47.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.47-.07-.14-.59-1.46-.81-1.97Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 function formatPageName(pathname: string | null): string {
   if (!pathname || pathname === "/") return "the Home page (/)";
   return `${pathname}`;
@@ -95,12 +118,12 @@ export function WhatsAppButton({
         rel="noopener noreferrer"
         aria-label="WhatsApp us"
         className={cn(
-          "glass-surface inline-flex h-12 w-12 items-center justify-center rounded-full border border-border text-success shadow-[var(--shadow-card-hover)] transition-all duration-200 hover:scale-105 hover:border-success/55 hover:bg-surface-2 active:scale-95",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg",
+          "inline-flex h-12 w-12 items-center justify-center rounded-full bg-success text-white shadow-sm transition-all duration-200 hover:scale-105 hover:brightness-110 active:scale-95",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success focus-visible:ring-offset-2 focus-visible:ring-offset-surface",
           className
         )}
       >
-        <MessageCircle strokeWidth={1.5} className="h-5 w-5" />
+        <WhatsAppIcon className="h-6 w-6" />
       </a>
     </Tooltip>
   );
