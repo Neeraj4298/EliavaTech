@@ -3,7 +3,7 @@ import { SITE_URL } from "@/lib/seo";
 
 /**
  * Section 9 — Robots.txt (`app/robots.ts`):
- * Allows all public routes, disallows internal `/styleguide` and `/api/` routes,
+ * Allows all public routes, disallows internal `/api/` routes,
  * and references `${SITE_URL}/sitemap.xml`.
  */
 export default function robots(): MetadataRoute.Robots {
@@ -12,7 +12,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/styleguide", "/api/"],
+        disallow: ["/api/"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

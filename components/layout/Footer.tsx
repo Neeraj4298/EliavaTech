@@ -1,6 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
-import { ArrowUpRight, Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
 import {
   SERVICE_ITEMS,
   INDUSTRY_ITEMS,
@@ -111,12 +111,6 @@ export function Footer() {
                   <Link href={item.href} className="text-text-muted hover:text-primary">{item.label}</Link>
                 </li>
               ))}
-              <li>
-                <Link href="/styleguide" className="inline-flex items-center gap-1 text-xs font-mono text-text-muted hover:text-primary">
-                  <span>/styleguide</span>
-                  <ArrowUpRight strokeWidth={1.5} className="h-3 w-3" />
-                </Link>
-              </li>
             </ul>
           </div>
         </div>
