@@ -302,6 +302,7 @@ export function ContactForm() {
             size="lg"
             isLoading={isSubmitting}
             withArrow
+            style={{ lineHeight: 1.15 }}
           >
             Send Consultation Request
           </Button>
