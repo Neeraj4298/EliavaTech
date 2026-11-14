@@ -89,9 +89,9 @@ export function HeroSection() {
           style={
             prefersReducedMotion
               ? undefined
-              : { scale: sceneScale, opacity: sceneOpacity }
+              : { opacity: sceneOpacity }
           }
-          className="lg:col-span-6 will-change-[transform,opacity]"
+          className="lg:col-span-6 will-change-[opacity]"
         >
           <HeroSceneLoader />
         </motion.div>

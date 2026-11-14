@@ -42,6 +42,7 @@ interface ScreenPoint {
 interface MonogramRigProps {
   isDark: boolean;
   exploded: boolean;
+  hovered: boolean;
   onToggleExploded: () => void;
   onUpdateOverlays: (
     tokens: Array<ScreenPoint | null>,
@@ -72,6 +73,7 @@ function projectToScreen(
 function MonogramRig({
   isDark,
   exploded,
+  hovered,
   onToggleExploded,
   onUpdateOverlays,
 }: MonogramRigProps) {
@@ -94,10 +96,26 @@ function MonogramRig({
   const rightEdgeOffset = React.useMemo(() => new THREE.Vector3(1.1, 0, 0), []);
   const midRightOffset = React.useMemo(() => new THREE.Vector3(0.85, 0, 0), []);
 
+  React.useEffect(() => {
+    const cancelDrag = () => {
+      dragging.current = false;
+      dragVelocity.current = { x: 0, y: 0 };
+    };
+    window.addEventListener("pointerup", cancelDrag, { passive: true });
+    window.addEventListener("pointercancel", cancelDrag, { passive: true });
+    window.addEventListener("scroll", cancelDrag, { passive: true });
+    return () => {
+      window.removeEventListener("pointerup", cancelDrag);
+      window.removeEventListener("pointercancel", cancelDrag);
+      window.removeEventListener("scroll", cancelDrag);
+    };
+  }, []);
+
   const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
     dragging.current = true;
     movedDuringDrag.current = false;
+    dragVelocity.current = { x: 0, y: 0 };
     prevPointer.current = { x: e.clientX, y: e.clientY };
   };
 
@@ -108,6 +126,11 @@ function MonogramRig({
     dragging.current = false;
   };
 
+  const onPointerCancel = () => {
+    dragging.current = false;
+    dragVelocity.current = { x: 0, y: 0 };
+  };
+
   const onPointerMove = (e: ThreeEvent<PointerEvent>) => {
     if (!dragging.current) return;
     const dx = e.clientX - prevPointer.current.x;
@@ -116,7 +139,7 @@ function MonogramRig({
       movedDuringDrag.current = true;
     }
     prevPointer.current = { x: e.clientX, y: e.clientY };
-    dragVelocity.current = { x: dy * 0.006, y: dx * 0.008 };
+    dragVelocity.current = { x: dy * 0.005, y: dx * 0.006 };
     dragAngle.current.y += dragVelocity.current.y;
     dragAngle.current.x = THREE.MathUtils.clamp(
       dragAngle.current.x + dragVelocity.current.x,
@@ -125,14 +148,18 @@ function MonogramRig({
     );
   };
 
-  useFrame((state, delta) => {
-    elapsedRef.current += delta;
-    const t = elapsedRef.current;
+  useFrame((state) => {
     if (!dragging.current) {
-      dragVelocity.current.x *= 0.92;
-      dragVelocity.current.y *= 0.92;
-      dragAngle.current.y += dragVelocity.current.y + delta * 0.18;
-      dragAngle.current.x += dragVelocity.current.x;
+      dragVelocity.current.x *= 0.8;
+      dragVelocity.current.y *= 0.8;
+      if (Math.abs(dragVelocity.current.x) < 0.0001) dragVelocity.current.x = 0;
+      if (Math.abs(dragVelocity.current.y) < 0.0001) dragVelocity.current.y = 0;
+      dragAngle.current.y += dragVelocity.current.y;
+      dragAngle.current.x = THREE.MathUtils.clamp(
+        dragAngle.current.x + dragVelocity.current.x,
+        -0.55,
+        0.55
+      );
     }
 
     const { width, height } = state.size;
@@ -141,31 +168,26 @@ function MonogramRig({
 
     if (rootGroup.current) {
       rootGroup.current.scale.setScalar(responsiveScale);
-      const targetRotX = dragAngle.current.x - state.pointer.y * 0.24;
-      const targetRotY = dragAngle.current.y + state.pointer.x * 0.34;
       rootGroup.current.rotation.x = THREE.MathUtils.lerp(
         rootGroup.current.rotation.x,
-        targetRotX,
-        0.08
+        dragAngle.current.x,
+        0.12
       );
       rootGroup.current.rotation.y = THREE.MathUtils.lerp(
         rootGroup.current.rotation.y,
-        targetRotY,
-        0.08
+        dragAngle.current.y,
+        0.12
       );
-      rootGroup.current.position.y = Math.sin(t * 1.2) * 0.09;
+      rootGroup.current.position.y = 0;
     }
 
     const topTargetY = exploded ? 1.25 : 0.85;
     const botTargetY = exploded ? -1.25 : -0.85;
     if (topSlab.current) {
-      topSlab.current.position.y = THREE.MathUtils.lerp(topSlab.current.position.y, topTargetY, 0.1);
+      topSlab.current.position.y = THREE.MathUtils.lerp(topSlab.current.position.y, topTargetY, 0.12);
     }
     if (botSlab.current) {
-      botSlab.current.position.y = THREE.MathUtils.lerp(botSlab.current.position.y, botTargetY, 0.1);
-    }
-    if (orbitGroup.current) {
-      orbitGroup.current.rotation.y = t * 0.28;
+      botSlab.current.position.y = THREE.MathUtils.lerp(botSlab.current.position.y, botTargetY, 0.12);
     }
 
     const tokenPositions = ORBIT_TOKENS.map((_, i) =>
@@ -200,7 +222,8 @@ function MonogramRig({
       ref={rootGroup}
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
-      onPointerOut={onPointerUp}
+      onPointerOut={onPointerCancel}
+      onPointerCancel={onPointerCancel}
       onPointerMove={onPointerMove}
     >
       <RoundedBox ref={topSlab} args={[2.6, 0.46, 0.68]} radius={0.12} smoothness={4} position={[0, 0.85, 0]}>
@@ -277,6 +300,7 @@ export function HeroScene({ active = true }: HeroSceneProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme !== "light";
   const [exploded, setExploded] = React.useState(false);
+  const [hovered, setHovered] = React.useState(false);
 
   const tokenElRefs = React.useRef<Array<HTMLDivElement | null>>([]);
   const layerElRefs = React.useRef<Array<HTMLDivElement | null>>([]);
@@ -318,8 +342,14 @@ export function HeroScene({ active = true }: HeroSceneProps) {
   return (
     <div
       data-cursor-label="Drag"
-      onMouseEnter={() => setExploded(true)}
-      onMouseLeave={() => setExploded(false)}
+      onMouseEnter={() => {
+        setHovered(true);
+        setExploded(true);
+      }}
+      onMouseLeave={() => {
+        setHovered(false);
+        setExploded(false);
+      }}
       className="relative h-[300px] sm:h-[460px] lg:h-[540px] w-full overflow-hidden select-none touch-pan-y cursor-grab active:cursor-grabbing rounded-card border border-border/60 bg-surface/35"
     >
       <Canvas
@@ -344,6 +374,7 @@ export function HeroScene({ active = true }: HeroSceneProps) {
         <MonogramRig
           isDark={isDark}
           exploded={exploded}
+          hovered={hovered}
           onToggleExploded={() => setExploded((prev) => !prev)}
           onUpdateOverlays={handleUpdateOverlays}
         />

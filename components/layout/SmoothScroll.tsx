@@ -29,11 +29,13 @@ export function SmoothScroll({ children }: SmoothScrollProps) {
 
     const lenis = new Lenis({
       content: document.body,
-      duration: 1.05,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration: 0.5,
+      easing: (t: number) => 1 - Math.pow(1 - t, 3),
       smoothWheel: true,
+      syncTouch: false,
       allowNestedScroll: true,
-      touchMultiplier: 1.5,
+      wheelMultiplier: 0.9,
+      touchMultiplier: 1,
       prevent: (node: HTMLElement) =>
         Boolean(node.closest?.("[data-lenis-prevent]")),
     });
