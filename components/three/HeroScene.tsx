@@ -42,9 +42,12 @@ interface ScreenPoint {
 interface MonogramRigProps {
   isDark: boolean;
   exploded: boolean;
+  onToggleExploded: () => void;
   onUpdateOverlays: (
     tokens: Array<ScreenPoint | null>,
-    layers: Array<ScreenPoint | null>
+    layers: Array<ScreenPoint | null>,
+    width: number,
+    height: number
   ) => void;
 }
 
@@ -69,6 +72,7 @@ function projectToScreen(
 function MonogramRig({
   isDark,
   exploded,
+  onToggleExploded,
   onUpdateOverlays,
 }: MonogramRigProps) {
   const rootGroup = React.useRef<THREE.Group>(null);
@@ -80,22 +84,27 @@ function MonogramRig({
 
   const elapsedRef = React.useRef(0);
   const dragging = React.useRef(false);
+  const movedDuringDrag = React.useRef(false);
   const prevPointer = React.useRef({ x: 0, y: 0 });
   const dragVelocity = React.useRef({ x: 0, y: 0 });
   const dragAngle = React.useRef({ x: 0.12, y: -0.32 });
 
   const scratchVec = React.useMemo(() => new THREE.Vector3(), []);
   const zeroOffset = React.useMemo(() => new THREE.Vector3(0, 0, 0), []);
-  const rightEdgeOffset = React.useMemo(() => new THREE.Vector3(1.45, 0, 0), []);
-  const midRightOffset = React.useMemo(() => new THREE.Vector3(1.15, 0, 0), []);
+  const rightEdgeOffset = React.useMemo(() => new THREE.Vector3(1.1, 0, 0), []);
+  const midRightOffset = React.useMemo(() => new THREE.Vector3(0.85, 0, 0), []);
 
   const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
     dragging.current = true;
+    movedDuringDrag.current = false;
     prevPointer.current = { x: e.clientX, y: e.clientY };
   };
 
   const onPointerUp = () => {
+    if (dragging.current && !movedDuringDrag.current) {
+      onToggleExploded();
+    }
     dragging.current = false;
   };
 
@@ -103,6 +112,9 @@ function MonogramRig({
     if (!dragging.current) return;
     const dx = e.clientX - prevPointer.current.x;
     const dy = e.clientY - prevPointer.current.y;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+      movedDuringDrag.current = true;
+    }
     prevPointer.current = { x: e.clientX, y: e.clientY };
     dragVelocity.current = { x: dy * 0.006, y: dx * 0.008 };
     dragAngle.current.y += dragVelocity.current.y;
@@ -123,7 +135,12 @@ function MonogramRig({
       dragAngle.current.x += dragVelocity.current.x;
     }
 
+    const { width, height } = state.size;
+    const aspect = height > 0 ? width / height : 1;
+    const responsiveScale = THREE.MathUtils.clamp(aspect * 1.02, 0.72, 1);
+
     if (rootGroup.current) {
+      rootGroup.current.scale.setScalar(responsiveScale);
       const targetRotX = dragAngle.current.x - state.pointer.y * 0.24;
       const targetRotY = dragAngle.current.y + state.pointer.x * 0.34;
       rootGroup.current.rotation.x = THREE.MathUtils.lerp(
@@ -151,7 +168,6 @@ function MonogramRig({
       orbitGroup.current.rotation.y = t * 0.28;
     }
 
-    const { width, height } = state.size;
     const tokenPositions = ORBIT_TOKENS.map((_, i) =>
       projectToScreen(
         tokenMeshRefs.current[i] ?? null,
@@ -172,7 +188,7 @@ function MonogramRig({
       projectToScreen(item.mesh, state.camera, width, height, item.offset, scratchVec)
     );
 
-    onUpdateOverlays(tokenPositions, layerPositions);
+    onUpdateOverlays(tokenPositions, layerPositions, width, height);
   });
 
   const goldColor = isDark ? "#F2B84B" : "#C98A12";
@@ -268,20 +284,31 @@ export function HeroScene({ active = true }: HeroSceneProps) {
   const handleUpdateOverlays = React.useCallback(
     (
       tokens: Array<ScreenPoint | null>,
-      layers: Array<ScreenPoint | null>
+      layers: Array<ScreenPoint | null>,
+      width: number,
+      height: number
     ) => {
+      const padX = width < 440 ? 58 : 68;
+      const padTop = 44;
+      const padBottom = 44;
+
       for (let i = 0; i < tokens.length; i++) {
         const el = tokenElRefs.current[i];
         const pos = tokens[i];
         if (el && pos) {
-          el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) translate(-50%, -50%)`;
+          const cx = Math.min(Math.max(pos.x, padX), Math.max(padX, width - padX));
+          const cy = Math.min(Math.max(pos.y, padTop), Math.max(padTop, height - padBottom));
+          el.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
         }
       }
+      const layerPadX = width < 440 ? 88 : 104;
       for (let i = 0; i < layers.length; i++) {
         const el = layerElRefs.current[i];
         const pos = layers[i];
         if (el && pos) {
-          el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) translate(-50%, -50%)`;
+          const cx = Math.min(Math.max(pos.x, layerPadX), Math.max(layerPadX, width - layerPadX));
+          const cy = Math.min(Math.max(pos.y, padTop), Math.max(padTop, height - padBottom));
+          el.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
         }
       }
     },
@@ -293,7 +320,7 @@ export function HeroScene({ active = true }: HeroSceneProps) {
       data-cursor-label="Drag"
       onMouseEnter={() => setExploded(true)}
       onMouseLeave={() => setExploded(false)}
-      className="relative h-[420px] sm:h-[480px] lg:h-[540px] w-full overflow-hidden select-none cursor-grab active:cursor-grabbing rounded-card border border-border/60 bg-surface/35"
+      className="relative h-[380px] sm:h-[460px] lg:h-[540px] w-full overflow-hidden select-none touch-pan-y cursor-grab active:cursor-grabbing rounded-card border border-border/60 bg-surface/35"
     >
       <Canvas
         dpr={[1, 1.75]}
@@ -317,6 +344,7 @@ export function HeroScene({ active = true }: HeroSceneProps) {
         <MonogramRig
           isDark={isDark}
           exploded={exploded}
+          onToggleExploded={() => setExploded((prev) => !prev)}
           onUpdateOverlays={handleUpdateOverlays}
         />
       </Canvas>
@@ -360,9 +388,11 @@ export function HeroScene({ active = true }: HeroSceneProps) {
         ))}
       </div>
 
-      <div className="pointer-events-none absolute bottom-3 left-4 right-4 flex items-center justify-between text-[11px] font-mono text-text-muted">
-        <span>{exploded ? "Exploded layer view active" : "Hover to inspect layers · Drag to rotate"}</span>
-        <span>3D Monogram</span>
+      <div className="pointer-events-none absolute bottom-3 left-4 right-4 flex items-center justify-between gap-2 text-[10px] sm:text-[11px] font-mono text-text-muted">
+        <span className="truncate">
+          {exploded ? "Exploded layer view active" : "Tap or hover layers · Drag to rotate"}
+        </span>
+        <span className="shrink-0">3D Monogram</span>
       </div>
     </div>
   );

@@ -17,20 +17,10 @@ const DynamicHeroScene = dynamic(
 function detectShouldAutoLoad3D(): boolean {
   if (typeof window === "undefined") return false;
   try {
-    // Section 5.2: Show SceneFallback on small phones (<768px) or low-power devices
-    if (window.innerWidth < 768) return false;
-
     const nav = window.navigator as Navigator & {
-      deviceMemory?: number;
       connection?: { saveData?: boolean };
     };
     if (nav.connection?.saveData) return false;
-    if (typeof nav.hardwareConcurrency === "number" && nav.hardwareConcurrency <= 2) {
-      return false;
-    }
-    if (typeof nav.deviceMemory === "number" && nav.deviceMemory < 4) {
-      return false;
-    }
 
     const canvas = document.createElement("canvas");
     const gl =
