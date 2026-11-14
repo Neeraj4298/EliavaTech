@@ -18,7 +18,7 @@ export function FoundersPreviewSection() {
     <Section>
       <div className="space-y-12">
         <SectionHeading
-          eyebrow="Founding Team · [PLACEHOLDER]"
+          eyebrow="Founding Team"
           title="Led directly by three co-founders."
           description="Every project is scoped, designed, and engineered by the founders—not handed off to junior account managers."
           action={

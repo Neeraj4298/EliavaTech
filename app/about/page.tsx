@@ -83,9 +83,9 @@ export default function AboutPage() {
       <Section>
         <div className="space-y-10">
           <SectionHeading
-            eyebrow="Founding Team · [PLACEHOLDER]"
+            eyebrow="Founding Team"
             title="Three co-founders across strategy, engineering, and design."
-            description="Replace placeholder founder names and bios before launch."
+            description="Every project is scoped, designed, and engineered directly by our founding team."
           />
           <StaggerGroup className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {ABOUT_CONTENT.founders.map((founder) => (
