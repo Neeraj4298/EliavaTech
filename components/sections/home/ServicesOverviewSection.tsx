@@ -45,13 +45,15 @@ export function ServicesOverviewSection() {
           }
         />
 
-        <StaggerGroup className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <StaggerGroup className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:auto-rows-fr gap-6">
           {SERVICE_ITEMS.map((service, idx) => {
             const Icon = iconMap[service.icon];
             return (
               <StaggerItem
                 key={service.slug}
-                className={idx === 0 ? "md:col-span-2 lg:col-span-2" : ""}
+                className={
+                  idx === 0 ? "h-full md:col-span-2 lg:col-span-2" : "h-full"
+                }
               >
                 <Link href={service.href} className="block h-full group">
                   <TiltCard cursorLabel="View" className="h-full">
