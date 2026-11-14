@@ -18,6 +18,47 @@ export interface BookingEmbedProps {
  */
 export function BookingEmbed({ className }: BookingEmbedProps) {
   const { resolvedTheme } = useTheme();
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const overlayRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const updateAperture = (clientX: number, clientY: number) => {
+      const container = containerRef.current;
+      const overlay = overlayRef.current;
+      if (!container || !overlay) return;
+
+      const rect = container.getBoundingClientRect();
+      const inside =
+        clientX >= rect.left &&
+        clientX <= rect.right &&
+        clientY >= rect.top &&
+        clientY <= rect.bottom;
+
+      if (!inside) {
+        overlay.style.clipPath = "none";
+        return;
+      }
+
+      const x = Math.round(clientX - rect.left);
+      const y = Math.round(clientY - rect.top);
+      const r = 3;
+      overlay.style.clipPath = `polygon(0px 0px, 100% 0px, 100% 100%, 0px 100%, 0px 0px, ${
+        x - r
+      }px ${y - r}px, ${x - r}px ${y + r}px, ${x + r}px ${y + r}px, ${
+        x + r
+      }px ${y - r}px, ${x - r}px ${y - r}px, 0px 0px)`;
+    };
+
+    const handleMouseMove = (event: MouseEvent) => {
+      updateAperture(event.clientX, event.clientY);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
   const envCalLink = (process.env.NEXT_PUBLIC_CAL_LINK || "").trim();
   const calLinkRaw =
     !envCalLink || envCalLink === "supporteliavatech/30min"
@@ -61,10 +102,18 @@ export function BookingEmbed({ className }: BookingEmbedProps) {
 
       {isConfigured ? (
         <div className="space-y-4">
-          <div className="overflow-hidden rounded-input border border-border bg-bg">
+          <div
+            ref={containerRef}
+            className="relative overflow-hidden rounded-input border border-border bg-bg"
+          >
+            <div
+              ref={overlayRef}
+              aria-hidden="true"
+              className="absolute inset-0 z-10"
+            />
             <iframe
               src={iframeSrc}
-              title="Book a Free Consultation with EliavaTech on Cal.com"
+              aria-label="Book a Free Consultation with EliavaTech on Cal.com"
               className="h-[520px] w-full border-0"
               loading="lazy"
             />
