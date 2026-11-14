@@ -201,7 +201,7 @@ export const FOUNDERS_PLACEHOLDER: FounderPlaceholderData[] = [
   {
     id: "founder-1",
     name: "[Name] [PLACEHOLDER]",
-    role: "Co-founder and CEO",
+    role: "Co-founder",
     focus: "Strategy & Client Relationships",
     bio: "[Short bio placeholder — oversees discovery, business problem framing, and long-term client partnerships.]",
     initials: "F1",
@@ -210,7 +210,7 @@ export const FOUNDERS_PLACEHOLDER: FounderPlaceholderData[] = [
   {
     id: "founder-2",
     name: "[Name] [PLACEHOLDER]",
-    role: "Co-founder and CTO",
+    role: "Co-founder",
     focus: "Engineering & Automation",
     bio: "[Short bio placeholder — leads full-stack architecture, custom CRM/ERP builds, and WhatsApp/n8n workflows.]",
     initials: "F2",
@@ -219,7 +219,7 @@ export const FOUNDERS_PLACEHOLDER: FounderPlaceholderData[] = [
   {
     id: "founder-3",
     name: "[Name] [PLACEHOLDER]",
-    role: "Co-founder and Head of Design & Product",
+    role: "Co-founder",
     focus: "Design Systems & Product UX",
     bio: "[Short bio placeholder — shapes brand clarity, accessible interfaces, and conversion-focused user journeys.]",
     initials: "F3",

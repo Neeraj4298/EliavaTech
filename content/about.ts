@@ -58,7 +58,7 @@ export const ABOUT_CONTENT = {
     {
       id: "founder-1",
       name: "[Name] [PLACEHOLDER]",
-      role: "Co-founder and CEO",
+      role: "Co-founder",
       focus: "Strategy and client relationships",
       bio: "[short bio — PLACEHOLDER: Leads business discovery, operational scoping, and long-term client relationships across SMB sectors.]",
       accent: "gold",
@@ -66,7 +66,7 @@ export const ABOUT_CONTENT = {
     {
       id: "founder-2",
       name: "[Name] [PLACEHOLDER]",
-      role: "Co-founder and CTO",
+      role: "Co-founder",
       focus: "Engineering and automation",
       bio: "[short bio — PLACEHOLDER: Architects Next.js applications, PostgreSQL databases, custom CRM/ERP modules, and WhatsApp/n8n workflows.]",
       accent: "primary",
@@ -74,7 +74,7 @@ export const ABOUT_CONTENT = {
     {
       id: "founder-3",
       name: "[Name] [PLACEHOLDER]",
-      role: "Co-founder and Head of Design and Product",
+      role: "Co-founder",
       focus: "Design systems and product UX",
       bio: "[short bio — PLACEHOLDER: Directs brand systems, interactive 3D and motion craft, and accessible conversion-focused interfaces.]",
       accent: "success",
