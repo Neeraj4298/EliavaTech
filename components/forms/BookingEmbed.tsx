@@ -11,6 +11,8 @@ export interface BookingEmbedProps {
   className?: string;
 }
 
+const emptySubscribe = () => () => {};
+
 /**
  * Section 4.9, 6 & 7 — BookingEmbed:
  * Embeds the Cal.com booking calendar using NEXT_PUBLIC_CAL_LINK.
@@ -18,6 +20,11 @@ export interface BookingEmbedProps {
  */
 export function BookingEmbed({ className }: BookingEmbedProps) {
   const { resolvedTheme } = useTheme();
+  const mounted = React.useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
   const containerRef = React.useRef<HTMLDivElement>(null);
   const overlayRef = React.useRef<HTMLDivElement>(null);
 
@@ -72,7 +79,7 @@ export function BookingEmbed({ className }: BookingEmbedProps) {
     .replace(/^\/+/, "");
 
   const isConfigured = cleanCalPath.length > 0;
-  const themeParam = resolvedTheme === "light" ? "light" : "dark";
+  const themeParam = mounted && resolvedTheme === "light" ? "light" : "dark";
   const iframeSrc = isConfigured
     ? `https://cal.com/${cleanCalPath}?embed=true&theme=${themeParam}&layout=month_view`
     : "";
