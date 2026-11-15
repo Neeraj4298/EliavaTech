@@ -7,8 +7,6 @@ import {
   LEGAL_NAV_LINKS,
 } from "@/content/navigation";
 import { Logo } from "@/components/brand/Logo";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 
 const COMPANY_LINKS = [
   { label: "Work & Demos", href: "/work" },
@@ -24,26 +22,6 @@ export function Footer() {
   return (
     <footer className="border-t border-border bg-surface text-text">
       <div className="container-max py-16 md:py-20">
-        <div className="mb-14 flex flex-col lg:flex-row lg:items-center justify-between gap-6 rounded-card border border-border bg-surface-2 p-6 md:p-8">
-          <div className="space-y-2 max-w-2xl">
-            <Badge variant="gold" dot>Founding client pricing available</Badge>
-            <h2 className="text-h3">
-              Have a business problem? Let&apos;s work out how technology can solve it.
-            </h2>
-            <p className="text-small text-text-muted">
-              We reply within one business day with a clear scope and honest recommendation.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <Button href="/contact" variant="primary" size="lg" withArrow>
-              Book a Free Consultation
-            </Button>
-            <Button href="/pricing" variant="secondary" size="lg">
-              View Pricing
-            </Button>
-          </div>
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-14 border-b border-border">
           <div className="lg:col-span-4 space-y-4">
             <Link href="/" aria-label="EliavaTech Home" className="inline-block">
