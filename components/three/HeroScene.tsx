@@ -42,8 +42,9 @@ interface ScreenPoint {
 interface MonogramRigProps {
   isDark: boolean;
   exploded: boolean;
-  hovered: boolean;
-  onToggleExploded: () => void;
+  draggingRef: React.MutableRefObject<boolean>;
+  dragVelocityRef: React.MutableRefObject<{ x: number; y: number }>;
+  dragAngleRef: React.MutableRefObject<{ x: number; y: number }>;
   onUpdateOverlays: (
     tokens: Array<ScreenPoint | null>,
     layers: Array<ScreenPoint | null>,
@@ -73,8 +74,9 @@ function projectToScreen(
 function MonogramRig({
   isDark,
   exploded,
-  hovered,
-  onToggleExploded,
+  draggingRef,
+  dragVelocityRef,
+  dragAngleRef,
   onUpdateOverlays,
 }: MonogramRigProps) {
   const rootGroup = React.useRef<THREE.Group>(null);
@@ -85,78 +87,21 @@ function MonogramRig({
   const tokenMeshRefs = React.useRef<Array<THREE.Group | null>>([]);
 
   const elapsedRef = React.useRef(0);
-  const dragging = React.useRef(false);
-  const movedDuringDrag = React.useRef(false);
-  const prevPointer = React.useRef({ x: 0, y: 0 });
-  const dragVelocity = React.useRef({ x: 0, y: 0 });
-  const dragAngle = React.useRef({ x: 0.12, y: -0.32 });
 
   const scratchVec = React.useMemo(() => new THREE.Vector3(), []);
   const zeroOffset = React.useMemo(() => new THREE.Vector3(0, 0, 0), []);
   const rightEdgeOffset = React.useMemo(() => new THREE.Vector3(1.1, 0, 0), []);
   const midRightOffset = React.useMemo(() => new THREE.Vector3(0.85, 0, 0), []);
 
-  React.useEffect(() => {
-    const cancelDrag = () => {
-      dragging.current = false;
-      dragVelocity.current = { x: 0, y: 0 };
-    };
-    window.addEventListener("pointerup", cancelDrag, { passive: true });
-    window.addEventListener("pointercancel", cancelDrag, { passive: true });
-    window.addEventListener("scroll", cancelDrag, { passive: true });
-    return () => {
-      window.removeEventListener("pointerup", cancelDrag);
-      window.removeEventListener("pointercancel", cancelDrag);
-      window.removeEventListener("scroll", cancelDrag);
-    };
-  }, []);
-
-  const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
-    e.stopPropagation();
-    dragging.current = true;
-    movedDuringDrag.current = false;
-    dragVelocity.current = { x: 0, y: 0 };
-    prevPointer.current = { x: e.clientX, y: e.clientY };
-  };
-
-  const onPointerUp = () => {
-    if (dragging.current && !movedDuringDrag.current) {
-      onToggleExploded();
-    }
-    dragging.current = false;
-  };
-
-  const onPointerCancel = () => {
-    dragging.current = false;
-    dragVelocity.current = { x: 0, y: 0 };
-  };
-
-  const onPointerMove = (e: ThreeEvent<PointerEvent>) => {
-    if (!dragging.current) return;
-    const dx = e.clientX - prevPointer.current.x;
-    const dy = e.clientY - prevPointer.current.y;
-    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
-      movedDuringDrag.current = true;
-    }
-    prevPointer.current = { x: e.clientX, y: e.clientY };
-    dragVelocity.current = { x: dy * 0.005, y: dx * 0.006 };
-    dragAngle.current.y += dragVelocity.current.y;
-    dragAngle.current.x = THREE.MathUtils.clamp(
-      dragAngle.current.x + dragVelocity.current.x,
-      -0.55,
-      0.55
-    );
-  };
-
   useFrame((state, delta) => {
     elapsedRef.current += delta;
     const t = elapsedRef.current;
-    if (!dragging.current) {
-      dragVelocity.current.x *= 0.92;
-      dragVelocity.current.y *= 0.92;
-      dragAngle.current.y += dragVelocity.current.y + delta * 0.18;
-      dragAngle.current.x = THREE.MathUtils.clamp(
-        dragAngle.current.x + dragVelocity.current.x,
+    if (!draggingRef.current) {
+      dragVelocityRef.current.x *= 0.92;
+      dragVelocityRef.current.y *= 0.92;
+      dragAngleRef.current.y += dragVelocityRef.current.y + delta * 0.22;
+      dragAngleRef.current.x = THREE.MathUtils.clamp(
+        dragAngleRef.current.x + dragVelocityRef.current.x,
         -0.55,
         0.55
       );
@@ -164,21 +109,21 @@ function MonogramRig({
 
     const { width, height } = state.size;
     const aspect = height > 0 ? width / height : 1;
-    const responsiveScale = THREE.MathUtils.clamp(aspect * 1.02, 0.72, 1);
+    const responsiveScale = THREE.MathUtils.clamp(aspect * 0.95, 0.65, 1);
 
     if (rootGroup.current) {
       rootGroup.current.scale.setScalar(responsiveScale);
-      const targetRotX = dragAngle.current.x - state.pointer.y * 0.24;
-      const targetRotY = dragAngle.current.y + state.pointer.x * 0.34;
+      const targetRotX = dragAngleRef.current.x - state.pointer.y * 0.24;
+      const targetRotY = dragAngleRef.current.y + state.pointer.x * 0.34;
       rootGroup.current.rotation.x = THREE.MathUtils.lerp(
         rootGroup.current.rotation.x,
         targetRotX,
-        0.08
+        0.09
       );
       rootGroup.current.rotation.y = THREE.MathUtils.lerp(
         rootGroup.current.rotation.y,
         targetRotY,
-        0.08
+        0.09
       );
       rootGroup.current.position.y = Math.sin(t * 1.2) * 0.09;
     }
@@ -192,7 +137,7 @@ function MonogramRig({
       botSlab.current.position.y = THREE.MathUtils.lerp(botSlab.current.position.y, botTargetY, 0.1);
     }
     if (orbitGroup.current) {
-      orbitGroup.current.rotation.y = t * 0.28;
+      orbitGroup.current.rotation.y = t * 0.32;
     }
 
     const tokenPositions = ORBIT_TOKENS.map((_, i) =>
@@ -223,14 +168,7 @@ function MonogramRig({
   const baseSlabColor = isDark ? "#1B2644" : "#DDE3F4";
 
   return (
-    <group
-      ref={rootGroup}
-      onPointerDown={onPointerDown}
-      onPointerUp={onPointerUp}
-      onPointerOut={onPointerCancel}
-      onPointerCancel={onPointerCancel}
-      onPointerMove={onPointerMove}
-    >
+    <group ref={rootGroup}>
       <RoundedBox ref={topSlab} args={[2.6, 0.46, 0.68]} radius={0.12} smoothness={4} position={[0, 0.85, 0]}>
         <meshStandardMaterial
           color={goldColor}
@@ -305,10 +243,60 @@ export function HeroScene({ active = true }: HeroSceneProps) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme !== "light";
   const [exploded, setExploded] = React.useState(false);
-  const [hovered, setHovered] = React.useState(false);
+
+  const draggingRef = React.useRef(false);
+  const movedDuringDragRef = React.useRef(false);
+  const prevPointerRef = React.useRef({ x: 0, y: 0 });
+  const dragVelocityRef = React.useRef({ x: 0, y: 0 });
+  const dragAngleRef = React.useRef({ x: 0.12, y: -0.32 });
 
   const tokenElRefs = React.useRef<Array<HTMLDivElement | null>>([]);
   const layerElRefs = React.useRef<Array<HTMLDivElement | null>>([]);
+
+  React.useEffect(() => {
+    const handleWindowPointerMove = (e: PointerEvent) => {
+      if (!draggingRef.current) return;
+      const dx = e.clientX - prevPointerRef.current.x;
+      const dy = e.clientY - prevPointerRef.current.y;
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+        movedDuringDragRef.current = true;
+      }
+      prevPointerRef.current = { x: e.clientX, y: e.clientY };
+      dragVelocityRef.current = { x: dy * 0.006, y: dx * 0.008 };
+      dragAngleRef.current.y += dragVelocityRef.current.y;
+      dragAngleRef.current.x = THREE.MathUtils.clamp(
+        dragAngleRef.current.x + dragVelocityRef.current.x,
+        -0.55,
+        0.55
+      );
+    };
+
+    const handleWindowPointerUp = () => {
+      if (draggingRef.current && !movedDuringDragRef.current) {
+        setExploded((prev) => !prev);
+      }
+      draggingRef.current = false;
+    };
+
+    const handleWindowPointerCancel = () => {
+      draggingRef.current = false;
+    };
+
+    window.addEventListener("pointermove", handleWindowPointerMove, { passive: true });
+    window.addEventListener("pointerup", handleWindowPointerUp, { passive: true });
+    window.addEventListener("pointercancel", handleWindowPointerCancel, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", handleWindowPointerMove);
+      window.removeEventListener("pointerup", handleWindowPointerUp);
+      window.removeEventListener("pointercancel", handleWindowPointerCancel);
+    };
+  }, []);
+
+  const handleContainerPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    draggingRef.current = true;
+    movedDuringDragRef.current = false;
+    prevPointerRef.current = { x: e.clientX, y: e.clientY };
+  };
 
   const handleUpdateOverlays = React.useCallback(
     (
@@ -347,14 +335,9 @@ export function HeroScene({ active = true }: HeroSceneProps) {
   return (
     <div
       data-cursor-label="Drag"
-      onMouseEnter={() => {
-        setHovered(true);
-        setExploded(true);
-      }}
-      onMouseLeave={() => {
-        setHovered(false);
-        setExploded(false);
-      }}
+      onPointerDown={handleContainerPointerDown}
+      onMouseEnter={() => setExploded(true)}
+      onMouseLeave={() => setExploded(false)}
       className="relative h-[300px] sm:h-[460px] lg:h-[540px] w-full overflow-hidden select-none touch-pan-y cursor-grab active:cursor-grabbing rounded-card border border-border/60 bg-surface/35"
     >
       <Canvas
@@ -379,8 +362,9 @@ export function HeroScene({ active = true }: HeroSceneProps) {
         <MonogramRig
           isDark={isDark}
           exploded={exploded}
-          hovered={hovered}
-          onToggleExploded={() => setExploded((prev) => !prev)}
+          draggingRef={draggingRef}
+          dragVelocityRef={dragVelocityRef}
+          dragAngleRef={dragAngleRef}
           onUpdateOverlays={handleUpdateOverlays}
         />
       </Canvas>
