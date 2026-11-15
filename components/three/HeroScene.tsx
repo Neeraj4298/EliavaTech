@@ -148,13 +148,13 @@ function MonogramRig({
     );
   };
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
+    elapsedRef.current += delta;
+    const t = elapsedRef.current;
     if (!dragging.current) {
-      dragVelocity.current.x *= 0.8;
-      dragVelocity.current.y *= 0.8;
-      if (Math.abs(dragVelocity.current.x) < 0.0001) dragVelocity.current.x = 0;
-      if (Math.abs(dragVelocity.current.y) < 0.0001) dragVelocity.current.y = 0;
-      dragAngle.current.y += dragVelocity.current.y;
+      dragVelocity.current.x *= 0.92;
+      dragVelocity.current.y *= 0.92;
+      dragAngle.current.y += dragVelocity.current.y + delta * 0.18;
       dragAngle.current.x = THREE.MathUtils.clamp(
         dragAngle.current.x + dragVelocity.current.x,
         -0.55,
@@ -168,26 +168,31 @@ function MonogramRig({
 
     if (rootGroup.current) {
       rootGroup.current.scale.setScalar(responsiveScale);
+      const targetRotX = dragAngle.current.x - state.pointer.y * 0.24;
+      const targetRotY = dragAngle.current.y + state.pointer.x * 0.34;
       rootGroup.current.rotation.x = THREE.MathUtils.lerp(
         rootGroup.current.rotation.x,
-        dragAngle.current.x,
-        0.12
+        targetRotX,
+        0.08
       );
       rootGroup.current.rotation.y = THREE.MathUtils.lerp(
         rootGroup.current.rotation.y,
-        dragAngle.current.y,
-        0.12
+        targetRotY,
+        0.08
       );
-      rootGroup.current.position.y = 0;
+      rootGroup.current.position.y = Math.sin(t * 1.2) * 0.09;
     }
 
     const topTargetY = exploded ? 1.25 : 0.85;
     const botTargetY = exploded ? -1.25 : -0.85;
     if (topSlab.current) {
-      topSlab.current.position.y = THREE.MathUtils.lerp(topSlab.current.position.y, topTargetY, 0.12);
+      topSlab.current.position.y = THREE.MathUtils.lerp(topSlab.current.position.y, topTargetY, 0.1);
     }
     if (botSlab.current) {
-      botSlab.current.position.y = THREE.MathUtils.lerp(botSlab.current.position.y, botTargetY, 0.12);
+      botSlab.current.position.y = THREE.MathUtils.lerp(botSlab.current.position.y, botTargetY, 0.1);
+    }
+    if (orbitGroup.current) {
+      orbitGroup.current.rotation.y = t * 0.28;
     }
 
     const tokenPositions = ORBIT_TOKENS.map((_, i) =>
