@@ -17,7 +17,7 @@ FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Generate Prisma Client from prisma/schema.prisma before compiling Next.js.
-RUN npx prisma generate
+RUN DATABASE_URL="postgresql://build:build@127.0.0.1:5432/build?schema=public" npx prisma generate
 RUN npm run build
 
 FROM base AS runner
@@ -27,6 +27,8 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
+
+LABEL org.opencontainers.image.source="https://github.com/Neeraj4298/EliavaTech"
 
 RUN groupadd --system --gid 1001 nodejs \
   && useradd --system --uid 1001 --gid nodejs nextjs
