@@ -23,10 +23,23 @@ import { trackFormSubmission } from "@/lib/analytics";
 
 declare global {
   interface Window {
-    onEliavaTurnstileSuccess?: (token: string) => void;
-    onEliavaTurnstileError?: () => void;
+    turnstile?: {
+      render: (
+        container: HTMLElement,
+        options: {
+          sitekey: string;
+          callback?: (token: string) => void;
+          "error-callback"?: () => void;
+          "expired-callback"?: () => void;
+        }
+      ) => string;
+      reset: (widgetId?: string) => void;
+      remove: (widgetId?: string) => void;
+    };
   }
 }
+
+const TURNSTILE_CONTAINER_ID = "eliava-turnstile";
 
 export function ContactForm() {
   const turnstileSiteKey = (
@@ -61,19 +74,45 @@ export function ContactForm() {
     },
   });
 
+  const turnstileContainerRef = React.useRef<HTMLDivElement | null>(null);
+  const [turnstileScriptReady, setTurnstileScriptReady] = React.useState(false);
+  // The widget lives in the form, which unmounts after a successful submit.
+  const showingForm = submittedData === null;
+
+  // Render explicitly (the implicit `.cf-turnstile` scan only runs once at
+  // script load, so it never re-rendered after "Send Another Enquiry").
   React.useEffect(() => {
-    if (!turnstileSiteKey) return;
-    window.onEliavaTurnstileSuccess = (token: string) => {
-      setValue("turnstileToken", token, { shouldValidate: true });
-    };
-    window.onEliavaTurnstileError = () => {
-      setValue("turnstileToken", "");
-    };
+    if (!turnstileSiteKey || !showingForm) return;
+    const container = turnstileContainerRef.current;
+    if (!container || !window.turnstile) return;
+
+    const widgetId = window.turnstile.render(container, {
+      sitekey: turnstileSiteKey,
+      callback: (token: string) =>
+        setValue("turnstileToken", token, { shouldValidate: true }),
+      "error-callback": () => setValue("turnstileToken", ""),
+      "expired-callback": () => setValue("turnstileToken", ""),
+    });
+
     return () => {
-      delete window.onEliavaTurnstileSuccess;
-      delete window.onEliavaTurnstileError;
+      try {
+        window.turnstile?.remove(widgetId);
+      } catch {
+        // widget already gone
+      }
     };
-  }, [turnstileSiteKey, setValue]);
+  }, [turnstileSiteKey, turnstileScriptReady, showingForm, setValue]);
+
+  // Turnstile tokens are single-use: refresh after any failed attempt.
+  const resetTurnstile = () => {
+    if (!turnstileSiteKey) return;
+    setValue("turnstileToken", "");
+    try {
+      window.turnstile?.reset(`#${TURNSTILE_CONTAINER_ID}`);
+    } catch {
+      // ignore
+    }
+  };
 
   const onSubmit = async (values: ContactFormValues) => {
     setServerError(null);
@@ -81,7 +120,7 @@ export function ContactForm() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify({ ...values, source: "contact" }),
       });
 
       const payload = (await res.json().catch(() => null)) as {
@@ -95,6 +134,7 @@ export function ContactForm() {
           payload?.error ||
             "Could not submit your request right now. Please try again or reach us directly on WhatsApp."
         );
+        resetTurnstile();
         return;
       }
 
@@ -108,6 +148,7 @@ export function ContactForm() {
       setServerError(
         "Network error while sending your message. Please check your connection or message us on WhatsApp."
       );
+      resetTurnstile();
     }
   };
 
@@ -273,15 +314,11 @@ export function ContactForm() {
         {turnstileSiteKey ? (
           <div className="pt-1">
             <Script
-              src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+              src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
               strategy="lazyOnload"
+              onReady={() => setTurnstileScriptReady(true)}
             />
-            <div
-              className="cf-turnstile"
-              data-sitekey={turnstileSiteKey}
-              data-callback="onEliavaTurnstileSuccess"
-              data-error-callback="onEliavaTurnstileError"
-            />
+            <div id={TURNSTILE_CONTAINER_ID} ref={turnstileContainerRef} />
           </div>
         ) : (
           <div className="flex items-center gap-2 text-xs text-text-muted">

@@ -64,7 +64,7 @@ export function GoogleAnalytics() {
               ad_personalization: 'denied'
             });
             gtag('js', new Date());
-            gtag('config', '${gaId}', { anonymize_ip: true });
+            gtag('config', ${JSON.stringify(gaId)}, { anonymize_ip: true });
           `,
         }}
       />

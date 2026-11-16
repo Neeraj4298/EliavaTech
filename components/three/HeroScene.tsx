@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { RoundedBox, Environment, Lightformer } from "@react-three/drei";
 import { useTheme } from "next-themes";
 import { Code2, MessageSquare, ShoppingCart, BarChart3 } from "lucide-react";

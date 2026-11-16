@@ -25,7 +25,6 @@ export function HeroSection() {
     offset: ["start start", "end start"],
   });
 
-  const sceneScale = useTransform(scrollYProgress, [0, 1], [1, 0.86]);
   const sceneOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.15]);
 
   return (

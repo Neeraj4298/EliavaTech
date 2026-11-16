@@ -91,7 +91,10 @@ export async function POST(req: NextRequest) {
     const data = parsed.data;
 
     // Verify Cloudflare Turnstile when TURNSTILE_SECRET_KEY is set
-    const turnstileOk = await verifyTurnstileToken(data.turnstileToken, ip);
+    const requiresTurnstile = (data.source ?? "contact") === "contact";
+    const turnstileOk = requiresTurnstile
+      ? await verifyTurnstileToken(data.turnstileToken, ip)
+      : true;
     if (!turnstileOk) {
       return NextResponse.json(
         {
@@ -174,7 +177,12 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (!emailResult.sent) {
+    // The enquiry counts as received if it reached us by any channel. Failing
+    // the request when only the visitor's confirmation email bounced would make
+    // them resubmit and create duplicate leads.
+    const received =
+      dbSaved || emailResult.teamEmailSent || webhookSent;
+    if (!received) {
       return NextResponse.json(
         {
           ok: false,
