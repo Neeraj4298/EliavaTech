@@ -8,7 +8,7 @@ import {
   MAX_CHAT_CONVERSATION_MESSAGES,
   MAX_CHAT_MESSAGE_LENGTH,
   type ChatErrorType,
-} from "@/lib/gemini";
+} from "@/lib/chat-config";
 import { EASE_STANDARD, SPRING_PLAYFUL, usePrefersReducedMotion } from "@/lib/motion";
 import { trackChatStart } from "@/lib/analytics";
 import { ChatHeader } from "./ChatHeader";
@@ -168,10 +168,14 @@ export function ChatWidget({ mode = "floating", className }: ChatWidgetProps) {
     setInlineError(null);
 
     try {
-      const historyForApi = nextMessages
+      const trimmedHistory = nextMessages
         .slice(1)
-        .slice(-MAX_CHAT_CONVERSATION_MESSAGES)
-        .map(({ role, content }) => ({
+        .slice(-MAX_CHAT_CONVERSATION_MESSAGES);
+      // Gemini requires the conversation to start with a user turn.
+      const firstUserIdx = trimmedHistory.findIndex((m) => m.role === "user");
+      const historyForApi = (
+        firstUserIdx > 0 ? trimmedHistory.slice(firstUserIdx) : trimmedHistory
+      ).map(({ role, content }) => ({
           role,
           content:
             role === "user"

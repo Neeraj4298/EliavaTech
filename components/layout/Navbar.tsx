@@ -27,6 +27,12 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  React.useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+    };
+  }, []);
+
   const openMegaMenu = () => {
     if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
     setMegaMenuOpen(true);
@@ -73,6 +79,7 @@ export function Navbar() {
                     aria-expanded={link.hasMegaMenu ? megaMenuOpen : undefined}
                     aria-haspopup={link.hasMegaMenu ? "true" : undefined}
                     onFocus={link.hasMegaMenu ? openMegaMenu : undefined}
+                    onClick={() => setMegaMenuOpen(false)}
                     className={cn(
                       "group relative inline-flex items-center gap-1 px-3.5 py-2 text-small font-medium transition-colors",
                       isActive || (link.hasMegaMenu && megaMenuOpen)

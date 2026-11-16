@@ -43,7 +43,16 @@ function renderInlineNodes(text: string, keyPrefix: string): React.ReactNode[] {
       const linkMatch = raw.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
       if (linkMatch) {
         const [, label, rawHref] = linkMatch;
-        const href = rawHref.replace(/^https?:\/\/eliavatech\.com/, "") || "/";
+        const href = rawHref.replace(/^https?:\/\/(www\.)?eliavatech\.com/, "") || "/";
+        // Model output is untrusted: only allow site paths and http(s)/mailto/tel links.
+        const isSafeHref =
+          (href.startsWith("/") && !href.startsWith("//")) ||
+          /^(https?:|mailto:|tel:)/i.test(href);
+        if (!isSafeHref) {
+          nodes.push(label);
+          lastIndex = match.index + raw.length;
+          continue;
+        }
         nodes.push(
           href.startsWith("/") ? (
             <Link

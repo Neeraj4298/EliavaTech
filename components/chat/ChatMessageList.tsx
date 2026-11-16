@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { RotateCcw, Calendar, AlertCircle } from "lucide-react";
-import { type ChatErrorType, type ChatTurn } from "@/lib/gemini";
+import { type ChatErrorType, type ChatTurn } from "@/lib/chat-config";
 import { EASE_STANDARD, MOTION_DURATION, usePrefersReducedMotion } from "@/lib/motion";
 import { Logo } from "@/components/brand/Logo";
 import { WhatsAppButton } from "@/components/overlays/WhatsAppButton";

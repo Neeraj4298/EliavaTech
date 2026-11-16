@@ -31,6 +31,17 @@ export function BookingEmbed({ className }: BookingEmbedProps) {
   React.useEffect(() => {
     let settleTimer: number | null = null;
 
+    // The hover "aperture" overlay swallows every click except at the settled
+    // cursor position, so it would make the calendar unusable on touch devices
+    // (no mousemove events). Only enable it for fine pointers.
+    const canHover =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (!canHover) {
+      if (overlayRef.current) overlayRef.current.style.display = "none";
+      return;
+    }
+
     const closeAperture = () => {
       if (settleTimer !== null) {
         window.clearTimeout(settleTimer);

@@ -44,11 +44,13 @@ export const contactFormSchema = z.object({
   service: z
     .string()
     .trim()
-    .min(1, "Please select a service you are interested in."),
+    .min(1, "Please select a service you are interested in.")
+    .max(60, "Invalid service selection."),
   budgetRange: z
     .string()
     .trim()
-    .min(1, "Please select an estimated budget range."),
+    .min(1, "Please select an estimated budget range.")
+    .max(60, "Invalid budget selection."),
   message: z
     .string()
     .trim()
@@ -56,6 +58,9 @@ export const contactFormSchema = z.object({
     .max(2000, "Message must be under 2,000 characters."),
   // Honeypot spam field — must remain empty
   website: z.string().max(0, "Spam detected.").optional().or(z.literal("")),
+  // Which form submitted the request. Only the main contact form renders the
+  // Turnstile widget; the pricing quote form is still honeypot + rate limited.
+  source: z.enum(["contact", "pricing"]).optional(),
   // Cloudflare Turnstile token (optional when Turnstile keys are not configured in dev)
   turnstileToken: z.string().optional(),
 });

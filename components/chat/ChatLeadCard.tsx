@@ -36,18 +36,18 @@ export function ChatLeadCard({ onClose, onSuccess }: ChatLeadCardProps) {
 
     setSubmitting(true);
     try {
-      const res = await fetch("/api/contact", {
+      // Uses the chat endpoint's leadCapture path: it stores the lead, emails the
+      // team and is rate limited, without requiring a Turnstile token.
+      const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim(),
-          phone: "",
-          company: "",
-          service: "custom-software",
-          budgetRange: "undecided",
-          message: need.trim(),
-          website: "",
+          messages: [{ role: "user", content: need.trim().slice(0, 500) }],
+          leadCapture: {
+            name: name.trim(),
+            email: email.trim(),
+            need: need.trim().slice(0, 1000),
+          },
         }),
       });
       const data = (await res.json().catch(() => null)) as {
@@ -60,7 +60,7 @@ export function ChatLeadCard({ onClose, onSuccess }: ChatLeadCardProps) {
         setSubmitting(false);
         return;
       }
-      trackFormSubmission("chat_lead_card", "custom-software");
+      trackFormSubmission("chat_lead_card", "chat-enquiry");
       setSubmitted(true);
       setSubmitting(false);
       onSuccess({ name: name.trim(), email: email.trim(), need: need.trim() });

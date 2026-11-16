@@ -150,7 +150,11 @@ export function getAllBlogPosts(): BlogPost[] {
     };
   });
 
-  return posts.sort((a, b) => a.title.localeCompare(b.title));
+  return posts.sort(
+    (a, b) =>
+      b.publishedAt.localeCompare(a.publishedAt) ||
+      a.title.localeCompare(b.title)
+  );
 }
 
 export function getBlogPostBySlug(slug: string): BlogPost | null {

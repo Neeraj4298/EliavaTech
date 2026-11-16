@@ -43,6 +43,7 @@ export function PricingPageClient() {
           budgetRange,
           message: message.trim(),
           website: "",
+          source: "pricing",
         }),
       });
 

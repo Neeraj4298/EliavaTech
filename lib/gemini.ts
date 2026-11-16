@@ -12,7 +12,13 @@ import { INDUSTRIES_DATA } from "@/content/industries";
 export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
 export const FALLBACK_GEMINI_MODEL = "gemini-2.5-flash";
 
-export type ChatErrorType = "rate_limited" | "unavailable" | "invalid_request";
+import type { ChatErrorType, ChatTurn } from "@/lib/chat-config";
+
+export {
+  MAX_CHAT_MESSAGE_LENGTH,
+  MAX_CHAT_CONVERSATION_MESSAGES,
+} from "@/lib/chat-config";
+export type { ChatErrorType, ChatTurn } from "@/lib/chat-config";
 
 export class GeminiApiError extends Error {
   public readonly statusCode: number;
@@ -31,14 +37,6 @@ export class GeminiApiError extends Error {
     this.errorType = opts.errorType;
     this.upstreamStatus = opts.upstreamStatus;
   }
-}
-
-export const MAX_CHAT_MESSAGE_LENGTH = 500;
-export const MAX_CHAT_CONVERSATION_MESSAGES = 30;
-
-export interface ChatTurn {
-  role: "user" | "assistant";
-  content: string;
 }
 
 /**
@@ -120,8 +118,10 @@ export function extractLeadDetailsFromConversation(messages: ChatTurn[]): {
 
   const combinedUserText = userMessages.map((m) => m.content).join(" | ");
   const phoneMatch = combinedUserText.match(/(?:\+91[\s-]?)?[6-9]\d{9}/);
+  // Keyword is case-insensitive; the captured name must be capitalised so
+  // phrases like "I am interested in..." are not stored as a name.
   const nameMatch = combinedUserText.match(
-    /(?:my name is|i am|i'm|name:\s*)([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i
+    /(?:\b[Mm]y name is|\b[Ii] am|\b[Ii]'m|\b[Nn]ame:)\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/
   );
   return {
     email: emailMatch[0].toLowerCase(),
@@ -161,13 +161,17 @@ export async function createGeminiStream(
   let lastError: GeminiApiError | null = null;
 
   for (const modelName of modelsToTry) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:streamGenerateContent?alt=sse&key=${encodeURIComponent(
-      apiKey
-    )}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
+      modelName
+    )}:streamGenerateContent?alt=sse`;
 
     const res = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
+      signal: AbortSignal.timeout(30_000),
       body: JSON.stringify({
         system_instruction: {
           parts: [{ text: systemInstruction }],
