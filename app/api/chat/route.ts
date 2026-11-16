@@ -97,7 +97,7 @@ async function captureChatLead(lead: {
     }
   }
 
-  await sendLeadNotificationEmail({
+  const emailResult = await sendLeadNotificationEmail({
     leadId: savedLeadId,
     name: lead.name,
     email: lead.email,
@@ -107,7 +107,9 @@ async function captureChatLead(lead: {
   }).catch(() => null);
 
   const webhookUrl = process.env.N8N_WEBHOOK_URL;
+  let webhookQueued = false;
   if (webhookUrl) {
+    webhookQueued = true;
     fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -123,7 +125,10 @@ async function captureChatLead(lead: {
     }).catch(() => null);
   }
 
-  return savedLeadId;
+  return {
+    leadId: savedLeadId,
+    received: Boolean(savedLeadId || emailResult?.teamEmailSent || webhookQueued),
+  };
 }
 
 export async function POST(req: NextRequest) {
@@ -168,7 +173,22 @@ export async function POST(req: NextRequest) {
 
     // If explicit leadCapture payload was submitted from the chat widget
     if (leadCapture) {
-      const leadId = await captureChatLead({ ...leadCapture, sessionId });
+      const { leadId, received } = await captureChatLead({
+        ...leadCapture,
+        sessionId,
+      });
+      if (!received) {
+        return NextResponse.json(
+          {
+            ok: false,
+            fallback: true,
+            errorType: "unavailable" satisfies ChatErrorType,
+            error:
+              "We could not log your request right now. Please message us on WhatsApp or use the contact page.",
+          },
+          { status: 503 }
+        );
+      }
       return NextResponse.json({
         ok: true,
         leadCaptured: true,
