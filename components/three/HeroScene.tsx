@@ -261,6 +261,14 @@ export function HeroScene({ active = true }: HeroSceneProps) {
       if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
         movedDuringDragRef.current = true;
       }
+      // On touch, a mostly vertical swipe over the scene is the visitor scrolling
+      // the page, not rotating the model. Hand it to the browser and do not feed
+      // it into the rotation, otherwise the model keeps spinning after they lift.
+      if (e.pointerType === "touch" && Math.abs(dy) > Math.abs(dx)) {
+        draggingRef.current = false;
+        dragVelocityRef.current = { x: 0, y: 0 };
+        return;
+      }
       prevPointerRef.current = { x: e.clientX, y: e.clientY };
       dragVelocityRef.current = { x: dy * 0.006, y: dx * 0.008 };
       dragAngleRef.current.y += dragVelocityRef.current.y;
@@ -279,7 +287,9 @@ export function HeroScene({ active = true }: HeroSceneProps) {
     };
 
     const handleWindowPointerCancel = () => {
+      // The browser took over the gesture (native scroll): drop any momentum.
       draggingRef.current = false;
+      dragVelocityRef.current = { x: 0, y: 0 };
     };
 
     window.addEventListener("pointermove", handleWindowPointerMove, { passive: true });

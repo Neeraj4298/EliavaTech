@@ -183,14 +183,15 @@ export async function POST(req: NextRequest) {
     const received =
       dbSaved || emailResult.teamEmailSent || webhookSent;
     if (!received) {
+      // Details (missing credentials, SMTP errors) stay in server logs only.
+      console.error("[/api/contact] Enquiry not delivered:", emailResult.error);
       return NextResponse.json(
         {
           ok: false,
           error:
-            emailResult.error ||
-            "Could not send confirmation email. Please check email configuration.",
+            "We could not submit your request right now. Please message us on WhatsApp or email supporteliavatech@gmail.com.",
         },
-        { status: 500 }
+        { status: 503 }
       );
     }
 
