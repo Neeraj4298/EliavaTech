@@ -17,6 +17,34 @@ export const BUDGET_OPTIONS = [
   { value: "monthly-care", label: "Monthly Care Plan (₹1,499 – ₹5,999/mo)" },
 ] as const;
 
+/** Options used by the custom-quote form on the pricing page. */
+export const PRICING_SERVICE_OPTIONS = [
+  { value: "bundle", label: "Website + WhatsApp Automation Bundle" },
+  { value: "ecommerce", label: "E-commerce Store (from ₹34,999)" },
+  { value: "crm", label: "Custom CRM / Dashboard (from ₹49,999)" },
+  { value: "care", label: "Monthly Care Plan" },
+] as const;
+
+export const PRICING_BUDGET_OPTIONS = [
+  { value: "10k-25k", label: "₹10,000 – ₹25,000" },
+  { value: "25k-50k", label: "₹25,000 – ₹50,000" },
+  { value: "50k-1L", label: "₹50,000 – ₹1,00,000" },
+  { value: "1L+", label: "₹1,00,000+" },
+] as const;
+
+const SERVICE_VALUES = [
+  ...SERVICE_OPTIONS.map((o) => o.value),
+  ...PRICING_SERVICE_OPTIONS.map((o) => o.value),
+] as unknown as [string, ...string[]];
+
+const BUDGET_VALUES = [
+  ...BUDGET_OPTIONS.map((o) => o.value),
+  ...PRICING_BUDGET_OPTIONS.map((o) => o.value),
+] as unknown as [string, ...string[]];
+
+// Digits, spaces, dashes, brackets and an optional leading +. 7-15 digits.
+const PHONE_PATTERN = /^\+?[\d\s\-()]{7,25}$/;
+
 export const contactFormSchema = z.object({
   name: z
     .string()
@@ -26,43 +54,42 @@ export const contactFormSchema = z.object({
   email: z
     .string()
     .trim()
+    .toLowerCase()
     .email("Please enter a valid email address.")
     .max(160, "Email must be under 160 characters."),
   phone: z
     .string()
     .trim()
-    .min(7, "Please enter a valid phone or WhatsApp number.")
     .max(25, "Phone number is too long.")
-    .optional()
-    .or(z.literal("")),
+    .refine(
+      (value) =>
+        value === "" ||
+        (PHONE_PATTERN.test(value) && value.replace(/\D/g, "").length >= 7),
+      "Please enter a valid phone or WhatsApp number."
+    )
+    .optional(),
   company: z
     .string()
     .trim()
     .max(120, "Company name must be under 120 characters.")
-    .optional()
-    .or(z.literal("")),
-  service: z
-    .string()
-    .trim()
-    .min(1, "Please select a service you are interested in.")
-    .max(60, "Invalid service selection."),
-  budgetRange: z
-    .string()
-    .trim()
-    .min(1, "Please select an estimated budget range.")
-    .max(60, "Invalid budget selection."),
+    .optional(),
+  service: z.enum(SERVICE_VALUES, {
+    message: "Please select a service you are interested in.",
+  }),
+  budgetRange: z.enum(BUDGET_VALUES, {
+    message: "Please select an estimated budget range.",
+  }),
   message: z
     .string()
     .trim()
-    .min(3, "Please share a short summary of your project scope or need.")
+    .min(10, "Please share a short summary of your project (at least 10 characters).")
     .max(2000, "Message must be under 2,000 characters."),
-  // Honeypot spam field — must remain empty
-  website: z.string().max(0, "Spam detected.").optional().or(z.literal("")),
-  // Which form submitted the request. Only the main contact form renders the
-  // Turnstile widget; the pricing quote form is still honeypot + rate limited.
+  // Honeypot spam field: must stay empty.
+  website: z.string().max(0, "Spam detected.").optional(),
+  // Which form submitted the request (for analytics and email labels).
   source: z.enum(["contact", "pricing"]).optional(),
-  // Cloudflare Turnstile token (optional when Turnstile keys are not configured in dev)
-  turnstileToken: z.string().optional(),
+  // Cloudflare Turnstile token (required by the server in production).
+  turnstileToken: z.string().max(4096).optional(),
 });
 
 export type ContactFormValues = z.infer<typeof contactFormSchema>;

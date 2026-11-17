@@ -1,11 +1,10 @@
 "use client";
 
 import * as React from "react";
-import Script from "next/script";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { CheckCircle2, AlertCircle, ShieldCheck, RotateCcw } from "lucide-react";
+import { CheckCircle2, AlertCircle, RotateCcw } from "lucide-react";
 import {
   contactFormSchema,
   SERVICE_OPTIONS,
@@ -20,37 +19,21 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { WhatsAppButton } from "@/components/overlays/WhatsAppButton";
 import { trackFormSubmission } from "@/lib/analytics";
+import {
+  TURNSTILE_SITE_KEY,
+  TurnstileWidget,
+  resetTurnstileWidget,
+} from "./TurnstileWidget";
 
-declare global {
-  interface Window {
-    turnstile?: {
-      render: (
-        container: HTMLElement,
-        options: {
-          sitekey: string;
-          callback?: (token: string) => void;
-          "error-callback"?: () => void;
-          "expired-callback"?: () => void;
-        }
-      ) => string;
-      reset: (widgetId?: string) => void;
-      remove: (widgetId?: string) => void;
-    };
-  }
-}
-
-const TURNSTILE_CONTAINER_ID = "eliava-turnstile";
+const TURNSTILE_ID = "contact-turnstile";
 
 export function ContactForm() {
-  const turnstileSiteKey = (
-    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""
-  ).trim();
-
   const [serverError, setServerError] = React.useState<string | null>(null);
   const [submittedData, setSubmittedData] = React.useState<{
     name: string;
     email: string;
     leadId?: string | null;
+    confirmationEmailSent: boolean;
   } | null>(null);
 
   const {
@@ -74,48 +57,19 @@ export function ContactForm() {
     },
   });
 
-  const turnstileContainerRef = React.useRef<HTMLDivElement | null>(null);
-  const [turnstileScriptReady, setTurnstileScriptReady] = React.useState(false);
-  // The widget lives in the form, which unmounts after a successful submit.
-  const showingForm = submittedData === null;
-
-  // Render explicitly (the implicit `.cf-turnstile` scan only runs once at
-  // script load, so it never re-rendered after "Send Another Enquiry").
-  React.useEffect(() => {
-    if (!turnstileSiteKey || !showingForm) return;
-    const container = turnstileContainerRef.current;
-    if (!container || !window.turnstile) return;
-
-    const widgetId = window.turnstile.render(container, {
-      sitekey: turnstileSiteKey,
-      callback: (token: string) =>
-        setValue("turnstileToken", token, { shouldValidate: true }),
-      "error-callback": () => setValue("turnstileToken", ""),
-      "expired-callback": () => setValue("turnstileToken", ""),
-    });
-
-    return () => {
-      try {
-        window.turnstile?.remove(widgetId);
-      } catch {
-        // widget already gone
-      }
-    };
-  }, [turnstileSiteKey, turnstileScriptReady, showingForm, setValue]);
-
-  // Turnstile tokens are single-use: refresh after any failed attempt.
+  // Turnstile tokens are single use: refresh the widget after any failed attempt.
   const resetTurnstile = () => {
-    if (!turnstileSiteKey) return;
+    if (!TURNSTILE_SITE_KEY) return;
     setValue("turnstileToken", "");
-    try {
-      window.turnstile?.reset(`#${TURNSTILE_CONTAINER_ID}`);
-    } catch {
-      // ignore
-    }
+    resetTurnstileWidget(TURNSTILE_ID);
   };
 
   const onSubmit = async (values: ContactFormValues) => {
     setServerError(null);
+    if (TURNSTILE_SITE_KEY && !values.turnstileToken) {
+      setServerError("Please complete the spam check below, then send again.");
+      return;
+    }
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -127,6 +81,7 @@ export function ContactForm() {
         ok?: boolean;
         error?: string;
         leadId?: string | null;
+        userEmailSent?: boolean;
       } | null;
 
       if (!res.ok || !payload?.ok) {
@@ -143,6 +98,7 @@ export function ContactForm() {
         name: values.name,
         email: values.email,
         leadId: payload.leadId,
+        confirmationEmailSent: payload.userEmailSent === true,
       });
     } catch {
       setServerError(
@@ -175,8 +131,17 @@ export function ContactForm() {
         </div>
 
         <p className="text-body text-text-muted">
-          We have received your project details and sent a confirmation to{" "}
-          <strong className="text-text">{submittedData.email}</strong>. A co-founder will reply within one business day.
+          {submittedData.confirmationEmailSent ? (
+            <>
+              We have received your project details and sent a confirmation to{" "}
+              <strong className="text-text">{submittedData.email}</strong>. A co-founder will reply within one business day.
+            </>
+          ) : (
+            <>
+              We have received your project details. We could not send an automatic confirmation email, but your request reached our team and a co-founder will reply to{" "}
+              <strong className="text-text">{submittedData.email}</strong> within one business day.
+            </>
+          )}
         </p>
 
         <div className="pt-3 border-t border-border/60 flex flex-wrap items-center justify-between gap-3">
@@ -310,28 +275,17 @@ export function ContactForm() {
           {...register("message")}
         />
 
-        {/* Cloudflare Turnstile Spam Protection */}
-        {turnstileSiteKey ? (
-          <div className="pt-1">
-            <Script
-              src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-              strategy="lazyOnload"
-              onReady={() => setTurnstileScriptReady(true)}
-            />
-            <div id={TURNSTILE_CONTAINER_ID} ref={turnstileContainerRef} />
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 text-xs text-text-muted">
-            <ShieldCheck strokeWidth={1.5} className="h-4 w-4 text-success shrink-0" />
-            <span>
-              Protected by Cloudflare Turnstile + honeypot + per-IP rate limiting.
-            </span>
-          </div>
-        )}
+        {/* Cloudflare Turnstile spam protection (required by the server in production) */}
+        <TurnstileWidget
+          id={TURNSTILE_ID}
+          onToken={(token) =>
+            setValue("turnstileToken", token, { shouldValidate: true })
+          }
+        />
 
         <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <p className="text-xs text-text-muted">
-            Your details are stored securely and never shared with third parties.
+            We use your details only to reply to your enquiry. See our Privacy Policy.
           </p>
           <Button
             type="submit"

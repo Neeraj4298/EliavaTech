@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EliavaTech website
 
-## Getting Started
+Marketing site for EliavaTech: Next.js (App Router), TypeScript, Tailwind CSS,
+Prisma + PostgreSQL, Gemini-powered chat assistant, Cloudflare Turnstile.
 
-First, run the development server:
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm ci
+cp .env.example .env.local   # then fill in what you need
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Without any keys the site runs; forms need an email provider or a database to
+accept enquiries, and chat needs `GEMINI_API_KEY`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Checks
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run typecheck   # tsc --noEmit
+npm run lint        # eslint
+npm run build       # production build
+```
 
-## Learn More
+## Database and migrations
 
-To learn more about Next.js, take a look at the following resources:
+Schema lives in `prisma/schema.prisma`; migrations in `prisma/migrations`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Task | Command |
+| --- | --- |
+| Apply migrations in production / CI | `npm run db:migrate:deploy` |
+| Check migration status | `npm run db:migrate:status` |
+| Create a migration after editing the schema (development) | `npm run db:migrate:dev -- --name describe_change` |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Always commit the generated `prisma/migrations/*` folder. Run
+`db:migrate:deploy` as a release step before the new app version goes live.
+`prisma generate` runs automatically after `npm install` (`postinstall`).
 
-## Deploy on Vercel
+## Production checklist
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `DATABASE_URL` set and `npm run db:migrate:deploy` run.
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` set. The contact
+  and pricing forms are refused without the secret.
+- `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` set for shared rate limits.
+- Client IP: on Vercel nothing to do; elsewhere set `TRUSTED_IP_HEADER` or
+  `TRUSTED_PROXY_COUNT` (see `.env.example`).
+- Email: either `GMAIL_APP_PASSWORD` + `SMTP_USER`, or `RESEND_API_KEY` with a
+  verified-domain `RESEND_FROM_EMAIL`.
+- `GEMINI_API_KEY` set. `NEXT_PUBLIC_SITE_URL` set to the live domain.
+- Social profile URLs (`NEXT_PUBLIC_*_URL`) filled in.
+- Blog posts are published by setting `draft: false` in the post's frontmatter
+  after review. Drafts are hidden in production, excluded from the sitemap and
+  marked `noindex`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+
+- Public business details (email, phone, service area) live in
+  `content/site.ts`; founder details in `content/founders.ts`.
+- The Content Security Policy is set in `next.config.ts`.

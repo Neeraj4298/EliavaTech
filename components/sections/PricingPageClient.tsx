@@ -10,6 +10,17 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { trackFormSubmission } from "@/lib/analytics";
+import {
+  PRICING_BUDGET_OPTIONS,
+  PRICING_SERVICE_OPTIONS,
+} from "@/lib/contact-schema";
+import {
+  TURNSTILE_SITE_KEY,
+  TurnstileWidget,
+  resetTurnstileWidget,
+} from "@/components/forms/TurnstileWidget";
+
+const PRICING_TURNSTILE_ID = "pricing-turnstile";
 import { cn } from "@/lib/utils";
 
 export function PricingPageClient() {
@@ -23,6 +34,8 @@ export function PricingPageClient() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [submitError, setSubmitError] = React.useState<string | null>(null);
   const [submittedEmail, setSubmittedEmail] = React.useState("");
+  const [confirmationEmailSent, setConfirmationEmailSent] = React.useState(false);
+  const [turnstileToken, setTurnstileToken] = React.useState("");
 
   const visibleTiers = PRICING_TIERS.filter((tier) => tier.billingMode === billingMode);
 
@@ -30,6 +43,10 @@ export function PricingPageClient() {
     e.preventDefault();
     if (isSubmitting) return;
     setSubmitError(null);
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+      setSubmitError("Please complete the spam check below, then send again.");
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -44,12 +61,14 @@ export function PricingPageClient() {
           message: message.trim(),
           website: "",
           source: "pricing",
+          turnstileToken,
         }),
       });
 
       const payload = (await res.json().catch(() => null)) as {
         ok?: boolean;
         error?: string;
+        userEmailSent?: boolean;
         fieldErrors?: Record<string, string[] | undefined>;
       } | null;
 
@@ -62,18 +81,23 @@ export function PricingPageClient() {
             payload?.error ||
             "Could not submit your quote request right now. Please try again."
         );
+        setTurnstileToken("");
+        resetTurnstileWidget(PRICING_TURNSTILE_ID);
         setIsSubmitting(false);
         return;
       }
 
       trackFormSubmission("pricing_custom_quote", service);
       setSubmittedEmail(email.trim());
+      setConfirmationEmailSent(payload.userEmailSent === true);
       setQuoteSent(true);
       setIsSubmitting(false);
     } catch {
       setSubmitError(
         "Network error while sending your quote request. Please check your connection and try again."
       );
+      setTurnstileToken("");
+      resetTurnstileWidget(PRICING_TURNSTILE_ID);
       setIsSubmitting(false);
     }
   };
@@ -180,8 +204,19 @@ export function PricingPageClient() {
                 <span>Custom quote request received</span>
               </div>
               <p className="text-small text-text-muted">
-                Thank you, <span className="font-medium text-text">{name}</span>. We have notified the EliavaTech team and sent a confirmation email to{" "}
-                <span className="font-medium text-text">{submittedEmail}</span>. A co-founder will review your scope and reply within one business day.
+                Thank you, <span className="font-medium text-text">{name}</span>.{" "}
+                {confirmationEmailSent ? (
+                  <>
+                    We have notified the EliavaTech team and sent a confirmation email to{" "}
+                    <span className="font-medium text-text">{submittedEmail}</span>.
+                  </>
+                ) : (
+                  <>
+                    We have notified the EliavaTech team. We could not send an automatic confirmation email, but we will reply to{" "}
+                    <span className="font-medium text-text">{submittedEmail}</span>.
+                  </>
+                )}{" "}
+                A co-founder will review your scope and reply within one business day.
               </p>
             </div>
           ) : (
@@ -208,23 +243,13 @@ export function PricingPageClient() {
                 label="Package / Service"
                 value={service}
                 onChange={(e) => setService(e.target.value)}
-                options={[
-                  { value: "bundle", label: "Website + WhatsApp Automation Bundle" },
-                  { value: "ecommerce", label: "E-commerce Store (from ₹34,999)" },
-                  { value: "crm", label: "Custom CRM / Dashboard (from ₹49,999)" },
-                  { value: "care", label: "Monthly Care Plan" },
-                ]}
+                options={[...PRICING_SERVICE_OPTIONS]}
               />
               <Select
                 label="Estimated Budget Range"
                 value={budgetRange}
                 onChange={(e) => setBudgetRange(e.target.value)}
-                options={[
-                  { value: "10k-25k", label: "₹10,000 – ₹25,000" },
-                  { value: "25k-50k", label: "₹25,000 – ₹50,000" },
-                  { value: "50k-1L", label: "₹50,000 – ₹1,00,000" },
-                  { value: "1L+", label: "₹1,00,000+" },
-                ]}
+                options={[...PRICING_BUDGET_OPTIONS]}
               />
               <div className="sm:col-span-2">
                 <Textarea
@@ -235,6 +260,9 @@ export function PricingPageClient() {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                 />
+              </div>
+              <div className="sm:col-span-2">
+                <TurnstileWidget id={PRICING_TURNSTILE_ID} onToken={setTurnstileToken} />
               </div>
               {submitError && (
                 <p role="alert" className="sm:col-span-2 text-xs text-danger">
