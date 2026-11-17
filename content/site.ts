@@ -6,9 +6,9 @@
 export const BUSINESS = {
   name: "EliavaTech",
   email: "supporteliavatech@gmail.com",
-  phoneDisplay: "+91 70754 66449",
-  phoneE164: "+917075466449",
-  whatsappDigits: "917075466449",
+  phoneDisplay: "+91 91213 34113",
+  phoneE164: "+919121334113",
+  whatsappDigits: "919121334113",
   serviceAreaTitle: "Where We Work",
   serviceAreaLine: "Remote-first team serving businesses across India",
   serviceAreaNote: "Video consultations via Google Meet. On-site visits by arrangement.",
