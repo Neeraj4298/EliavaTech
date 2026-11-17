@@ -24,8 +24,8 @@ export function IndustriesShowcaseSection() {
       <div className="space-y-10">
         <SectionHeading
           eyebrow="Industry Solution Bundles"
-          title="Built for how Indian SMBs actually operate."
-          description="Select your sector to see the exact website, booking, and automation bundle we deploy."
+          title="Built for how Indian small businesses work."
+          description="Choose your sector to see the website, booking and automation bundle we build."
           action={
             <Button href="/industries" variant="secondary" size="md" withArrow>
               All 7 Industries
@@ -76,7 +76,7 @@ export function IndustriesShowcaseSection() {
                 Explore {activeIndustry.title} Bundle
               </Button>
               <Button href="/contact" variant="secondary" size="md">
-                Request Custom Scope
+                Request a Custom Scope
               </Button>
             </div>
           </div>

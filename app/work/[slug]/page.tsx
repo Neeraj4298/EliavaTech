@@ -67,7 +67,7 @@ export default async function WorkDetailPage({ params }: { params: Promise<{ slu
             eyebrow="Interactive Working Demo · Concept Project"
             eyebrowVariant="gold"
             title="Test the workflow below."
-            description="Interact with the live controls inside the browser frame to see how the system responds."
+            description="Use the live controls inside the browser frame to see how the system responds."
           />
           <ConceptProjectDemo demoType={project.demoType} demoUrl={project.demoUrl} />
         </div>
@@ -108,7 +108,7 @@ export default async function WorkDetailPage({ params }: { params: Promise<{ slu
 
           <div className="lg:col-span-6 space-y-6">
             <Card variant="default" className="space-y-4">
-              <Badge variant="gold" size="sm">Capabilities Proven (Concept Project)</Badge>
+              <Badge variant="gold" size="sm">What This Concept Project Shows</Badge>
               <h2 className="text-h3">Functional outcomes demonstrated</h2>
               <ul className="space-y-2.5">
                 {project.capabilitiesProven.map((cap) => (
@@ -127,7 +127,7 @@ export default async function WorkDetailPage({ params }: { params: Promise<{ slu
               </div>
               <div className="pt-2">
                 <Link href="/contact">
-                  <Button variant="primary" size="md" withArrow>Deploy Similar System for Your Business</Button>
+                  <Button variant="primary" size="md" withArrow>Build a Similar System for Your Business</Button>
                 </Link>
               </div>
             </Card>

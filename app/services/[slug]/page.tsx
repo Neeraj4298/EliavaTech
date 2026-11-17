@@ -115,7 +115,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
 
       <Section className="border-y border-border/60 bg-surface/40">
         <div className="space-y-8">
-          <SectionHeading eyebrow="Process & Tech" title={`How we deliver ${service.title}`} />
+          <SectionHeading eyebrow="Process and Technology" title={`How we deliver ${service.title}`} />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {service.process.map((p) => (
               <Card key={p.step} variant="default" className="space-y-2">
@@ -136,7 +136,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
 
       <Section>
         <div className="space-y-8">
-          <SectionHeading eyebrow="Sample Deliverables" title="Tangible production outputs." />
+          <SectionHeading eyebrow="Sample Deliverables" title="What you will receive." />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {service.sampleDeliverables.map((d) => (
               <Card key={d.title} variant="default" className="space-y-1.5">

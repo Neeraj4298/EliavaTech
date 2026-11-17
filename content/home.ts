@@ -28,16 +28,6 @@ export interface StatPointData {
   description: string;
 }
 
-export interface FounderPlaceholderData {
-  id: string;
-  name: string;
-  role: string;
-  focus: string;
-  bio: string;
-  initials: string;
-  accent: "gold" | "primary" | "success";
-}
-
 export interface FAQItemData {
   question: string;
   answer: string;
@@ -68,19 +58,19 @@ export const PROBLEM_CARDS: ProblemCardData[] = [
   {
     id: "manual-orders",
     title: "Manual orders",
-    promise: "Replace phone-and-notebook order taking with structured catalogues and instant checkout.",
+    promise: "Replace phone-and-notebook orders with an online catalogue and instant checkout.",
     icon: "ClipboardList",
   },
   {
     id: "lost-leads",
     title: "Lost leads",
-    promise: "Capture every website and WhatsApp enquiry into a single tracked pipeline automatically.",
+    promise: "Capture every website and WhatsApp enquiry in one place, automatically.",
     icon: "UserMinus",
   },
   {
     id: "repeated-questions",
     title: "Repeated customer questions",
-    promise: "Let automated WhatsApp flows and AI assistants handle timings, pricing and bookings 24/7.",
+    promise: "Let automated WhatsApp replies and 24/7 AI customer support handle timings, pricing and bookings.",
     icon: "MessageCircleQuestion",
   },
   {
@@ -92,14 +82,14 @@ export const PROBLEM_CARDS: ProblemCardData[] = [
 ];
 
 export const TECH_CAPABILITIES = [
-  { name: "Next.js", category: "Web Architecture" },
-  { name: "React", category: "Interactive UI" },
-  { name: "Node", category: "Backend Services" },
-  { name: "PostgreSQL", category: "Relational Data" },
+  { name: "Next.js", category: "Websites" },
+  { name: "React", category: "User Interface" },
+  { name: "Node", category: "Backend" },
+  { name: "PostgreSQL", category: "Database" },
   { name: "WhatsApp", category: "Business Automation" },
   { name: "Razorpay", category: "Indian Payments" },
-  { name: "Google Cloud", category: "Infrastructure & AI" },
-  { name: "n8n", category: "Workflow Orchestration" },
+  { name: "Google Cloud", category: "Cloud and AI" },
+  { name: "n8n", category: "Workflow Automation" },
 ] as const;
 
 export const PROCESS_STEPS: ProcessStepData[] = [
@@ -108,28 +98,28 @@ export const PROCESS_STEPS: ProcessStepData[] = [
     title: "Discover",
     summary:
       "We map your customer journey, current bottlenecks and revenue goals before recommending any tool.",
-    deliverable: "Clear scope, fixed timeline & written proposal",
+    deliverable: "Clear scope, fixed timeline and written proposal",
   },
   {
     step: "02",
     title: "Design",
     summary:
-      "We structure your pages, data models, and WhatsApp flows so customers and staff can use them effortlessly.",
-    deliverable: "Interactive wireframes & workflow blueprint",
+      "We plan your pages, data and WhatsApp flows so customers and staff find them easy to use.",
+    deliverable: "Interactive wireframes and workflow plan",
   },
   {
     step: "03",
     title: "Build",
     summary:
-      "We engineer your website, automation or software with clean TypeScript code, payment links and live testing.",
-    deliverable: "Production-ready launch in ~2 weeks",
+      "We build your website, automation or software, add payment links and test everything live.",
+    deliverable: "Ready to launch in about 2 weeks",
   },
   {
     step: "04",
     title: "Support",
     summary:
-      "We stay on to handle backups, uptime monitoring, security updates and continuous improvements as you grow.",
-    deliverable: "Monthly care & priority support",
+      "We stay on to handle backups, uptime monitoring, security updates and improvements as you grow.",
+    deliverable: "Monthly care and priority support",
   },
 ];
 
@@ -156,7 +146,7 @@ export const WHATSAPP_DEMO_MESSAGES: WhatsAppChatMessage[] = [
   {
     id: "m4",
     sender: "bot",
-    text: "Confirmed, Priya! Your appointment with Dr. Rao is booked for tomorrow at 6:15 PM. Location pin & reminder scheduled 2 hours prior.",
+    text: "Confirmed, Priya! Your appointment with Dr. Rao is booked for tomorrow at 6:15 PM. Location pin and a reminder scheduled for two hours before.",
     time: "10:15 AM",
     meta: "Synced to Clinic CRM + Google Calendar",
   },
@@ -169,7 +159,7 @@ export const WHY_ELIAVA_STATS: StatPointData[] = [
     suffix: " Lines",
     label: "Integrated Service Lines",
     description:
-      "Websites, e-commerce, WhatsApp & AI automation, custom software, and cloud support under one roof.",
+      "Websites, e-commerce, WhatsApp and AI automation, custom software and cloud support under one roof.",
   },
   {
     id: "response-time",
@@ -177,7 +167,7 @@ export const WHY_ELIAVA_STATS: StatPointData[] = [
     suffix: "h",
     label: "Guaranteed Response Time",
     description:
-      "Direct communication with the founding engineering and design team within one business day.",
+      "A direct reply from our founding team within one business day.",
   },
   {
     id: "typical-launch",
@@ -185,7 +175,7 @@ export const WHY_ELIAVA_STATS: StatPointData[] = [
     suffix: " Weeks",
     label: "Typical Website & Flow Launch",
     description:
-      "Focused sprints with weekly checkpoints so your business starts capturing leads quickly.",
+      "Short build cycles with weekly check-ins, so your business starts capturing leads quickly.",
   },
   {
     id: "transparent-scope",
@@ -193,37 +183,7 @@ export const WHY_ELIAVA_STATS: StatPointData[] = [
     suffix: "%",
     label: "Transparent Upfront Scope",
     description:
-      "Honest launch pricing, documented deliverables, and zero lock-in on your domain or data.",
-  },
-];
-
-export const FOUNDERS_PLACEHOLDER: FounderPlaceholderData[] = [
-  {
-    id: "founder-1",
-    name: "Karunya Gotru",
-    role: "Co-founder",
-    focus: "Strategy & Client Relationships",
-    bio: "Focused on understanding business requirements, shaping project direction, and building meaningful client relationships. Brings a business-oriented perspective to translating ideas into practical technology solutions.",
-    initials: "KG",
-    accent: "gold",
-  },
-  {
-    id: "founder-2",
-    name: "Neeraj Racharla",
-    role: "Co-founder",
-    focus: "Engineering & Automation",
-    bio: "Focused on cloud engineering, software infrastructure, and automation. Works on building scalable applications, streamlining deployment workflows, and creating reliable technology systems.",
-    initials: "NR",
-    accent: "primary",
-  },
-  {
-    id: "founder-3",
-    name: "Satish Ramagalla",
-    role: "Co-founder",
-    focus: "Design Systems & Product UX",
-    bio: "Focused on product experiences, interface design, and digital development. Interested in creating intuitive user journeys and translating product ideas into functional, accessible digital experiences.",
-    initials: "SR",
-    accent: "success",
+      "Honest launch pricing, documented deliverables and zero lock-in on your domain or data.",
   },
 ];
 
@@ -246,7 +206,7 @@ export const HOME_FAQS: FAQItemData[] = [
   {
     question: "Who owns the domain, source code, and customer data?",
     answer:
-      "You do. Your domain, Cloudflare DNS, database, and customer records remain in your company's accounts. We never hold client infrastructure hostage.",
+      "You do. Your domain, DNS, database and customer records stay in your company's accounts. We never hold your accounts or data back.",
   },
   {
     question: "Can we start with a simple website now and add automation or CRM later?",

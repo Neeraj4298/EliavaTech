@@ -15,9 +15,9 @@ import {
 import { JsonLd } from "@/components/seo/JsonLd";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Founding Client Pricing — Websites, Automation & Monthly Care",
+  title: "Founding Client Pricing and Monthly Plans",
   description:
-    "Transparent launch pricing for websites (from ₹9,999), e-commerce (from ₹34,999), WhatsApp automation (from ₹12,999), custom CRM software (from ₹49,999), and monthly care plans.",
+    "Clear launch pricing: websites from ₹9,999, e-commerce from ₹34,999, WhatsApp automation from ₹12,999, custom CRM from ₹49,999, plus monthly care plans.",
   path: "/pricing",
   ogTag: "Founding Client Pricing",
 });

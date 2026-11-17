@@ -51,7 +51,7 @@ export function ConceptProjectDemo({ demoType, demoUrl }: ConceptProjectDemoProp
             {booked && (
               <span className="inline-flex items-center gap-1.5 font-mono text-xs text-success">
                 <CheckCircle2 strokeWidth={1.5} className="h-4 w-4" />
-                <span>WhatsApp confirmation + 2h reminder queued</span>
+                <span>WhatsApp confirmation sent, reminder set for two hours before</span>
               </span>
             )}
           </div>

@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { AlertTriangle, CheckCircle2, ShieldCheck } from "lucide-react";
-import { LEGAL_REVIEW_BANNER, type LegalSection } from "@/content/legal";
+import { CheckCircle2, ShieldCheck } from "lucide-react";
+import { LEGAL_LAST_UPDATED, type LegalSection } from "@/content/legal";
+import { BUSINESS } from "@/content/site";
 import {
   resetCookieConsent,
   setCookieConsent,
@@ -27,7 +28,7 @@ export function LegalPageLayout({
   eyebrow,
   title,
   subtitle,
-  lastUpdated = "November 10, 2026 [PLACEHOLDER]",
+  lastUpdated = LEGAL_LAST_UPDATED,
   sections,
   showCookieControls = false,
 }: LegalPageLayoutProps) {
@@ -49,10 +50,6 @@ export function LegalPageLayout({
           <SplitHeading text={title} as="h1" className="text-h1 block" />
           <p className="text-body text-text-muted">{subtitle}</p>
 
-          <Card variant="elevated" padding="md" className="border-gold/50 flex items-start gap-3">
-            <AlertTriangle strokeWidth={1.5} className="mt-0.5 h-5 w-5 shrink-0 text-gold" aria-hidden="true" />
-            <p className="text-xs text-text leading-relaxed">{LEGAL_REVIEW_BANNER}</p>
-          </Card>
         </div>
       </Section>
 
@@ -119,7 +116,7 @@ export function LegalPageLayout({
                 Questions about privacy or data removal?
               </h2>
               <p className="text-xs text-text-muted">
-                Contact our Data Fiduciary team at supporteliavatech@gmail.com.
+                Email us at {BUSINESS.email}.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">

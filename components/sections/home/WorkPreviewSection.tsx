@@ -22,8 +22,8 @@ export function WorkPreviewSection() {
       <div className="space-y-12">
         <SectionHeading
           eyebrow="Concept Projects · Proof of Capability"
-          title="Interactive demonstrations built to production standards."
-          description="Explore three working concept projects showing how we engineer clinic booking systems, retail e-commerce, and real estate CRM pipelines."
+          title="Interactive demos built to real-world standards."
+          description="Explore three working concept projects: a clinic booking system, a retail e-commerce store and a real estate CRM."
           action={
             <Button href="/work" variant="secondary" size="md" withArrow>
               View All Demos

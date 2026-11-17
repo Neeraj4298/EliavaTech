@@ -43,6 +43,7 @@ export async function generateMetadata({
     modifiedTime: post.updatedAt,
     authors: [post.author],
     keywords: post.keywords,
+    noIndex: post.draft,
   });
 }
 

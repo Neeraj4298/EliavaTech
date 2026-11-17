@@ -11,8 +11,8 @@ import { Reveal } from "@/components/motion/Reveal";
 const AUTOMATION_BENEFITS = [
   "Replies to incoming WhatsApp enquiries in under 2 seconds, 24/7.",
   "Checks real appointment slots or product availability automatically.",
-  "Sends automated reminders 2 hours prior to cut clinic & salon no-shows.",
-  "Logs every lead directly into your CRM or Google Sheet via n8n.",
+  "Sends automated reminders two hours before appointments to reduce no-shows at clinics and salons.",
+  "Saves every lead to your CRM or Google Sheet automatically.",
 ];
 
 /**
@@ -28,7 +28,7 @@ export function WhatsAppDemoSection() {
             eyebrow="See Automation in Action"
             eyebrowVariant="gold"
             title="Turn WhatsApp messages into booked appointments automatically."
-            description="Your customers already use WhatsApp every day. We connect your business number to structured booking flows and CRM pipelines."
+            description="Your customers already use WhatsApp every day. We connect your business number to booking flows and your CRM."
           />
 
           <Reveal delay={0.1}>

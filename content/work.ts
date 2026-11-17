@@ -26,18 +26,18 @@ export const WORK_PROJECTS: ConceptProjectDetail[] = [
     challenge:
       "Local clinics lose patient enquiries when phone lines are busy during peak consultation hours, and front-desk staff spend hours manually calling patients to confirm next-day appointments.",
     solution:
-      "A mobile-first clinic website with real-time doctor slot selection connected to an automated WhatsApp confirmation and 2-hour prior reminder workflow.",
+      "A mobile-first clinic website with real-time doctor slot selection connected to automated WhatsApp confirmations and reminders sent two hours before appointments.",
     features: [
-      "Doctor & department slot picker with instant availability check",
+      "Doctor and department slot picker with instant availability check",
       "Automated WhatsApp booking confirmation with clinic location pin",
-      "Scheduled 2-hour prior WhatsApp reminder with 1-tap reschedule option",
+      "WhatsApp reminder sent two hours before the appointment, with a 1-tap reschedule option",
       "Front-desk day-sheet dashboard showing confirmed, pending, and walk-in patients",
     ],
     tech: ["Next.js", "TypeScript", "Tailwind CSS", "PostgreSQL", "Prisma", "WhatsApp Business API", "n8n"],
     capabilitiesProven: [
       "End-to-end slot reservation flow without phone calls",
-      "Automated WhatsApp webhook payload generation for confirmations and reminders",
-      "Structured doctor schedule and patient intake state management",
+      "Automated WhatsApp messages for confirmations and reminders",
+      "Organised doctor schedules and patient intake",
     ],
     demoUrl: "demo.eliavatech.com/clinic-booking-system",
     demoType: "clinic",
@@ -53,18 +53,18 @@ export const WORK_PROJECTS: ConceptProjectDetail[] = [
     challenge:
       "Growing retail stores taking orders over Instagram and WhatsApp struggle with stock mismatches, manual UPI screenshot verification, and writing GST bills by hand.",
     solution:
-      "A fast D2C storefront with variant-level inventory tracking, instant Razorpay UPI/card checkout, automated GST PDF invoices, and a merchant fulfillment dashboard.",
+      "A fast D2C storefront with variant-level inventory tracking, instant Razorpay UPI/card checkout, automated GST PDF invoices, and a merchant fulfilment dashboard.",
     features: [
-      "Category & variant filterable catalogue with real-time stock badges",
+      "Catalogue filtered by category and variant, with live stock labels",
       "Razorpay checkout supporting UPI, cards, netbanking, and wallets",
       "Automated GST invoice calculation (CGST/SGST/IGST) with HSN codes",
       "Merchant inventory and order status dashboard with low-stock alerts",
     ],
     tech: ["Next.js", "TypeScript", "PostgreSQL", "Prisma", "Razorpay", "Tailwind CSS"],
     capabilitiesProven: [
-      "Interactive cart, variant selection, and GST tax breakdown calculation",
+      "Interactive cart, variant selection and GST tax breakdown",
       "Simulated Razorpay order creation and payment verification flow",
-      "Real-time inventory deduction and merchant order status toggling",
+      "Live stock updates and merchant order status changes",
     ],
     demoUrl: "demo.eliavatech.com/retail-store-ecommerce",
     demoType: "ecommerce",
@@ -80,7 +80,7 @@ export const WORK_PROJECTS: ConceptProjectDetail[] = [
     challenge:
       "Property agencies and builders collect enquiries from portals, website forms, and WhatsApp, but lose high-intent buyers when follow-ups and site-visit reminders live in scattered spreadsheets.",
     solution:
-      "A unified property listing portal paired with a Kanban-style lead CRM that automatically assigns incoming enquiries, schedules site visits, and triggers WhatsApp brochure & follow-up messages.",
+      "A unified property listing portal paired with a Kanban-style lead CRM that automatically assigns incoming enquiries, schedules site visits, and triggers WhatsApp brochure and follow-up messages.",
     features: [
       "Searchable property listings with configuration, floor plan, and locality filters",
       "4-stage enquiry pipeline (New Enquiry → Brochure Sent → Site Visit Scheduled → Negotiation)",
@@ -89,8 +89,8 @@ export const WORK_PROJECTS: ConceptProjectDetail[] = [
     ],
     tech: ["Next.js", "TypeScript", "PostgreSQL", "Prisma", "n8n", "WhatsApp Business API"],
     capabilitiesProven: [
-      "Interactive stage transitions across the 4-stage real estate sales pipeline",
-      "Automated WhatsApp brochure and site-visit confirmation trigger preview",
+      "Interactive movement of leads across the 4-stage real estate sales pipeline",
+      "Preview of automated WhatsApp brochures and site-visit confirmations",
       "Filterable property inventory linked directly to buyer budget ranges",
     ],
     demoUrl: "demo.eliavatech.com/real-estate-lead-crm",

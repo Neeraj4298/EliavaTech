@@ -9,6 +9,7 @@ import { BookingEmbed } from "@/components/forms/BookingEmbed";
 import { WhatsAppButton } from "@/components/overlays/WhatsAppButton";
 import { buildBreadcrumbSchema, buildPageMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { BUSINESS, getSocialLinks } from "@/content/site";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Contact & Consultation Booking",
@@ -19,6 +20,7 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default function ContactPage() {
+  const socialLinks = getSocialLinks();
   const breadcrumb = buildBreadcrumbSchema([
     { name: "Home", path: "/" },
     { name: "Contact", path: "/contact" },
@@ -71,10 +73,10 @@ export default function ContactPage() {
                       Business Email
                     </p>
                     <a
-                      href="mailto:supporteliavatech@gmail.com"
+                      href={`mailto:${BUSINESS.email}`}
                       className="font-heading text-base font-semibold text-text hover:text-primary"
                     >
-                      supporteliavatech@gmail.com
+                      {BUSINESS.email}
                     </a>
                   </div>
                 </div>
@@ -86,10 +88,10 @@ export default function ContactPage() {
                       Phone &amp; WhatsApp
                     </p>
                     <a
-                      href="tel:+917075466449"
+                      href={`tel:${BUSINESS.phoneE164}`}
                       className="font-heading text-base font-semibold text-text hover:text-primary"
                     >
-                      +91 70754 66449
+                      {BUSINESS.phoneDisplay}
                     </a>
                   </div>
                 </div>
@@ -98,13 +100,13 @@ export default function ContactPage() {
                   <MapPin strokeWidth={1.5} className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <div>
                     <p className="font-mono text-xs text-text-muted uppercase">
-                      Service Area [PLACEHOLDER]
+                      {BUSINESS.serviceAreaTitle}
                     </p>
                     <p className="font-heading text-base font-semibold text-text">
-                      Remote-first, serving India [PLACEHOLDER]
+                      {BUSINESS.serviceAreaLine}
                     </p>
                     <p className="text-xs text-text-muted mt-0.5">
-                      Video consultations via Google Meet · On-site by arrangement
+                      {BUSINESS.serviceAreaNote}
                     </p>
                   </div>
                 </div>
@@ -122,15 +124,13 @@ export default function ContactPage() {
               </div>
             </Card>
 
+            {socialLinks.length > 0 && (
             <Card variant="default" padding="md" className="space-y-3">
               <p className="font-mono text-xs uppercase tracking-wider text-text-muted">
-                Social Profiles [PLACEHOLDER]
+                Follow Us
               </p>
               <div className="grid grid-cols-2 gap-3">
-                {[
-                  { name: "LinkedIn", href: "https://linkedin.com" },
-                  { name: "Instagram", href: "https://instagram.com" },
-                ].map((social) => (
+                {socialLinks.map((social) => (
                   <a
                     key={social.name}
                     href={social.href}
@@ -144,6 +144,7 @@ export default function ContactPage() {
                 ))}
               </div>
             </Card>
+            )}
           </div>
         </div>
       </Section>

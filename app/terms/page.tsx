@@ -9,7 +9,7 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "Terms governing the use of the EliavaTech website, concept project demonstrations, and service engagements.",
   path: "/terms",
-  ogTag: "Legal · Terms of Service [PLACEHOLDER]",
+  ogTag: "Legal · Terms of Service",
 });
 
 export default function TermsPage() {
@@ -22,7 +22,7 @@ export default function TermsPage() {
     <>
       <JsonLd data={breadcrumb} />
       <LegalPageLayout
-        eyebrow="Legal · [PLACEHOLDER for Legal Review]"
+        eyebrow="Legal"
         title="Terms of Service"
         subtitle="Terms governing the use of the EliavaTech website, concept project demonstrations, founding client pricing estimates, and client ownership."
         sections={TERMS_SECTIONS}

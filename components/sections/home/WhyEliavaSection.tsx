@@ -19,7 +19,7 @@ export function WhyEliavaSection() {
       <div className="space-y-12">
         <SectionHeading
           eyebrow="Why EliavaTech"
-          title="A steady engineering partner for growing businesses."
+          title="A dependable technology partner for growing businesses."
           description="Honest commitments, direct founder access, and software built to last."
         />
 

@@ -30,12 +30,12 @@ export default function WorkPage() {
             Concept Projects · Proof of Capability
           </Badge>
           <SplitHeading
-            text="Working demonstrations built to production standards."
+            text="Working demos built to real-world standards."
             as="h1"
             className="text-h1 block"
           />
           <p className="text-body text-text-muted">
-            Every project below is clearly labelled as a <strong>Concept project</strong> engineered to demonstrate our website, e-commerce, WhatsApp automation, and custom CRM capabilities.
+            Every project below is clearly labelled as a <strong>Concept project</strong> built to show our website, e-commerce, WhatsApp automation and custom CRM work.
           </p>
         </div>
       </Section>

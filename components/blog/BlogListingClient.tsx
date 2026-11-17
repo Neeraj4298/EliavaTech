@@ -31,6 +31,18 @@ export function BlogListingClient({ posts, categories }: BlogListingClientProps)
     });
   }, [posts, selectedCategory, query]);
 
+  if (posts.length === 0) {
+    return (
+      <div className="rounded-card border border-border bg-surface p-10 text-center space-y-2">
+        <p className="font-heading text-lg font-semibold text-text">New guides are coming soon</p>
+        <p className="text-small text-text-muted">
+          We are preparing practical guides for business owners. Meanwhile, you can{" "}
+          <Link href="/contact" className="text-primary underline underline-offset-2">ask us a question</Link>.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">

@@ -13,9 +13,9 @@ import { buildBreadcrumbSchema, buildPageMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Industries — Digital Bundles for Indian SMBs",
+  title: "Industries We Serve in India",
   description:
-    "Website, booking, WhatsApp automation, and CRM bundles tailored for clinics, real estate, restaurants, education, retail, manufacturing, and professional services.",
+    "Website, booking, WhatsApp automation and CRM bundles for clinics, real estate, restaurants, education, retail, manufacturing and professional services.",
   path: "/industries",
   ogTag: "Seven Industry Sectors",
 });
@@ -43,7 +43,7 @@ export default function IndustriesPage() {
           />
           <Reveal delay={0.1}>
             <p className="text-body text-text-muted">
-              A clinic needs slot booking and appointment reminders; a retail shop needs UPI checkout and GST billing. Explore the exact bundle built for your industry.
+              A clinic needs slot booking and appointment reminders. A retail shop needs UPI checkout and GST billing. Explore the bundle built for your industry.
             </p>
           </Reveal>
         </div>
@@ -77,7 +77,7 @@ export default function IndustriesPage() {
                     </div>
 
                     <div className="pt-4 border-t border-border/60 flex items-center justify-between text-small font-medium text-primary">
-                      <span>View Workflow &amp; Bundle</span>
+                      <span>View Workflow and Bundle</span>
                       <ArrowRight strokeWidth={1.5} className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </div>
                   </div>

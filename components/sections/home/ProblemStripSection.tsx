@@ -35,9 +35,9 @@ export function ProblemStripSection() {
     <Section className="border-b border-border/60 bg-surface/40">
       <div className="space-y-10">
         <SectionHeading
-          eyebrow="Common Business Bottlenecks"
+          eyebrow="Common Business Problems"
           title="Customer problems first. Technology second."
-          description="Growing businesses lose time and revenue when enquiries, orders, and follow-ups rely on manual effort."
+          description="Growing businesses lose time and revenue when enquiries, orders and follow-ups depend on manual work."
         />
 
         <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
