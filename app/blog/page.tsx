@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { getAllBlogPosts, getBlogCategories } from "@/lib/blog";
+import {
+  draftPreviewEnabled,
+  getAllBlogPosts,
+  getBlogCategories,
+} from "@/lib/blog";
 import { buildBreadcrumbSchema, buildPageMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Section } from "@/components/layout/Section";
@@ -8,12 +12,16 @@ import { SplitHeading } from "@/components/motion/SplitHeading";
 import { BlogListingClient } from "@/components/blog/BlogListingClient";
 import { CTABandSection } from "@/components/sections/home/CTABandSection";
 
+const showingDrafts = draftPreviewEnabled();
+
 export const metadata: Metadata = buildPageMetadata({
   title: "Blog & Practical Guides",
   description:
-    "Clear, practical guides on business website costs in India, WhatsApp automation for clinics, custom CRM software, and digital strategy for SMBs.",
+    "Clear, practical guides on business website costs in India, WhatsApp automation for clinics, custom CRM software, and digital strategy for small businesses.",
   path: "/blog",
   ogTag: "Blog & Guides",
+  // Hide the listing from search engines while it can show unreviewed drafts.
+  noIndex: showingDrafts && getAllBlogPosts().some((p) => p.draft),
   keywords: [
     "website development company India",
     "business website cost India",
@@ -52,11 +60,13 @@ export default function BlogPage() {
         <div className="max-w-3xl space-y-5">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="primary" size="md" dot>
-              Insights &amp; Practical Guides
+              Insights and Practical Guides
             </Badge>
-            <Badge variant="gold" size="md">
-              4 Starter Drafts for Review
-            </Badge>
+            {posts.some((p) => p.draft) && (
+              <Badge variant="gold" size="md">
+                Draft preview (not public)
+              </Badge>
+            )}
           </div>
           <SplitHeading
             text="Clear answers on websites, automation and software."
@@ -65,7 +75,7 @@ export default function BlogPage() {
           />
           <p className="text-body text-text-muted">
             Practical guides written to help Indian business owners evaluate
-            website investments, WhatsApp automation, and custom CRM software.
+            website investments, WhatsApp automation and custom CRM software.
           </p>
         </div>
       </Section>

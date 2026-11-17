@@ -1,43 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { contactFormSchema } from "@/lib/contact-schema";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/request-ip";
+import { verifyTurnstile } from "@/lib/turnstile";
 import { prisma } from "@/lib/db";
 import { sendLeadNotificationEmail } from "@/lib/email";
+import { BUSINESS } from "@/content/site";
 
-function getClientIp(req: NextRequest): string {
-  const forwarded = req.headers.get("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0]?.trim() || "unknown";
-  }
-  return req.headers.get("x-real-ip") || "unknown";
-}
+const MAX_BODY_BYTES = 20_000;
 
-async function verifyTurnstileToken(token: string | undefined, ip: string): Promise<boolean> {
-  const secret = process.env.TURNSTILE_SECRET_KEY;
-  // If TURNSTILE_SECRET_KEY is not configured yet, skip external verification in dev
-  if (!secret) return true;
-  if (!token) return false;
+const DELIVERY_FAILED_MESSAGE = `We could not submit your request right now. Please message us on WhatsApp or email ${BUSINESS.email}.`;
 
+async function postWebhook(payload: Record<string, unknown>): Promise<boolean> {
+  const webhookUrl = process.env.N8N_WEBHOOK_URL?.trim();
+  if (!webhookUrl) return false;
   try {
-    const formData = new URLSearchParams();
-    formData.append("secret", secret);
-    formData.append("response", token);
-    if (ip !== "unknown") {
-      formData.append("remoteip", ip);
+    const res = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) {
+      console.error(`[/api/contact] n8n webhook responded ${res.status}`);
     }
-
-    const res = await fetch(
-      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: formData.toString(),
-      }
-    );
-    if (!res.ok) return false;
-    const data = (await res.json()) as { success?: boolean };
-    return Boolean(data.success);
-  } catch {
+    return res.ok;
+  } catch (err) {
+    console.error("[/api/contact] n8n webhook error:", err);
     return false;
   }
 }
@@ -45,7 +34,7 @@ async function verifyTurnstileToken(token: string | undefined, ip: string): Prom
 export async function POST(req: NextRequest) {
   try {
     const ip = getClientIp(req);
-    const rate = checkRateLimit(`contact:${ip}`, 5, 10 * 60 * 1000);
+    const rate = await checkRateLimit(`contact:${ip}`, 5, 10 * 60 * 1000, ip);
 
     if (!rate.allowed) {
       return NextResponse.json(
@@ -53,23 +42,29 @@ export async function POST(req: NextRequest) {
           ok: false,
           error: `Too many submissions. Please wait ${rate.retryAfterSeconds} seconds or contact us on WhatsApp.`,
         },
-        {
-          status: 429,
-          headers: { "Retry-After": String(rate.retryAfterSeconds) },
-        }
+        { status: 429, headers: { "Retry-After": String(rate.retryAfterSeconds) } }
       );
     }
 
-    const rawBody = await req.json().catch(() => null);
-    if (!rawBody || typeof rawBody !== "object") {
+    const declaredLength = Number(req.headers.get("content-length") ?? "0");
+    if (declaredLength > MAX_BODY_BYTES) {
+      return NextResponse.json(
+        { ok: false, error: "Your message is too large." },
+        { status: 413 }
+      );
+    }
+
+    const rawBody: unknown = await req.json().catch(() => null);
+    if (!rawBody || typeof rawBody !== "object" || Array.isArray(rawBody)) {
       return NextResponse.json(
         { ok: false, error: "Invalid request body." },
         { status: 400 }
       );
     }
 
-    // Silent honeypot check: if bot filled `website`, return 200 without storing
-    if (typeof (rawBody as { website?: string }).website === "string" && (rawBody as { website?: string }).website!.length > 0) {
+    // Silent honeypot: a bot filled the hidden field. Pretend success, store nothing.
+    const honeypot = (rawBody as { website?: unknown }).website;
+    if (typeof honeypot === "string" && honeypot.length > 0) {
       return NextResponse.json({
         ok: true,
         message: "Thank you. We will reply within one business day.",
@@ -87,36 +82,43 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
     const data = parsed.data;
 
-    // Verify Cloudflare Turnstile when TURNSTILE_SECRET_KEY is set
-    const requiresTurnstile = (data.source ?? "contact") === "contact";
-    const turnstileOk = requiresTurnstile
-      ? await verifyTurnstileToken(data.turnstileToken, ip)
-      : true;
-    if (!turnstileOk) {
+    // Spam protection applies to every form that posts here (contact + pricing).
+    const turnstile = await verifyTurnstile(data.turnstileToken, ip);
+    if (!turnstile.ok) {
+      if (turnstile.reason === "missing_secret") {
+        return NextResponse.json(
+          { ok: false, error: DELIVERY_FAILED_MESSAGE },
+          { status: 503 }
+        );
+      }
       return NextResponse.json(
         {
           ok: false,
-          error: "Spam protection verification failed. Please refresh and try again.",
+          error:
+            turnstile.reason === "unavailable"
+              ? "We could not run the spam check right now. Please try again in a moment."
+              : "Spam protection check failed. Please complete the check and try again.",
         },
         { status: 400 }
       );
     }
 
-    // 1. Save Lead to PostgreSQL via Prisma (gracefully handle missing/offline DB)
-    let savedLeadId: string | undefined;
-    let dbSaved = false;
+    const source = data.source ?? "contact";
+    const phone = data.phone || undefined;
+    const company = data.company || undefined;
 
+    // 1. Save the lead (the database is optional; failures are logged, not fatal).
+    let savedLeadId: string | undefined;
     if (prisma) {
       try {
         const created = await prisma.lead.create({
           data: {
             name: data.name,
             email: data.email,
-            phone: data.phone || null,
-            company: data.company || null,
+            phone: phone ?? null,
+            company: company ?? null,
             service: data.service,
             budgetRange: data.budgetRange,
             message: data.message,
@@ -125,72 +127,54 @@ export async function POST(req: NextRequest) {
           },
         });
         savedLeadId = created.id;
-        dbSaved = true;
       } catch (dbErr) {
         console.error("[/api/contact] Database save error:", dbErr);
       }
     }
+    const dbSaved = Boolean(savedLeadId);
 
-    // 2. Send Email Notification via Resend
-    const emailResult = await sendLeadNotificationEmail({
-      leadId: savedLeadId,
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      company: data.company,
-      service: data.service,
-      budgetRange: data.budgetRange,
-      message: data.message,
-    });
+    // 2. Notify the team and confirm to the visitor, and 3. call the webhook.
+    const [emailResult, webhookSent] = await Promise.all([
+      sendLeadNotificationEmail({
+        leadId: savedLeadId,
+        name: data.name,
+        email: data.email,
+        phone,
+        company,
+        service: data.service,
+        budgetRange: data.budgetRange,
+        message: data.message,
+        source,
+      }),
+      postWebhook({
+        id: savedLeadId ?? null,
+        name: data.name,
+        email: data.email,
+        phone: phone ?? null,
+        company: company ?? null,
+        service: data.service,
+        budgetRange: data.budgetRange,
+        message: data.message,
+        source,
+        createdAt: new Date().toISOString(),
+      }),
+    ]);
+
     if (emailResult.error) {
       console.warn("[/api/contact] Email warning:", emailResult.error);
     }
 
-    // 3. Call N8N_WEBHOOK_URL if set
-    const webhookUrl = process.env.N8N_WEBHOOK_URL;
-    let webhookSent = false;
-    if (webhookUrl) {
-      try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 5000);
-        const whRes = await fetch(webhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: savedLeadId ?? null,
-            name: data.name,
-            email: data.email,
-            phone: data.phone || null,
-            company: data.company || null,
-            service: data.service,
-            budgetRange: data.budgetRange,
-            message: data.message,
-            source: "form",
-            createdAt: new Date().toISOString(),
-          }),
-          signal: controller.signal,
-        });
-        clearTimeout(timer);
-        webhookSent = whRes.ok;
-      } catch (whErr) {
-        console.error("[/api/contact] n8n webhook error:", whErr);
-      }
-    }
-
-    // The enquiry counts as received if it reached us by any channel. Failing
-    // the request when only the visitor's confirmation email bounced would make
-    // them resubmit and create duplicate leads.
-    const received =
-      dbSaved || emailResult.teamEmailSent || webhookSent;
+    // The enquiry counts as received if it reached us by any channel. Failing the
+    // request when only the visitor's confirmation bounced would make them
+    // resubmit and create duplicate leads.
+    const received = dbSaved || emailResult.teamEmailSent || webhookSent;
     if (!received) {
-      // Details (missing credentials, SMTP errors) stay in server logs only.
-      console.error("[/api/contact] Enquiry not delivered:", emailResult.error);
+      console.error("[/api/contact] Enquiry not delivered by any channel.", {
+        dbConfigured: Boolean(prisma),
+        emailError: emailResult.error,
+      });
       return NextResponse.json(
-        {
-          ok: false,
-          error:
-            "We could not submit your request right now. Please message us on WhatsApp or email supporteliavatech@gmail.com.",
-        },
+        { ok: false, error: DELIVERY_FAILED_MESSAGE },
         { status: 503 }
       );
     }
@@ -199,18 +183,20 @@ export async function POST(req: NextRequest) {
       ok: true,
       leadId: savedLeadId ?? null,
       dbSaved,
-      emailSent: emailResult.sent,
       teamEmailSent: emailResult.teamEmailSent,
+      // The UI only tells the visitor "we emailed you" when this is true.
       userEmailSent: emailResult.userEmailSent,
       webhookSent,
-      message: "Thank you. We have received your enquiry and will reply within one business day.",
+      message:
+        "Thank you. We have received your enquiry and will reply within one business day.",
     });
   } catch (err) {
     console.error("[/api/contact] Unexpected error:", err);
     return NextResponse.json(
       {
         ok: false,
-        error: "Something went wrong while submitting your request. Please try again or reach us on WhatsApp.",
+        error:
+          "Something went wrong while submitting your request. Please try again or reach us on WhatsApp.",
       },
       { status: 500 }
     );

@@ -6,6 +6,7 @@ import { MessageCircle } from "lucide-react";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { trackWhatsAppClick } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+import { BUSINESS } from "@/content/site";
 
 export interface WhatsAppButtonProps {
   message?: string;
@@ -44,8 +45,8 @@ function formatPageName(pathname: string | null): string {
 
 export function getWhatsAppHref(customMessage?: string, pathname?: string | null): string {
   const rawNumber =
-    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "917075466449";
-  const cleanNumber = rawNumber.replace(/[^\d]/g, "") || "917075466449";
+    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || BUSINESS.whatsappDigits;
+  const cleanNumber = rawNumber.replace(/[^\d]/g, "") || BUSINESS.whatsappDigits;
   const pageContext = formatPageName(pathname ?? null);
   const text =
     customMessage ||

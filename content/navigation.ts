@@ -25,15 +25,6 @@ export interface ConceptProjectItem {
   summary: string;
 }
 
-export interface BlogPostPlaceholder {
-  slug: string;
-  title: string;
-  href: string;
-  category: string;
-  readingTime: string;
-  summary: string;
-}
-
 export const SERVICE_ITEMS: ServiceNavItem[] = [
   {
     slug: "web-development",
@@ -41,7 +32,7 @@ export const SERVICE_ITEMS: ServiceNavItem[] = [
     shortTitle: "Websites",
     href: "/services/web-development",
     description:
-      "Business sites, landing pages, booking sites and portfolios built with Next.js, SEO-ready and mobile-first.",
+      "Business websites, landing pages, booking sites and portfolios. Fast, mobile-first and ready for search.",
     startingPrice: "From ₹9,999",
     icon: "Globe",
   },
@@ -61,7 +52,7 @@ export const SERVICE_ITEMS: ServiceNavItem[] = [
     shortTitle: "WhatsApp & AI",
     href: "/services/whatsapp-ai-automation",
     description:
-      "WhatsApp Business API flows, instant lead capture, AI customer support, appointment reminders and n8n workflows.",
+      "WhatsApp Business flows, instant lead capture, 24/7 AI customer support, appointment reminders and automated workflows.",
     startingPrice: "From ₹12,999",
     icon: "MessageSquareCode",
   },
@@ -101,7 +92,7 @@ export const INDUSTRY_ITEMS: IndustryNavItem[] = [
     title: "Real Estate",
     href: "/industries/real-estate",
     summary:
-      "High-converting property listings, site-visit scheduling and automated lead follow-up CRM.",
+      "Clear property listings, site-visit scheduling and an automated lead follow-up CRM.",
     bundle: ["Property Listings", "Lead CRM", "WhatsApp Follow-ups"],
   },
   {
@@ -173,45 +164,6 @@ export const CONCEPT_PROJECTS: ConceptProjectItem[] = [
     industry: "Real Estate",
     summary:
       "Concept project showcasing property listings, a visual enquiry pipeline and automated WhatsApp site-visit follow-ups.",
-  },
-];
-
-export const BLOG_POSTS_PLACEHOLDER: BlogPostPlaceholder[] = [
-  {
-    slug: "how-much-does-a-business-website-cost-in-india",
-    title: "How much does a business website cost in India?",
-    href: "/blog/how-much-does-a-business-website-cost-in-india",
-    category: "Web Development",
-    readingTime: "6 min read",
-    summary:
-      "A transparent breakdown of starter websites, custom business portals and e-commerce builds for Indian SMBs.",
-  },
-  {
-    slug: "whatsapp-automation-for-clinics-and-appointment-businesses",
-    title: "WhatsApp automation for clinics and appointment-based businesses",
-    href: "/blog/whatsapp-automation-for-clinics-and-appointment-businesses",
-    category: "Automation",
-    readingTime: "5 min read",
-    summary:
-      "How automated booking confirmations and reminders reduce no-shows without adding front-desk workload.",
-  },
-  {
-    slug: "do-small-businesses-really-need-a-crm",
-    title: "Do small businesses really need a CRM?",
-    href: "/blog/do-small-businesses-really-need-a-crm",
-    category: "Custom Software",
-    readingTime: "5 min read",
-    summary:
-      "When spreadsheets stop working and how a lightweight custom CRM prevents lost enquiries.",
-  },
-  {
-    slug: "website-or-instagram-page-what-does-a-local-business-need",
-    title: "Website or Instagram page: what does a local business need?",
-    href: "/blog/website-or-instagram-page-what-does-a-local-business-need",
-    category: "Strategy",
-    readingTime: "4 min read",
-    summary:
-      "Why social media and a search-visible website solve different problems in your customer journey.",
   },
 ];
 

@@ -7,6 +7,7 @@ import {
   LEGAL_NAV_LINKS,
 } from "@/content/navigation";
 import { Logo } from "@/components/brand/Logo";
+import { BUSINESS, getSocialLinks } from "@/content/site";
 
 const COMPANY_LINKS = [
   { label: "Work & Demos", href: "/work" },
@@ -18,6 +19,7 @@ const COMPANY_LINKS = [
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const socialLinks = getSocialLinks();
 
   return (
     <footer className="border-t border-border bg-surface text-text">
@@ -34,19 +36,19 @@ export function Footer() {
             <ul className="space-y-2 pt-2 text-xs text-text-muted">
               <li className="flex items-center gap-2">
                 <Mail strokeWidth={1.5} className="h-4 w-4 text-primary shrink-0" />
-                <a href="mailto:supporteliavatech@gmail.com" className="hover:text-primary">
-                  supporteliavatech@gmail.com
+                <a href={`mailto:${BUSINESS.email}`} className="hover:text-primary">
+                  {BUSINESS.email}
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <Phone strokeWidth={1.5} className="h-4 w-4 text-primary shrink-0" />
-                <a href="tel:+917075466449" className="hover:text-primary">
-                  +91 70754 66449
+                <a href={`tel:${BUSINESS.phoneE164}`} className="hover:text-primary">
+                  {BUSINESS.phoneDisplay}
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <MapPin strokeWidth={1.5} className="h-4 w-4 text-primary shrink-0" />
-                <span>Remote-first, serving India [PLACEHOLDER]</span>
+                <span>{BUSINESS.serviceAreaLine}</span>
               </li>
             </ul>
           </div>
@@ -96,6 +98,17 @@ export function Footer() {
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-text-muted">
           <p>© {currentYear} EliavaTech. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-6">
+            {socialLinks.map((social) => (
+              <a
+                key={social.name}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-text"
+              >
+                {social.name}
+              </a>
+            ))}
             {LEGAL_NAV_LINKS.map((item) => (
               <Link key={item.href} href={item.href} className="hover:text-text">
                 {item.label}

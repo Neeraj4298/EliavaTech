@@ -82,8 +82,8 @@ function parseFrontmatter(raw: string): {
       category: fields.category || "General",
       publishedAt: fields.publishedAt || "2026-11-10",
       updatedAt: fields.updatedAt || fields.publishedAt || "2026-11-10",
-      author: fields.author || "Founder [PLACEHOLDER]",
-      authorRole: fields.authorRole || "Co-founder [PLACEHOLDER]",
+      author: fields.author || "EliavaTech Team",
+      authorRole: fields.authorRole || "EliavaTech",
       draft: fields.draft !== "false",
       keywords,
     },
@@ -128,7 +128,35 @@ function computeReadingTime(mdxBody: string): {
   };
 }
 
-export function getAllBlogPosts(): BlogPost[] {
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * A post is public only when it is not a draft and its publish date is a valid
+ * date that is not in the future.
+ */
+export function isPostPublished(
+  post: Pick<BlogPostMeta, "draft" | "publishedAt">
+): boolean {
+  if (post.draft) return false;
+  if (!ISO_DATE.test(post.publishedAt)) return false;
+  const published = new Date(`${post.publishedAt}T00:00:00Z`).getTime();
+  return Number.isFinite(published) && published <= Date.now();
+}
+
+/**
+ * Drafts are visible only in local development (or when SHOW_DRAFT_POSTS=true)
+ * so they can be reviewed. They never appear in production pages, the sitemap
+ * or search indexing.
+ */
+export function draftPreviewEnabled(): boolean {
+  return (
+    process.env.NODE_ENV !== "production" ||
+    process.env.SHOW_DRAFT_POSTS === "true"
+  );
+}
+
+/** Every post on disk, including drafts. Prefer `getAllBlogPosts` for pages. */
+function readAllBlogPosts(): BlogPost[] {
   if (!fs.existsSync(BLOG_DIR)) return [];
   const files = fs
     .readdirSync(BLOG_DIR)
@@ -155,6 +183,17 @@ export function getAllBlogPosts(): BlogPost[] {
       b.publishedAt.localeCompare(a.publishedAt) ||
       a.title.localeCompare(b.title)
   );
+}
+
+/** Posts that may be shown on the site right now. */
+export function getAllBlogPosts(): BlogPost[] {
+  const all = readAllBlogPosts();
+  return draftPreviewEnabled() ? all : all.filter(isPostPublished);
+}
+
+/** Posts that search engines may index (used by the sitemap). */
+export function getPublishedBlogPosts(): BlogPost[] {
+  return readAllBlogPosts().filter(isPostPublished);
 }
 
 export function getBlogPostBySlug(slug: string): BlogPost | null {

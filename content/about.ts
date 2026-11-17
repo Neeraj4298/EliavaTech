@@ -1,15 +1,8 @@
+import { FOUNDERS } from "@/content/founders";
+
 export interface ValueItem {
   title: string;
   description: string;
-}
-
-export interface FounderDetail {
-  id: string;
-  name: string;
-  role: string;
-  focus: string;
-  bio: string;
-  accent: "gold" | "primary" | "success";
 }
 
 export const ABOUT_CONTENT = {
@@ -54,30 +47,5 @@ export const ABOUT_CONTENT = {
         "We stay available after launch with structured care plans, backups, and direct access to the founders.",
     },
   ] satisfies ValueItem[],
-  founders: [
-    {
-      id: "founder-1",
-      name: "Karunya Gotru",
-      role: "Co-founder",
-      focus: "Strategy & Client Relationships",
-      bio: "Focused on understanding business requirements, shaping project direction, and building meaningful client relationships. Brings a business-oriented perspective to translating ideas into practical technology solutions.",
-      accent: "gold",
-    },
-    {
-      id: "founder-2",
-      name: "Neeraj Racharla",
-      role: "Co-founder",
-      focus: "Engineering & Automation",
-      bio: "Focused on cloud engineering, software infrastructure, and automation. Works on building scalable applications, streamlining deployment workflows, and creating reliable technology systems.",
-      accent: "primary",
-    },
-    {
-      id: "founder-3",
-      name: "Satish Ramagalla",
-      role: "Co-founder",
-      focus: "Design Systems & Product UX",
-      bio: "Focused on product experiences, interface design, and digital development. Interested in creating intuitive user journeys and translating product ideas into functional, accessible digital experiences.",
-      accent: "success",
-    },
-  ] satisfies FounderDetail[],
+  founders: FOUNDERS,
 } as const;

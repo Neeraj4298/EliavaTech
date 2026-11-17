@@ -114,7 +114,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
 
       <Section className="border-y border-border/60 bg-surface/40">
         <div className="space-y-8">
-          <SectionHeading eyebrow="Example Workflow Diagram" title="How enquiries flow from website to WhatsApp to CRM." />
+          <SectionHeading eyebrow="Example Workflow" title="How enquiries flow from website to WhatsApp to CRM." />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {industry.workflowDiagram.map((node) => (
               <Card key={node.step} variant="default" className="flex flex-col justify-between gap-4">

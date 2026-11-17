@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/seo";
 import { SERVICE_ITEMS, INDUSTRY_ITEMS, CONCEPT_PROJECTS } from "@/content/navigation";
-import { getAllBlogPosts } from "@/lib/blog";
+import { getPublishedBlogPosts } from "@/lib/blog";
 
 /**
  * Section 9 — Dynamic XML Sitemap (`app/sitemap.ts`):
@@ -51,7 +51,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.75,
   }));
 
-  const blogRoutes = getAllBlogPosts().map((post) => ({
+  // Only published posts: drafts and future-dated posts must not be indexed.
+  const blogRoutes = getPublishedBlogPosts().map((post) => ({
     url: `${SITE_URL}/blog/${post.slug}`,
     lastModified: new Date(post.updatedAt),
     changeFrequency: "monthly" as const,

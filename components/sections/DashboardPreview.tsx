@@ -26,13 +26,13 @@ const RECORDS: Record<DashboardTab, MockRecord[]> = {
     { id: "L-102", title: "2BHK Villa Plot · Sarjapur", channel: "WhatsApp Bot", stage: "New Enquiry", stageTone: "gold", meta: "Budget qualified · Awaiting slot" },
   ],
   appointments: [
-    { id: "A-209", title: "Dr. Rao · Dental Checkup", channel: "Online Booking", stage: "Confirmed", stageTone: "success", meta: "Tomorrow 6:15 PM · 2h reminder set" },
+    { id: "A-209", title: "Dr. Rao · Dental Checkup", channel: "Online Booking", stage: "Confirmed", stageTone: "success", meta: "Tomorrow 6:15 PM · Reminder set for two hours before" },
     { id: "A-208", title: "Dr. Menon · Consultation", channel: "WhatsApp Flow", stage: "Reminder Sent", stageTone: "primary", meta: "Today 5:30 PM · Location pin sent" },
     { id: "A-207", title: "Physiotherapy Session", channel: "Front Desk", stage: "Rescheduled", stageTone: "gold", meta: "Moved to Fri 10:30 AM via WhatsApp" },
   ],
   orders: [
     { id: "ORD-882", title: "Handloom Kurta · Size M (x2)", channel: "Razorpay UPI", stage: "GST Invoice Ready", stageTone: "success", meta: "₹3,498 paid · Stock synced (-2)" },
-    { id: "ORD-881", title: "Brass Corporate Gift Box", channel: "Store Checkout", stage: "Dispatched", stageTone: "primary", meta: "AWB sent on WhatsApp · ₹12,400" },
+    { id: "ORD-881", title: "Brass Corporate Gift Box", channel: "Store Checkout", stage: "Dispatched", stageTone: "primary", meta: "Tracking link sent on WhatsApp · ₹12,400" },
     { id: "ORD-880", title: "Organic Spice Assortment", channel: "Razorpay Card", stage: "Packing", stageTone: "gold", meta: "HSN 0910 · CGST/SGST calculated" },
   ],
 };
@@ -63,7 +63,7 @@ export function DashboardPreview({
               [
                 { id: "leads", label: "Lead CRM" },
                 { id: "appointments", label: "Clinic Bookings" },
-                { id: "orders", label: "E-commerce & GST" },
+                { id: "orders", label: "E-commerce and GST" },
               ] as const
             ).map((t) => (
               <button
@@ -121,7 +121,7 @@ export function DashboardPreview({
             <CheckCircle2 strokeWidth={1.5} className="h-3.5 w-3.5 text-success" />
             <span>Concept Dashboard Preview</span>
           </span>
-          <span>Live Webhook Stream</span>
+          <span>Live Activity Feed</span>
         </div>
       </div>
     </DeviceMockup>

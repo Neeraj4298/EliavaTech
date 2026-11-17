@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { FOUNDERS_PLACEHOLDER } from "@/content/home";
+import { FOUNDERS } from "@/content/founders";
 import { Section } from "@/components/layout/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Badge } from "@/components/ui/Badge";
@@ -11,7 +11,7 @@ import { StaggerGroup, StaggerItem } from "@/components/motion/StaggerGroup";
 
 /**
  * Section 4.2 #9 & Section 4.7 — Founders Preview:
- * Three neutral illustrated founder avatars with [PLACEHOLDER] details and link to About.
+ * Three neutral illustrated founder avatars with their roles and link to About.
  */
 export function FoundersPreviewSection() {
   return (
@@ -20,7 +20,7 @@ export function FoundersPreviewSection() {
         <SectionHeading
           eyebrow="Founding Team"
           title="Led directly by three co-founders."
-          description="Every project is scoped, designed, and engineered by the founders—not handed off to junior account managers."
+          description="Every project is planned, designed and built by the founders, not handed off to junior account managers."
           action={
             <Button href="/about" variant="secondary" size="md" withArrow>
               More About EliavaTech
@@ -29,7 +29,7 @@ export function FoundersPreviewSection() {
         />
 
         <StaggerGroup className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {FOUNDERS_PLACEHOLDER.map((founder) => (
+          {FOUNDERS.map((founder) => (
             <StaggerItem key={founder.id} className="h-full">
               <Card
                 variant="default"

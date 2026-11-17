@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { Resend } from "resend";
 import nodemailer from "nodemailer";
+import { BUSINESS } from "@/content/site";
 
 function getEnvValue(key: string): string {
   const fromProc = process.env[key]?.trim();
@@ -72,6 +73,10 @@ const BUDGET_LABELS: Record<string, string> = {
   undecided: "Undecided",
 };
 
+function singleLine(value: string): string {
+  return value.replace(/[\r\n\u2028\u2029]+/g, " ").trim();
+}
+
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -102,9 +107,11 @@ function buildTeamEmailContent(payload: LeadEmailPayload, serviceLabel: string, 
   const safeMessage = escapeHtml(payload.message).replace(/\n/g, "<br />");
 
   return {
-    subject: `New EliavaTech Quote / Consultation Request: ${payload.name}${
-      payload.company ? ` (${payload.company})` : ""
-    }`,
+    subject: singleLine(
+      `New EliavaTech Quote / Consultation Request: ${payload.name}${
+        payload.company ? ` (${payload.company})` : ""
+      }`
+    ),
     text: [
       `New quote / consultation request submitted on EliavaTech:`,
       ``,
@@ -160,7 +167,7 @@ function buildUserEmailContent(payload: LeadEmailPayload, serviceLabel: string, 
       `- Project Scope & Goals:`,
       `  ${payload.message}`,
       ``,
-      `If you would like to add any details, simply reply to this email or contact us at supporteliavatech@gmail.com / +91 70754 66449.`,
+      `If you would like to add any details, simply reply to this email or contact us at ${BUSINESS.email} / ${BUSINESS.phoneDisplay}.`,
       ``,
       `Warm regards,`,
       `The EliavaTech Team`,
@@ -177,49 +184,106 @@ function buildUserEmailContent(payload: LeadEmailPayload, serviceLabel: string, 
         <p style="margin: 0; font-size: 14px; line-height: 1.5;"><strong>Project Scope &amp; Goals:</strong><br />${safeMessage}</p>
       </div>
       <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #9ca3af;">
-        Have additional context to share? Simply reply directly to this email or reach us at <a href="mailto:supporteliavatech@gmail.com" style="color: #8b7ffc;">supporteliavatech@gmail.com</a> / <strong>+91 70754 66449</strong>.<br /><br />
+        Have additional context to share? Simply reply directly to this email or reach us at <a href="mailto:${BUSINESS.email}" style="color: #8b7ffc;">${BUSINESS.email}</a> / <strong>${BUSINESS.phoneDisplay}</strong>.<br /><br />
         Warm regards,<br />
         <strong style="color: #ffffff;">The EliavaTech Team</strong>
       </p>
     </div>`,
   };
 }
+/**
+ * Sends the team notification and the visitor confirmation.
+ *
+ * Provider order: Gmail/SMTP when an app password is set, otherwise Resend.
+ * Resend needs RESEND_FROM_EMAIL on a domain verified in Resend. The shared
+ * `onboarding@resend.dev` test sender is only allowed outside production,
+ * because it can only deliver to the Resend account owner.
+ *
+ * This function never throws: every failure is returned in `error`.
+ */
 export async function sendLeadNotificationEmail(
   payload: LeadEmailPayload
 ): Promise<LeadEmailResult> {
-  const notifyEmail =
-    getEnvValue("NOTIFY_EMAIL") || "supporteliavatech@gmail.com";
-  const smtpUser =
-    getEnvValue("SMTP_USER") || notifyEmail || "supporteliavatech@gmail.com";
-  const rawSmtpPass =
-    getEnvValue("GMAIL_APP_PASSWORD") || getEnvValue("SMTP_PASS");
-  const smtpPass = rawSmtpPass.replace(/\s+/g, "");
-  const resendApiKey = getEnvValue("RESEND_API_KEY");
+  const failed = (error: string): LeadEmailResult => ({
+    sent: false,
+    teamEmailSent: false,
+    userEmailSent: false,
+    error,
+  });
 
-  const serviceLabel = formatServiceLabel(payload.service);
-  const budgetLabel = formatBudgetLabel(payload.budgetRange);
-  const teamContent = buildTeamEmailContent(payload, serviceLabel, budgetLabel);
-  const userContent = buildUserEmailContent(payload, serviceLabel, budgetLabel);
+  try {
+    const notifyEmail = getEnvValue("NOTIFY_EMAIL") || BUSINESS.email;
+    const smtpUser = getEnvValue("SMTP_USER") || notifyEmail;
+    const smtpPass = (
+      getEnvValue("GMAIL_APP_PASSWORD") || getEnvValue("SMTP_PASS")
+    ).replace(/\s+/g, "");
+    const resendApiKey = getEnvValue("RESEND_API_KEY");
 
-  // 1. Prefer Gmail / SMTP when GMAIL_APP_PASSWORD or SMTP_PASS is configured
-  // (Allows sending to ANY user email address like neerajlocker@gmail.com without custom domain restrictions)
-  if (smtpPass) {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: smtpUser,
-        pass: smtpPass,
-      },
-    });
+    const serviceLabel = formatServiceLabel(payload.service);
+    const budgetLabel = formatBudgetLabel(payload.budgetRange);
+    const teamContent = buildTeamEmailContent(payload, serviceLabel, budgetLabel);
+    const userContent = buildUserEmailContent(payload, serviceLabel, budgetLabel);
 
-    const fromAddress = `EliavaTech <${smtpUser}>`;
+    type Sender = (msg: {
+      to: string;
+      replyTo: string;
+      subject: string;
+      text: string;
+      html: string;
+    }) => Promise<void>;
+
+    let send: Sender;
+
+    if (smtpPass) {
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: { user: smtpUser, pass: smtpPass },
+      });
+      const from = `${BUSINESS.name} <${smtpUser}>`;
+      send = async (msg) => {
+        await transporter.sendMail({ from, ...msg });
+      };
+    } else if (resendApiKey) {
+      const configuredFrom = getEnvValue("RESEND_FROM_EMAIL");
+      const isTestSender =
+        !configuredFrom || /@resend\.dev>?$/i.test(configuredFrom);
+      if (!configuredFrom && process.env.NODE_ENV === "production") {
+        return failed(
+          "RESEND_FROM_EMAIL is not set. Set it to an address on a domain verified in Resend."
+        );
+      }
+      if (/@(gmail|yahoo|outlook|hotmail)\.com>?$/i.test(configuredFrom)) {
+        return failed(
+          "RESEND_FROM_EMAIL must use a domain verified in Resend, not a free mailbox domain."
+        );
+      }
+      const from = isTestSender
+        ? `${BUSINESS.name} <onboarding@resend.dev>`
+        : configuredFrom;
+      const resend = new Resend(resendApiKey);
+      send = async (msg) => {
+        const res = await resend.emails.send({
+          from,
+          to: [msg.to],
+          replyTo: msg.replyTo,
+          subject: msg.subject,
+          text: msg.text,
+          html: msg.html,
+        });
+        if (res.error) throw new Error(res.error.message);
+      };
+    } else {
+      return failed(
+        "No email provider configured: set GMAIL_APP_PASSWORD (with SMTP_USER) or RESEND_API_KEY with RESEND_FROM_EMAIL."
+      );
+    }
+
+    const errors: string[] = [];
     let teamEmailSent = false;
     let userEmailSent = false;
-    const errors: string[] = [];
 
     try {
-      await transporter.sendMail({
-        from: fromAddress,
+      await send({
         to: notifyEmail,
         replyTo: payload.email,
         subject: teamContent.subject,
@@ -229,15 +293,12 @@ export async function sendLeadNotificationEmail(
       teamEmailSent = true;
     } catch (err) {
       errors.push(
-        `Team email SMTP error: ${
-          err instanceof Error ? err.message : "Unknown error"
-        }`
+        `Team email error: ${err instanceof Error ? err.message : "Unknown error"}`
       );
     }
 
     try {
-      await transporter.sendMail({
-        from: fromAddress,
+      await send({
         to: payload.email,
         replyTo: notifyEmail,
         subject: userContent.subject,
@@ -247,9 +308,7 @@ export async function sendLeadNotificationEmail(
       userEmailSent = true;
     } catch (err) {
       errors.push(
-        `User confirmation SMTP error: ${
-          err instanceof Error ? err.message : "Unknown error"
-        }`
+        `Customer confirmation error: ${err instanceof Error ? err.message : "Unknown error"}`
       );
     }
 
@@ -259,70 +318,9 @@ export async function sendLeadNotificationEmail(
       userEmailSent,
       error: errors.length > 0 ? errors.join("; ") : undefined,
     };
-  }
-
-  // 2. Fallback to Resend if RESEND_API_KEY is configured
-  if (!resendApiKey) {
-    return {
-      sent: false,
-      teamEmailSent: false,
-      userEmailSent: false,
-      error:
-        "Email credentials missing in .env.local. Add GMAIL_APP_PASSWORD (for supporteliavatech@gmail.com) or RESEND_API_KEY to .env.local and restart the dev server.",
-    };
-  }
-
-  const configuredFrom = process.env.RESEND_FROM_EMAIL?.trim();
-  const fromEmail =
-    configuredFrom && !configuredFrom.toLowerCase().endsWith("@gmail.com")
-      ? configuredFrom
-      : "EliavaTech <onboarding@resend.dev>";
-
-  const resend = new Resend(resendApiKey);
-  let teamEmailSent = false;
-  let userEmailSent = false;
-  const errors: string[] = [];
-
-  try {
-    const teamRes = await resend.emails.send({
-      from: fromEmail,
-      to: [notifyEmail],
-      replyTo: payload.email,
-      subject: teamContent.subject,
-      text: teamContent.text,
-      html: teamContent.html,
-    });
-    if (teamRes.error) {
-      errors.push(`Team email error: ${teamRes.error.message}`);
-    } else {
-      teamEmailSent = true;
-    }
   } catch (err) {
-    errors.push(err instanceof Error ? err.message : "Unknown team email error");
+    return failed(
+      `Email setup error: ${err instanceof Error ? err.message : "Unknown error"}`
+    );
   }
-
-  try {
-    const userRes = await resend.emails.send({
-      from: fromEmail,
-      to: [payload.email],
-      replyTo: notifyEmail,
-      subject: userContent.subject,
-      text: userContent.text,
-      html: userContent.html,
-    });
-    if (userRes.error) {
-      errors.push(`User confirmation email error: ${userRes.error.message}`);
-    } else {
-      userEmailSent = true;
-    }
-  } catch (err) {
-    errors.push(err instanceof Error ? err.message : "Unknown user email error");
-  }
-
-  return {
-    sent: teamEmailSent && userEmailSent,
-    teamEmailSent,
-    userEmailSent,
-    error: errors.length > 0 ? errors.join("; ") : undefined,
-  };
 }

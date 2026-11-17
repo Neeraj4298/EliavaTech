@@ -15,7 +15,7 @@ import { buildBreadcrumbSchema, buildPageMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Services — Websites, E-commerce, WhatsApp AI & Custom Software",
+  title: "Websites, E-commerce, WhatsApp and AI Services",
   description:
     "Web development, e-commerce, WhatsApp and AI automation, custom software, and cloud support built for growing Indian businesses.",
   path: "/services",
@@ -100,10 +100,15 @@ export default function ServicesPage() {
       <Section className="border-y border-border/60 bg-surface/40">
         <div className="space-y-10">
           <SectionHeading
-            eyebrow="Service Comparison Strip"
+            eyebrow="Service Comparison"
             title="Compare outcomes, timelines and starting investment."
           />
-          <div className="overflow-x-auto rounded-card border border-border bg-surface">
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label="Service comparison table (scrollable)"
+            className="overflow-x-auto rounded-card border border-border bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-border bg-surface-2 text-xs font-mono uppercase text-text-muted">

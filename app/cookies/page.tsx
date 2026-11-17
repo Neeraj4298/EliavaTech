@@ -9,7 +9,7 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "How EliavaTech uses strictly necessary storage and consent-gated Google Analytics 4 cookies.",
   path: "/cookies",
-  ogTag: "Legal · Cookie Policy [PLACEHOLDER]",
+  ogTag: "Legal · Cookie Policy",
 });
 
 export default function CookiesPage() {
@@ -22,7 +22,7 @@ export default function CookiesPage() {
     <>
       <JsonLd data={breadcrumb} />
       <LegalPageLayout
-        eyebrow="Legal · [PLACEHOLDER for Legal Review]"
+        eyebrow="Legal"
         title="Cookie Policy"
         subtitle="How EliavaTech uses essential browser storage and consent-gated Google Analytics 4 cookies."
         sections={COOKIE_SECTIONS}

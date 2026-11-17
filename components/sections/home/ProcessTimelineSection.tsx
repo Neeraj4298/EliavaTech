@@ -73,8 +73,8 @@ export function ProcessTimelineSection() {
       <div ref={containerRef} className="space-y-12">
         <SectionHeading
           eyebrow="How We Work"
-          title="Four structured steps from problem to launch."
-          description="No endless agency meetings or vague timelines. Every project follows a transparent four-stage delivery rhythm."
+          title="Four clear steps from problem to launch."
+          description="No endless meetings or vague timelines. Every project follows the same four clear stages."
         />
 
         {/* Horizontal Progress Bar (Desktop) */}

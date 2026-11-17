@@ -7,6 +7,7 @@ import { WhatsAppButton } from "@/components/overlays/WhatsAppButton";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { EASE_STANDARD, MOTION_DURATION, usePrefersReducedMotion } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+import { BUSINESS } from "@/content/site";
 
 const NUDGE_KEY = "eliavatech-chat-nudge-shown";
 
@@ -87,10 +88,10 @@ export function ChatLauncherGroup({
       {/* Theme-matched vertical pill dock housing Call + WhatsApp + AI Assistant */}
       <div className="glass-surface flex flex-col items-center gap-1.5 p-1.5 md:gap-2.5 md:p-2 rounded-full border border-border shadow-[var(--shadow-card-hover)]">
         <div className={cn(open && "hidden sm:block")}>
-          <Tooltip content="Call us (+91 70754 66449)" placement="left">
+          <Tooltip content={`Call us (${BUSINESS.phoneDisplay})`} placement="left">
             <a
-              href="tel:+917075466449"
-              aria-label="Call EliavaTech (+91 70754 66449)"
+              href={`tel:${BUSINESS.phoneE164}`}
+              aria-label={`Call EliavaTech (${BUSINESS.phoneDisplay})`}
               className="inline-flex h-9 w-9 md:h-12 md:w-12 items-center justify-center rounded-full border border-primary/25 bg-primary/12 text-primary transition-all duration-200 hover:scale-105 hover:border-primary hover:bg-primary hover:text-white active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
             >
               <Phone strokeWidth={1.75} className="h-4 w-4 md:h-5 md:w-5" />

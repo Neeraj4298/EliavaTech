@@ -9,7 +9,7 @@ export const metadata: Metadata = buildPageMetadata({
   description:
     "How EliavaTech collects, uses, and protects personal data in compliance with India's Digital Personal Data Protection Act (DPDP Act).",
   path: "/privacy",
-  ogTag: "Legal · Privacy Policy [PLACEHOLDER]",
+  ogTag: "Legal · Privacy Policy",
 });
 
 export default function PrivacyPage() {
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
     <>
       <JsonLd data={breadcrumb} />
       <LegalPageLayout
-        eyebrow="Legal · [PLACEHOLDER for Legal Review]"
+        eyebrow="Legal"
         title="Privacy Policy"
         subtitle="How EliavaTech collects, uses, stores, and protects personal data in accordance with India's Digital Personal Data Protection Act, 2023 (DPDP Act)."
         sections={PRIVACY_SECTIONS}
