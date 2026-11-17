@@ -74,8 +74,11 @@ export function WhatsAppDemo() {
         </div>
       </div>
 
-      <div className="min-h-[320px] bg-bg p-5 flex flex-col justify-between gap-4">
-        <div className="space-y-3">
+      {/* Fixed height: the loop adds/removes messages, so a growing container would
+          shift the whole page below it while the visitor is scrolling. Newest
+          messages stay anchored to the bottom and older ones scroll out the top. */}
+      <div className="h-[500px] sm:h-[580px] bg-bg p-5 flex flex-col justify-between gap-4">
+        <div className="min-h-0 flex-1 overflow-hidden flex flex-col justify-end space-y-3 [mask-image:linear-gradient(to_bottom,transparent,black_28px)]">
           <AnimatePresence initial={false}>
             {messages.map((msg) => {
               const isBot = msg.sender === "bot";
@@ -110,7 +113,7 @@ export function WhatsAppDemo() {
             })}
           </AnimatePresence>
           {typing && !reduced && (
-            <div className="inline-flex items-center gap-1.5 rounded-pill border border-border bg-surface px-3.5 py-2">
+            <div className="inline-flex self-start items-center gap-1.5 rounded-pill border border-border bg-surface px-3.5 py-2">
               <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce" />
               <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce [animation-delay:120ms]" />
               <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce [animation-delay:240ms]" />
