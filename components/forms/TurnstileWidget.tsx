@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Script from "next/script";
-import { ShieldCheck } from "lucide-react";
 
 declare global {
   interface Window {
@@ -12,7 +11,7 @@ declare global {
         options: {
           sitekey: string;
           callback?: (token: string) => void;
-          "error-callback"?: () => void;
+          "error-callback"?: () => boolean | void;
           "expired-callback"?: () => void;
           "timeout-callback"?: () => void;
         }
@@ -47,9 +46,21 @@ export interface TurnstileWidgetProps {
   onToken: (token: string) => void;
 }
 
+function isPreviewOrLocalHost(): boolean {
+  if (typeof window === "undefined") return false;
+  const host = window.location.hostname.toLowerCase();
+  return (
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host.endsWith(".vercel.app")
+  );
+}
+
 /**
  * Cloudflare Turnstile spam check, shared by the contact and pricing forms.
  * Renders explicitly so it still works after the form is reset or remounted.
+ * If the widget cannot connect (e.g. preview domain, Brave Shields, adblocker
+ * or Cloudflare challenge error), it hides cleanly so the form remains usable.
  */
 export function TurnstileWidget({ id, onToken }: TurnstileWidgetProps) {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
@@ -57,6 +68,7 @@ export function TurnstileWidget({ id, onToken }: TurnstileWidgetProps) {
   const [scriptReady, setScriptReady] = React.useState(
     () => typeof window !== "undefined" && Boolean(window.turnstile)
   );
+  const [widgetUnavailable, setWidgetUnavailable] = React.useState(false);
   const onTokenRef = React.useRef(onToken);
 
   React.useEffect(() => {
@@ -64,37 +76,50 @@ export function TurnstileWidget({ id, onToken }: TurnstileWidgetProps) {
   }, [onToken]);
 
   React.useEffect(() => {
-    if (!TURNSTILE_SITE_KEY || !scriptReady) return;
+    if (!TURNSTILE_SITE_KEY || !scriptReady || widgetUnavailable) return;
+    if (isPreviewOrLocalHost()) return;
     const container = containerRef.current;
     if (!container || !window.turnstile) return;
 
-    const widgetId = window.turnstile.render(container, {
-      sitekey: TURNSTILE_SITE_KEY,
-      callback: (token) => onTokenRef.current(token),
-      "error-callback": () => onTokenRef.current(""),
-      "expired-callback": () => onTokenRef.current(""),
-      "timeout-callback": () => onTokenRef.current(""),
-    });
-    widgetIds.set(id, widgetId);
+    let widgetId: string | undefined;
+    try {
+      widgetId = window.turnstile.render(container, {
+        sitekey: TURNSTILE_SITE_KEY,
+        callback: (token) => onTokenRef.current(token),
+        "error-callback": () => {
+          onTokenRef.current("");
+          setWidgetUnavailable(true);
+          if (widgetId) {
+            try {
+              window.turnstile?.remove(widgetId);
+            } catch {
+              // ignore
+            }
+          }
+          return true;
+        },
+        "expired-callback": () => onTokenRef.current(""),
+        "timeout-callback": () => onTokenRef.current(""),
+      });
+      widgetIds.set(id, widgetId);
+    } catch {
+      // ignore render error
+    }
 
     return () => {
       widgetIds.delete(id);
-      try {
-        window.turnstile?.remove(widgetId);
-      } catch {
-        // already removed
+      if (widgetId) {
+        try {
+          window.turnstile?.remove(widgetId);
+        } catch {
+          // already removed
+        }
       }
     };
-  }, [id, scriptReady]);
+  }, [id, scriptReady, widgetUnavailable]);
 
-  if (!TURNSTILE_SITE_KEY) {
-    // Local development without Cloudflare keys.
-    return process.env.NODE_ENV === "production" ? null : (
-      <div className="flex items-center gap-2 text-xs text-text-muted">
-        <ShieldCheck strokeWidth={1.5} className="h-4 w-4 text-success shrink-0" />
-        <span>Spam check is off in development (no Turnstile site key set).</span>
-      </div>
-    );
+  if (!TURNSTILE_SITE_KEY || widgetUnavailable) {
+    return null;
   }
 
   return (
@@ -102,7 +127,14 @@ export function TurnstileWidget({ id, onToken }: TurnstileWidgetProps) {
       <Script
         src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
         strategy="afterInteractive"
-        onReady={() => setScriptReady(true)}
+        onReady={() => {
+          if (isPreviewOrLocalHost()) {
+            setWidgetUnavailable(true);
+            return;
+          }
+          setScriptReady(true);
+        }}
+        onError={() => setWidgetUnavailable(true)}
       />
       <div id={id} ref={containerRef} />
     </div>

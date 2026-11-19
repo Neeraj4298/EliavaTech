@@ -15,7 +15,6 @@ import {
   PRICING_SERVICE_OPTIONS,
 } from "@/lib/contact-schema";
 import {
-  TURNSTILE_SITE_KEY,
   TurnstileWidget,
   resetTurnstileWidget,
 } from "@/components/forms/TurnstileWidget";
@@ -43,10 +42,6 @@ export function PricingPageClient() {
     e.preventDefault();
     if (isSubmitting) return;
     setSubmitError(null);
-    if (TURNSTILE_SITE_KEY && !turnstileToken) {
-      setSubmitError("Please complete the spam check below, then send again.");
-      return;
-    }
     setIsSubmitting(true);
 
     try {

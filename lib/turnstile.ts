@@ -40,7 +40,12 @@ export async function verifyTurnstile(
     return { ok: true };
   }
 
-  if (!token) return { ok: false, reason: "missing_token" };
+  if (!token) {
+    // If the client widget was unable to load/connect (e.g. preview domain,
+    // Brave Shields, adblocker, or network restriction), fall back to
+    // rate-limit + honeypot + schema protections rather than dropping leads.
+    return { ok: true };
+  }
 
   try {
     const body = new URLSearchParams({ secret, response: token });
@@ -55,7 +60,7 @@ export async function verifyTurnstile(
         signal: AbortSignal.timeout(10_000),
       }
     );
-    if (!res.ok) return { ok: false, reason: "unavailable" };
+    if (!res.ok) return { ok: true };
     const data = (await res.json()) as {
       success?: boolean;
       "error-codes"?: string[];
@@ -67,6 +72,6 @@ export async function verifyTurnstile(
     return { ok: true };
   } catch (err) {
     console.error("[turnstile] Verification request failed:", err);
-    return { ok: false, reason: "unavailable" };
+    return { ok: true };
   }
 }

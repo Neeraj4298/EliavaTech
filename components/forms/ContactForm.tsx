@@ -66,10 +66,6 @@ export function ContactForm() {
 
   const onSubmit = async (values: ContactFormValues) => {
     setServerError(null);
-    if (TURNSTILE_SITE_KEY && !values.turnstileToken) {
-      setServerError("Please complete the spam check below, then send again.");
-      return;
-    }
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
