@@ -14,6 +14,7 @@ declare global {
           callback?: (token: string) => void;
           "error-callback"?: () => void;
           "expired-callback"?: () => void;
+          "timeout-callback"?: () => void;
         }
       ) => string;
       reset: (widgetIdOrSelector?: string) => void;
@@ -22,14 +23,19 @@ declare global {
   }
 }
 
+export const DEFAULT_TURNSTILE_SITE_KEY = "0x4AAAAAAGIXyivKpESd5hg3";
+
 export const TURNSTILE_SITE_KEY = (
-  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || DEFAULT_TURNSTILE_SITE_KEY
 ).trim();
+
+const widgetIds = new Map<string, string>();
 
 /** Turnstile tokens are single use: call this after any failed submit. */
 export function resetTurnstileWidget(id: string) {
   try {
-    window.turnstile?.reset(`#${id}`);
+    const widgetId = widgetIds.get(id);
+    window.turnstile?.reset(widgetId ?? `#${id}`);
   } catch {
     // widget not rendered yet
   }
@@ -67,20 +73,22 @@ export function TurnstileWidget({ id, onToken }: TurnstileWidgetProps) {
       callback: (token) => onTokenRef.current(token),
       "error-callback": () => onTokenRef.current(""),
       "expired-callback": () => onTokenRef.current(""),
+      "timeout-callback": () => onTokenRef.current(""),
     });
+    widgetIds.set(id, widgetId);
 
     return () => {
+      widgetIds.delete(id);
       try {
         window.turnstile?.remove(widgetId);
       } catch {
         // already removed
       }
     };
-  }, [scriptReady]);
+  }, [id, scriptReady]);
 
   if (!TURNSTILE_SITE_KEY) {
-    // Local development without Cloudflare keys. In production the server
-    // refuses submissions when Turnstile is not configured.
+    // Local development without Cloudflare keys.
     return process.env.NODE_ENV === "production" ? null : (
       <div className="flex items-center gap-2 text-xs text-text-muted">
         <ShieldCheck strokeWidth={1.5} className="h-4 w-4 text-success shrink-0" />
@@ -93,7 +101,7 @@ export function TurnstileWidget({ id, onToken }: TurnstileWidgetProps) {
     <div className="pt-1">
       <Script
         src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-        strategy="lazyOnload"
+        strategy="afterInteractive"
         onReady={() => setScriptReady(true)}
       />
       <div id={id} ref={containerRef} />

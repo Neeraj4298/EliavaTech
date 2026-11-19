@@ -16,6 +16,8 @@ RUN npm ci
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAGIXyivKpESd5hg3
+ENV NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
 # Generate Prisma Client from prisma/schema.prisma before compiling Next.js.
 RUN DATABASE_URL="postgresql://build:build@127.0.0.1:5432/build?schema=public" npx prisma generate
 RUN npm run build

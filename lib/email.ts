@@ -4,9 +4,16 @@ import { Resend } from "resend";
 import nodemailer from "nodemailer";
 import { BUSINESS } from "@/content/site";
 
+function stripQuotes(value: string): string {
+  return value.trim().replace(/^["']|["']$/g, "");
+}
+
 function getEnvValue(key: string): string {
-  const fromProc = process.env[key]?.trim();
-  if (fromProc) return fromProc;
+  const fromProc = process.env[key];
+  if (fromProc) {
+    const cleaned = stripQuotes(fromProc);
+    if (cleaned) return cleaned;
+  }
   try {
     const envPath = path.join(process.cwd(), ".env.local");
     const content = fs.readFileSync(envPath, "utf8");
@@ -17,10 +24,8 @@ function getEnvValue(key: string): string {
       if (eqIdx === -1) continue;
       const k = trimmed.slice(0, eqIdx).trim();
       if (k === key) {
-        return trimmed
-          .slice(eqIdx + 1)
-          .trim()
-          .replace(/^["']|["']$/g, "");
+        const val = stripQuotes(trimmed.slice(eqIdx + 1));
+        if (val) return val;
       }
     }
   } catch {
@@ -232,49 +237,71 @@ export async function sendLeadNotificationEmail(
       html: string;
     }) => Promise<void>;
 
-    let send: Sender;
+    const senders: Array<{ name: string; send: Sender }> = [];
 
     if (smtpPass) {
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: { user: smtpUser, pass: smtpPass },
-      });
+      const smtpHost = getEnvValue("SMTP_HOST");
+      const smtpPort = Number(getEnvValue("SMTP_PORT") || "0");
+      const transporter = nodemailer.createTransport(
+        smtpHost
+          ? {
+              host: smtpHost,
+              port: smtpPort > 0 ? smtpPort : 465,
+              secure: smtpPort > 0 ? smtpPort === 465 : true,
+              auth: { user: smtpUser, pass: smtpPass },
+              connectionTimeout: 10_000,
+              greetingTimeout: 10_000,
+              socketTimeout: 15_000,
+            }
+          : {
+              service: "gmail",
+              auth: { user: smtpUser, pass: smtpPass },
+              connectionTimeout: 10_000,
+              greetingTimeout: 10_000,
+              socketTimeout: 15_000,
+            }
+      );
       const from = `${BUSINESS.name} <${smtpUser}>`;
-      send = async (msg) => {
-        await transporter.sendMail({ from, ...msg });
-      };
-    } else if (resendApiKey) {
+      senders.push({
+        name: "SMTP",
+        send: async (msg) => {
+          await transporter.sendMail({ from, ...msg });
+        },
+      });
+    }
+
+    if (resendApiKey) {
       const configuredFrom = getEnvValue("RESEND_FROM_EMAIL");
+      const isFreeMailbox = /@(gmail|yahoo|outlook|hotmail)\.com>?$/i.test(
+        configuredFrom
+      );
       const isTestSender =
-        !configuredFrom || /@resend\.dev>?$/i.test(configuredFrom);
-      if (!configuredFrom && process.env.NODE_ENV === "production") {
-        return failed(
-          "RESEND_FROM_EMAIL is not set. Set it to an address on a domain verified in Resend."
-        );
-      }
-      if (/@(gmail|yahoo|outlook|hotmail)\.com>?$/i.test(configuredFrom)) {
-        return failed(
-          "RESEND_FROM_EMAIL must use a domain verified in Resend, not a free mailbox domain."
-        );
-      }
+        !configuredFrom ||
+        isFreeMailbox ||
+        /@resend\.dev>?$/i.test(configuredFrom);
       const from = isTestSender
         ? `${BUSINESS.name} <onboarding@resend.dev>`
         : configuredFrom;
       const resend = new Resend(resendApiKey);
-      send = async (msg) => {
-        const res = await resend.emails.send({
-          from,
-          to: [msg.to],
-          replyTo: msg.replyTo,
-          subject: msg.subject,
-          text: msg.text,
-          html: msg.html,
-        });
-        if (res.error) throw new Error(res.error.message);
-      };
-    } else {
+      senders.push({
+        name: "Resend",
+        send: async (msg) => {
+          const res = await resend.emails.send({
+            from,
+            to: [msg.to],
+            replyTo: msg.replyTo,
+            subject: msg.subject,
+            text: msg.text,
+            html: msg.html,
+          });
+          if (res.error) throw new Error(res.error.message);
+        },
+      });
+    }
+
+    if (senders.length === 0) {
       return failed(
-        "No email provider configured: set GMAIL_APP_PASSWORD (with SMTP_USER) or RESEND_API_KEY with RESEND_FROM_EMAIL."
+        "No email provider configured: set GMAIL_APP_PASSWORD (with SMTP_USER) or RESEND_API_KEY."
       );
     }
 
@@ -282,34 +309,46 @@ export async function sendLeadNotificationEmail(
     let teamEmailSent = false;
     let userEmailSent = false;
 
-    try {
-      await send({
-        to: notifyEmail,
-        replyTo: payload.email,
-        subject: teamContent.subject,
-        text: teamContent.text,
-        html: teamContent.html,
-      });
-      teamEmailSent = true;
-    } catch (err) {
-      errors.push(
-        `Team email error: ${err instanceof Error ? err.message : "Unknown error"}`
-      );
-    }
+    for (const provider of senders) {
+      if (!teamEmailSent) {
+        try {
+          await provider.send({
+            to: notifyEmail,
+            replyTo: payload.email,
+            subject: teamContent.subject,
+            text: teamContent.text,
+            html: teamContent.html,
+          });
+          teamEmailSent = true;
+        } catch (err) {
+          errors.push(
+            `Team email (${provider.name}) error: ${
+              err instanceof Error ? err.message : "Unknown error"
+            }`
+          );
+        }
+      }
 
-    try {
-      await send({
-        to: payload.email,
-        replyTo: notifyEmail,
-        subject: userContent.subject,
-        text: userContent.text,
-        html: userContent.html,
-      });
-      userEmailSent = true;
-    } catch (err) {
-      errors.push(
-        `Customer confirmation error: ${err instanceof Error ? err.message : "Unknown error"}`
-      );
+      if (!userEmailSent) {
+        try {
+          await provider.send({
+            to: payload.email,
+            replyTo: notifyEmail,
+            subject: userContent.subject,
+            text: userContent.text,
+            html: userContent.html,
+          });
+          userEmailSent = true;
+        } catch (err) {
+          errors.push(
+            `Customer confirmation (${provider.name}) error: ${
+              err instanceof Error ? err.message : "Unknown error"
+            }`
+          );
+        }
+      }
+
+      if (teamEmailSent && userEmailSent) break;
     }
 
     return {

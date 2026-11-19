@@ -39,8 +39,8 @@ Always commit the generated `prisma/migrations/*` folder. Run
 ## Production checklist
 
 - `DATABASE_URL` set and `npm run db:migrate:deploy` run.
-- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` set. The contact
-  and pricing forms are refused without the secret.
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` set (optional,
+  recommended for Turnstile spam protection on the contact and pricing forms).
 - `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` set for shared rate limits.
 - Client IP: on Vercel nothing to do; elsewhere set `TRUSTED_IP_HEADER` or
   `TRUSTED_PROXY_COUNT` (see `.env.example`).

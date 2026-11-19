@@ -87,12 +87,6 @@ export async function POST(req: NextRequest) {
     // Spam protection applies to every form that posts here (contact + pricing).
     const turnstile = await verifyTurnstile(data.turnstileToken, ip);
     if (!turnstile.ok) {
-      if (turnstile.reason === "missing_secret") {
-        return NextResponse.json(
-          { ok: false, error: DELIVERY_FAILED_MESSAGE },
-          { status: 503 }
-        );
-      }
       return NextResponse.json(
         {
           ok: false,

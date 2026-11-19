@@ -5,12 +5,18 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient(): PrismaClient | undefined {
-  if (!process.env.DATABASE_URL) {
+  const url = process.env.DATABASE_URL?.trim();
+  if (!url) {
     return undefined;
   }
-  return new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-  });
+  try {
+    return new PrismaClient({
+      log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+    });
+  } catch (err) {
+    console.error("[db] Failed to initialize PrismaClient:", err);
+    return undefined;
+  }
 }
 
 export const prisma: PrismaClient | undefined =
