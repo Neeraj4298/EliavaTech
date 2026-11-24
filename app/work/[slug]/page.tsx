@@ -51,7 +51,7 @@ export default async function WorkDetailPage({ params }: { params: Promise<{ slu
             <span>Back to All Work</span>
           </Link>
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="gold" size="md" dot>{project.label}</Badge>
+            <Badge variant="gold" size="md">{project.label}</Badge>
             <Badge variant="primary" size="md">{project.serviceFilter}</Badge>
             <Badge variant="default" size="md">{project.industryFilter}</Badge>
           </div>
@@ -76,14 +76,14 @@ export default async function WorkDetailPage({ params }: { params: Promise<{ slu
       {/* Challenge & Solution */}
       <Section className="border-y border-border/60 bg-surface/40">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Card variant="default" className="space-y-3">
-            <Badge variant="danger" size="sm" dot>The Challenge</Badge>
+          <Card variant="default" className="space-y-2.5">
+            <p className="font-mono text-xs font-medium text-danger">The Challenge</p>
             <h2 className="text-h3">Operational bottleneck</h2>
             <p className="text-small text-text-muted leading-relaxed">{project.challenge}</p>
           </Card>
 
-          <Card variant="elevated" className="space-y-3">
-            <Badge variant="success" size="sm" dot>Our Solution</Badge>
+          <Card variant="elevated" className="space-y-2.5">
+            <p className="font-mono text-xs font-medium text-success">Our Solution</p>
             <h2 className="text-h3">Connected architecture</h2>
             <p className="text-small text-text-muted leading-relaxed">{project.solution}</p>
           </Card>
@@ -93,8 +93,8 @@ export default async function WorkDetailPage({ params }: { params: Promise<{ slu
       {/* Features, Tech & Capabilities Proven */}
       <Section>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <Card variant="default" className="lg:col-span-6 space-y-4">
-            <Badge variant="primary" size="sm">Key Features</Badge>
+          <Card variant="default" className="lg:col-span-6 space-y-3">
+            <p className="font-mono text-xs font-medium text-primary">Key Features</p>
             <h2 className="text-h3">What is built into this demo</h2>
             <ul className="space-y-3 pt-2">
               {project.features.map((f) => (
@@ -107,8 +107,8 @@ export default async function WorkDetailPage({ params }: { params: Promise<{ slu
           </Card>
 
           <div className="lg:col-span-6 space-y-6">
-            <Card variant="default" className="space-y-4">
-              <Badge variant="gold" size="sm">What This Concept Project Shows</Badge>
+            <Card variant="default" className="space-y-3">
+              <p className="font-mono text-xs font-medium text-primary">What This Concept Project Shows</p>
               <h2 className="text-h3">Functional outcomes demonstrated</h2>
               <ul className="space-y-2.5">
                 {project.capabilitiesProven.map((cap) => (
@@ -121,7 +121,7 @@ export default async function WorkDetailPage({ params }: { params: Promise<{ slu
             </Card>
 
             <Card variant="default" className="space-y-3">
-              <span className="font-mono text-xs uppercase text-text-muted">Tech Stack:</span>
+              <span className="font-mono text-xs text-text-muted">Tech Stack:</span>
               <div className="flex flex-wrap gap-2">
                 {project.tech.map((t) => <Badge key={t} variant="default" size="md">{t}</Badge>)}
               </div>

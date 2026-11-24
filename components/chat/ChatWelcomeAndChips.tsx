@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
-import { Globe, MessageSquareCode, Boxes, Clock, Sparkles } from "lucide-react";
+import { Globe, MessageSquareCode, Boxes, Clock } from "lucide-react";
 import { EASE_STANDARD, MOTION_DURATION, usePrefersReducedMotion } from "@/lib/motion";
 
 export const WELCOME_SUGGESTIONS = [
@@ -134,14 +134,13 @@ export function FollowUpChipsBar({
 
   return (
     <motion.div
-      data-lenis-prevent-horizontal
       initial={reduced ? false : "hidden"}
       animate="visible"
       variants={{
         hidden: {},
         visible: { transition: { staggerChildren: 0.06 } },
       }}
-      className="no-scrollbar chips-edge-mask flex items-center gap-2 overflow-x-auto overscroll-contain border-t border-border bg-surface/60 px-4 py-2.5 pr-7"
+      className="flex flex-wrap items-center gap-1.5 border-t border-border bg-surface/60 px-3.5 py-2.5"
     >
       {showQuoteButton && (
         <motion.button
@@ -151,7 +150,7 @@ export function FollowUpChipsBar({
           variants={reduced ? undefined : { hidden: { opacity: 0, y: 6 }, visible: { opacity: 1, y: 0 } }}
           className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-pill border border-primary/50 bg-primary/12 px-3 py-1.5 text-xs font-semibold text-primary transition-all duration-200 hover:bg-primary hover:text-on-primary active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
-          <Sparkles strokeWidth={1.5} className="h-3 w-3 shrink-0" />
+          <MessageSquareCode strokeWidth={1.5} className="h-3 w-3 shrink-0" />
           <span>Get Quote</span>
         </motion.button>
       )}

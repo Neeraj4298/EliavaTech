@@ -53,7 +53,7 @@ export function ParticleField({ count = 110, isDark }: ParticleFieldProps) {
     pointsRef.current.rotation.x = Math.sin(elapsedRef.current * 0.2) * 0.06;
   });
 
-  const color = isDark ? "#9A8DFF" : "#4B3FE0";
+  const color = isDark ? "#60A5FA" : "#1D4ED8";
 
   return (
     <points ref={pointsRef}>

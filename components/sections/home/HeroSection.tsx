@@ -3,7 +3,6 @@
 import * as React from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { HERO_CONTENT } from "@/content/home";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { SplitHeading } from "@/components/motion/SplitHeading";
 import { MagneticButton } from "@/components/motion/MagneticButton";
@@ -32,24 +31,14 @@ export function HeroSection() {
       ref={sectionRef}
       className="relative overflow-hidden py-8 md:py-24 lg:py-28 border-b border-border/60"
     >
-      {/* Subtle architectural background radial glow */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-30"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 20% 25%, var(--primary) 0%, transparent 45%)",
-        }}
-      />
+      {/* Background Section Container */}
 
       <div className="container-max relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-7 lg:gap-12 items-center">
         {/* Left Column */}
         <div className="lg:col-span-6 space-y-4 md:space-y-6">
-          <div>
-            <Badge variant="primary" size="md" dot>
-              {HERO_CONTENT.label}
-            </Badge>
-          </div>
+          <p className="font-mono text-xs sm:text-small font-medium text-primary">
+            {HERO_CONTENT.label}
+          </p>
 
           <SplitHeading
             text={HERO_CONTENT.title}
@@ -75,9 +64,8 @@ export function HeroSection() {
             </MagneticButton>
           </div>
 
-          <div className="pt-4 border-t border-border/60 flex items-center gap-3">
-            <span className="h-2 w-2 rounded-full bg-gold shrink-0" aria-hidden="true" />
-            <p className="font-mono text-xs sm:text-small text-text-muted tracking-wide">
+          <div className="pt-4 border-t border-border/60">
+            <p className="font-mono text-xs sm:text-small text-text-muted">
               {HERO_CONTENT.trustLine}
             </p>
           </div>

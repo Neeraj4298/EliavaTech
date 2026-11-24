@@ -66,14 +66,14 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             <span>All Services</span>
           </Link>
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="primary" size="md" dot>{service.title}</Badge>
+            <Badge variant="primary" size="md">{service.title}</Badge>
             <Badge variant="gold" size="md">{service.startingPrice}</Badge>
           </div>
           <SplitHeading text={service.headline} as="h1" className="text-h1 block" />
           <p className="text-body text-text-muted">{service.outcome}</p>
           <div className="rounded-card border border-border bg-surface p-4 flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="font-mono text-xs text-primary uppercase">Starting Price</p>
+              <p className="font-mono text-xs text-primary">Starting Price</p>
               <p className="text-small text-text font-medium">{service.priceNote}</p>
             </div>
             <Link href="/contact"><Button variant="primary" size="md" withArrow>Book a Free Consultation</Button></Link>
@@ -99,7 +99,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           </Card>
 
           <Card variant="elevated" className="lg:col-span-7 space-y-4">
-            <Badge variant="success" size="sm" dot>Checklist</Badge>
+            <p className="font-mono text-xs font-medium text-success">Checklist</p>
             <h2 className="text-h3">What is included</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               {service.includedChecklist.map((item) => (
@@ -126,7 +126,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             ))}
           </div>
           <div className="rounded-card border border-border bg-surface p-4 flex flex-wrap items-center justify-between gap-3">
-            <span className="font-mono text-xs uppercase text-text-muted">Tech Used:</span>
+            <span className="font-mono text-xs text-text-muted">Tech Used:</span>
             <div className="flex flex-wrap gap-2">
               {service.techUsed.map((t) => <Badge key={t} variant="default" size="md">{t}</Badge>)}
             </div>

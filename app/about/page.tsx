@@ -30,7 +30,7 @@ export default function AboutPage() {
       <JsonLd data={breadcrumb} />
       <Section className="border-b border-border/60">
         <div className="max-w-3xl space-y-5">
-          <Badge variant="primary" size="md" dot>{ABOUT_CONTENT.hero.eyebrow}</Badge>
+          <p className="font-mono text-xs font-medium text-primary">{ABOUT_CONTENT.hero.eyebrow}</p>
           <SplitHeading text={ABOUT_CONTENT.hero.title} as="h1" className="text-h1 block" />
           <p className="text-body text-text-muted">{ABOUT_CONTENT.hero.subtext}</p>
         </div>
@@ -38,8 +38,8 @@ export default function AboutPage() {
 
       <Section>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          <div className="lg:col-span-7 space-y-5">
-            <Badge variant="default" size="sm">Mission &amp; Direction</Badge>
+          <div className="lg:col-span-7 space-y-4">
+            <p className="font-mono text-xs font-medium text-primary">Mission &amp; Direction</p>
             <h2 className="text-h2">{ABOUT_CONTENT.story.heading}</h2>
             <div className="space-y-4 text-body text-text-muted">
               {ABOUT_CONTENT.story.paragraphs.map((para, idx) => (
@@ -48,8 +48,8 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <Card variant="elevated" padding="lg" className="lg:col-span-5 space-y-4 border-gold/40">
-            <Badge variant="gold" size="sm" dot>{ABOUT_CONTENT.nameMeaning.badge}</Badge>
+          <Card variant="elevated" padding="lg" className="lg:col-span-5 space-y-3 border-gold/40">
+            <p className="font-mono text-xs font-medium text-gold">{ABOUT_CONTENT.nameMeaning.badge}</p>
             <h2 className="text-h3">{ABOUT_CONTENT.nameMeaning.heading}</h2>
             <p className="text-small text-text-muted leading-relaxed">{ABOUT_CONTENT.nameMeaning.body}</p>
             <p className="pt-2 border-t border-border/60 font-mono text-xs text-text-muted">

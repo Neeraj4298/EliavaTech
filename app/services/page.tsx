@@ -47,7 +47,11 @@ export default function ServicesPage() {
       <JsonLd data={breadcrumb} />
       <Section className="border-b border-border/60">
         <div className="max-w-3xl space-y-5">
-          <Reveal><Badge variant="primary" size="md" dot>Five Integrated Service Lines</Badge></Reveal>
+          <Reveal>
+            <p className="font-mono text-xs font-medium text-primary">
+              Five Integrated Service Lines
+            </p>
+          </Reveal>
           <SplitHeading text="Websites, automation and custom software built around your business." as="h1" className="text-h1 block" />
           <Reveal delay={0.1}>
             <p className="text-body text-text-muted">
@@ -111,7 +115,7 @@ export default function ServicesPage() {
           >
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-border bg-surface-2 text-xs font-mono uppercase text-text-muted">
+                <tr className="border-b border-border bg-surface-2 text-xs font-mono text-text-muted">
                   <th className="p-4">Dimension</th>
                   <th className="p-4">Web Dev</th>
                   <th className="p-4">E-commerce</th>

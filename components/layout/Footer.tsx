@@ -54,7 +54,7 @@ export function Footer() {
           </div>
 
           <div className="lg:col-span-3 space-y-3">
-            <h3 className="font-heading text-small font-semibold uppercase tracking-wider text-text">
+            <h3 className="font-heading text-small font-semibold text-text">
               Services
             </h3>
             <ul className="space-y-2 text-small">
@@ -68,7 +68,7 @@ export function Footer() {
           </div>
 
           <div className="lg:col-span-3 space-y-3">
-            <h3 className="font-heading text-small font-semibold uppercase tracking-wider text-text">
+            <h3 className="font-heading text-small font-semibold text-text">
               Industries
             </h3>
             <ul className="space-y-2 text-small">
@@ -82,7 +82,7 @@ export function Footer() {
           </div>
 
           <div className="lg:col-span-2 space-y-3">
-            <h3 className="font-heading text-small font-semibold uppercase tracking-wider text-text">
+            <h3 className="font-heading text-small font-semibold text-text">
               Company
             </h3>
             <ul className="space-y-2 text-small">

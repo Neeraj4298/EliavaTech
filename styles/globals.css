@@ -11,9 +11,9 @@
   --border: #DDE1EC;
   --text: #0B1020;
   --text-muted: #55607A;
-  --primary: #4B3FE0;
-  --primary-text: #4B3FE0;
-  --primary-hover: #3A2FC4;
+  --primary: #1D4ED8;
+  --primary-text: #1D4ED8;
+  --primary-hover: #1E40AF;
   --gold: #C98A12;
   --gold-text: #855808;
   --success: #0A6E4B;
@@ -22,9 +22,9 @@
   --on-primary: var(--surface);
 
   --shadow-card: 0 4px 20px -2px rgba(11, 16, 32, 0.05), 0 2px 6px -1px rgba(11, 16, 32, 0.03);
-  --shadow-card-hover: 0 12px 32px -4px rgba(75, 63, 224, 0.10), 0 4px 12px -2px rgba(11, 16, 32, 0.05);
-  --glow-primary: 0 8px 24px -4px rgba(75, 63, 224, 0.18);
-  --gradient-primary: linear-gradient(135deg, #4B3FE0 0%, #6355F5 100%);
+  --shadow-card-hover: 0 8px 24px -4px rgba(11, 16, 32, 0.08), 0 2px 6px -1px rgba(11, 16, 32, 0.04);
+  --glow-primary: 0 8px 24px -4px rgba(29, 78, 216, 0.22);
+  --gradient-primary: linear-gradient(135deg, #1E40AF 0%, #2563EB 100%);
   --glass-bg: rgba(255, 255, 255, 0.78);
   --glass-border: rgba(221, 225, 236, 0.85);
   color-scheme: light;
@@ -38,11 +38,10 @@
   --border: #222C47;
   --text: #EEF1F8;
   --text-muted: #9AA6C3;
-  /* Fill colour is darker so white labels reach AA contrast; text colour is lighter so
-     violet text reaches AA on dark panels. */
-  --primary: #6A5AF9;
-  --primary-text: #9185FF;
-  --primary-hover: #7466FB;
+  /* Fill colour and text token for cobalt / royal blue theme */
+  --primary: #2563EB;
+  --primary-text: #60A5FA;
+  --primary-hover: #1D4ED8;
   --gold: #F2B84B;
   --gold-text: #F2B84B;
   --success: #34D399;
@@ -51,9 +50,9 @@
   --on-primary: #FFFFFF;
 
   --shadow-card: 0 0 0 1px rgba(34, 44, 71, 0.6);
-  --shadow-card-hover: 0 0 28px -4px rgba(124, 108, 255, 0.25);
-  --glow-primary: 0 0 28px -4px rgba(124, 108, 255, 0.32);
-  --gradient-primary: linear-gradient(135deg, #6A5AF9 0%, #5468E0 100%);
+  --shadow-card-hover: 0 0 0 1px rgba(37, 99, 235, 0.45);
+  --glow-primary: 0 0 28px -4px rgba(37, 99, 235, 0.36);
+  --gradient-primary: linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%);
   --glass-bg: rgba(13, 19, 34, 0.76);
   --glass-border: rgba(34, 44, 71, 0.85);
   color-scheme: dark;

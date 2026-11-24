@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Badge, type BadgeVariant } from "./Badge";
+import { type BadgeVariant } from "./Badge";
 import { Reveal } from "@/components/motion/Reveal";
 import { SplitHeading } from "@/components/motion/SplitHeading";
 import { cn } from "@/lib/utils";
@@ -18,11 +18,10 @@ export interface SectionHeadingProps {
 
 /**
  * Section 6 — SectionHeading:
- * Reusable section header with eyebrow Badge, SplitHeading H2, and description.
+ * Reusable section header with quiet typographic eyebrow, SplitHeading H2, and description.
  */
 export function SectionHeading({
   eyebrow,
-  eyebrowVariant = "primary",
   title,
   description,
   align = "left",
@@ -41,12 +40,12 @@ export function SectionHeading({
         className
       )}
     >
-      <div className={cn("space-y-3", !isCenter && "max-w-2xl")}>
+      <div className={cn("space-y-2.5", !isCenter && "max-w-2xl")}>
         {eyebrow && (
           <Reveal>
-            <Badge variant={eyebrowVariant} size="md" dot>
+            <p className="font-mono text-xs font-medium text-primary">
               {eyebrow}
-            </Badge>
+            </p>
           </Reveal>
         )}
         <SplitHeading text={title} as="h2" className="text-h2 block" />

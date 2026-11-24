@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { INDUSTRIES_DATA } from "@/content/industries";
 import { Section } from "@/components/layout/Section";
-import { Badge } from "@/components/ui/Badge";
 import { SplitHeading } from "@/components/motion/SplitHeading";
 import { Reveal } from "@/components/motion/Reveal";
 import { StaggerGroup, StaggerItem } from "@/components/motion/StaggerGroup";
@@ -32,9 +31,9 @@ export default function IndustriesPage() {
       <Section className="border-b border-border/60">
         <div className="max-w-3xl space-y-5">
           <Reveal>
-            <Badge variant="primary" size="md" dot>
+            <p className="font-mono text-xs font-medium text-primary">
               Seven Industry Sectors
-            </Badge>
+            </p>
           </Reveal>
           <SplitHeading
             text="Solution bundles tailored to how your sector operates."
@@ -56,8 +55,8 @@ export default function IndustriesPage() {
               <Link href={`/industries/${industry.slug}`} className="block h-full group">
                 <TiltCard cursorLabel="View" className="h-full">
                   <div className="flex h-full flex-col justify-between gap-6">
-                    <div className="space-y-4">
-                      <Badge variant="default" size="sm">Industry Bundle</Badge>
+                    <div className="space-y-3">
+                      <p className="font-mono text-xs text-text-muted">Industry Bundle</p>
                       <h2 className="font-heading text-lg md:text-2xl font-semibold text-text group-hover:text-primary transition-colors">
                         {industry.title}
                       </h2>

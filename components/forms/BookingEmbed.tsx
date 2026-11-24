@@ -25,77 +25,6 @@ export function BookingEmbed({ className }: BookingEmbedProps) {
     () => true,
     () => false
   );
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const overlayRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    let settleTimer: number | null = null;
-
-    // The hover "aperture" overlay swallows every click except at the settled
-    // cursor position, so it would make the calendar unusable on touch devices
-    // (no mousemove events). Only enable it for fine pointers.
-    const canHover =
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    if (!canHover) {
-      if (overlayRef.current) overlayRef.current.style.display = "none";
-      return;
-    }
-
-    const closeAperture = () => {
-      if (settleTimer !== null) {
-        window.clearTimeout(settleTimer);
-        settleTimer = null;
-      }
-      if (overlayRef.current) {
-        overlayRef.current.style.clipPath = "none";
-      }
-    };
-
-    const openApertureAt = (clientX: number, clientY: number) => {
-      const container = containerRef.current;
-      const overlay = overlayRef.current;
-      if (!container || !overlay) return;
-
-      const rect = container.getBoundingClientRect();
-      const inside =
-        clientX >= rect.left &&
-        clientX <= rect.right &&
-        clientY >= rect.top &&
-        clientY <= rect.bottom;
-
-      if (!inside) {
-        overlay.style.clipPath = "none";
-        return;
-      }
-
-      const x = Math.round(clientX - rect.left);
-      const y = Math.round(clientY - rect.top);
-      const r = 10;
-      overlay.style.clipPath = `polygon(0px 0px, 100% 0px, 100% 100%, 0px 100%, 0px 0px, ${
-        x - r
-      }px ${y - r}px, ${x - r}px ${y + r}px, ${x + r}px ${y + r}px, ${
-        x + r
-      }px ${y - r}px, ${x - r}px ${y - r}px, 0px 0px)`;
-    };
-
-    const handleMouseMove = (event: MouseEvent) => {
-      closeAperture();
-      settleTimer = window.setTimeout(() => {
-        openApertureAt(event.clientX, event.clientY);
-      }, 90);
-    };
-
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    window.addEventListener("wheel", closeAperture, { passive: true, capture: true });
-    window.addEventListener("scroll", closeAperture, { passive: true });
-    return () => {
-      if (settleTimer !== null) window.clearTimeout(settleTimer);
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("wheel", closeAperture, { capture: true });
-      window.removeEventListener("scroll", closeAperture);
-    };
-  }, []);
 
   const envCalLink = (process.env.NEXT_PUBLIC_CAL_LINK || "").trim();
   const calLinkRaw =
@@ -133,22 +62,14 @@ export function BookingEmbed({ className }: BookingEmbedProps) {
           </p>
         </div>
 
-        <Badge variant="primary" size="sm" dot>
+        <span className="font-mono text-xs text-primary">
           Cal.com Calendar
-        </Badge>
+        </span>
       </div>
 
       {isConfigured ? (
         <div className="space-y-4">
-          <div
-            ref={containerRef}
-            className="relative overflow-hidden rounded-input border border-border bg-bg"
-          >
-            <div
-              ref={overlayRef}
-              aria-hidden="true"
-              className="absolute inset-0 z-10"
-            />
+          <div className="relative overflow-hidden rounded-input border border-border bg-bg">
             <iframe
               src={iframeSrc}
               aria-label="Book a Free Consultation with EliavaTech on Cal.com"

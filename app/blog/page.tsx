@@ -59,9 +59,9 @@ export default function BlogPage() {
       <Section className="border-b border-border/60">
         <div className="max-w-3xl space-y-5">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="primary" size="md" dot>
+            <p className="font-mono text-xs font-medium text-primary">
               Insights and Practical Guides
-            </Badge>
+            </p>
             {posts.some((p) => p.draft) && (
               <Badge variant="gold" size="md">
                 Draft preview (not public)

@@ -63,7 +63,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
             <ArrowLeft strokeWidth={1.5} className="h-4 w-4" />
             <span>All Industries</span>
           </Link>
-          <div><Badge variant="primary" size="md" dot>Industry Bundle · {industry.title}</Badge></div>
+          <p className="font-mono text-xs font-medium text-primary">Industry Bundle · {industry.title}</p>
           <SplitHeading text={industry.headline} as="h1" className="text-h1 block" />
           <p className="text-body text-text-muted">{industry.summary}</p>
           <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -76,7 +76,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
       <Section>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-5 space-y-4">
-            <Badge variant="danger" size="sm" dot>Typical Problems</Badge>
+            <p className="font-mono text-xs font-medium text-danger">Typical Problems</p>
             <h2 className="text-h3">Bottlenecks in {industry.title}</h2>
             <div className="space-y-3 pt-2">
               {industry.typicalProblems.map((prob) => (
@@ -92,7 +92,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
           </div>
 
           <div className="lg:col-span-7 space-y-4">
-            <Badge variant="success" size="sm" dot>Our Solution Bundle</Badge>
+            <p className="font-mono text-xs font-medium text-success">Our Solution Bundle</p>
             <h2 className="text-h3">What we deploy for {industry.title}</h2>
             <div className="space-y-3 pt-2">
               {industry.bundle.map((b, idx) => (
@@ -135,7 +135,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
       <Section>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <div className="lg:col-span-5 space-y-4">
-            <Badge variant="gold" size="md" dot>Concept project</Badge>
+            <Badge variant="gold" size="sm">Concept project</Badge>
             <h2 className="text-h2">{conceptProject.title}</h2>
             <p className="text-body text-text-muted">{conceptProject.summary}</p>
             <Link href={`/work/${conceptProject.slug}`} className="inline-block pt-2">

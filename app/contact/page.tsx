@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Mail, Phone, MapPin, Clock, ArrowUpRight } from "lucide-react";
 import { Section } from "@/components/layout/Section";
-import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { SplitHeading } from "@/components/motion/SplitHeading";
 import { ContactForm } from "@/components/forms/ContactForm";
@@ -31,9 +30,9 @@ export default function ContactPage() {
       <JsonLd data={breadcrumb} />
       <Section className="border-b border-border/60">
         <div className="max-w-3xl space-y-5">
-          <Badge variant="gold" size="md" dot>
+          <p className="font-mono text-xs font-medium text-primary">
             We reply within one business day
-          </Badge>
+          </p>
           <SplitHeading
             text="Tell us about the business problem you want to solve."
             as="h1"
@@ -69,7 +68,7 @@ export default function ContactPage() {
                 <div className="flex items-start gap-3.5 rounded-input border border-border bg-surface p-4">
                   <Mail strokeWidth={1.5} className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-mono text-xs text-text-muted uppercase">
+                    <p className="font-mono text-xs text-text-muted">
                       Business Email
                     </p>
                     <a
@@ -84,7 +83,7 @@ export default function ContactPage() {
                 <div className="flex items-start gap-3.5 rounded-input border border-border bg-surface p-4">
                   <Phone strokeWidth={1.5} className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-mono text-xs text-text-muted uppercase">
+                    <p className="font-mono text-xs text-text-muted">
                       Phone &amp; WhatsApp
                     </p>
                     <a
@@ -99,7 +98,7 @@ export default function ContactPage() {
                 <div className="flex items-start gap-3.5 rounded-input border border-border bg-surface p-4">
                   <MapPin strokeWidth={1.5} className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-mono text-xs text-text-muted uppercase">
+                    <p className="font-mono text-xs text-text-muted">
                       {BUSINESS.serviceAreaTitle}
                     </p>
                     <p className="font-heading text-base font-semibold text-text">
@@ -126,7 +125,7 @@ export default function ContactPage() {
 
             {socialLinks.length > 0 && (
             <Card variant="default" padding="md" className="space-y-3">
-              <p className="font-mono text-xs uppercase tracking-wider text-text-muted">
+              <p className="font-mono text-xs text-text-muted font-normal">
                 Follow Us
               </p>
               <div className="grid grid-cols-2 gap-3">

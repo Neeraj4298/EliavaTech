@@ -44,7 +44,7 @@ export function WorkGridClient() {
       {/* Filter Controls */}
       <div className="rounded-card border border-border bg-surface p-5 space-y-4">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-mono text-xs uppercase text-text-muted mr-2">
+          <span className="font-mono text-xs text-text-muted mr-2">
             Filter by Service:
           </span>
           {SERVICE_FILTERS.map((f) => (
@@ -66,7 +66,7 @@ export function WorkGridClient() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-border/60">
-          <span className="font-mono text-xs uppercase text-text-muted mr-2">
+          <span className="font-mono text-xs text-text-muted mr-2">
             Filter by Industry:
           </span>
           {INDUSTRY_FILTERS.map((f) => (
@@ -96,7 +96,7 @@ export function WorkGridClient() {
               <div className="flex h-full flex-col justify-between gap-6">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between gap-2">
-                    <Badge variant="gold" size="sm" dot>
+                    <Badge variant="gold" size="sm">
                       {project.label}
                     </Badge>
                     <span className="font-mono text-xs text-text-muted">

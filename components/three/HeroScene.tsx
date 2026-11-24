@@ -164,7 +164,7 @@ function MonogramRig({
   });
 
   const goldColor = isDark ? "#F2B84B" : "#C98A12";
-  const indigoColor = isDark ? "#7C6CFF" : "#4B3FE0";
+  const indigoColor = isDark ? "#2563EB" : "#1D4ED8";
   const baseSlabColor = isDark ? "#1B2644" : "#DDE3F4";
 
   return (
@@ -183,7 +183,7 @@ function MonogramRig({
       <RoundedBox ref={midSlab} args={[1.95, 0.46, 0.68]} radius={0.12} smoothness={4} position={[-0.325, 0, 0]}>
         <meshPhysicalMaterial
           color={indigoColor}
-          emissive={isDark ? "#7C6CFF" : "#000000"}
+          emissive={isDark ? "#2563EB" : "#000000"}
           emissiveIntensity={isDark ? 0.28 : 0}
           roughness={isDark ? 0.18 : 0.25}
           metalness={0.35}
@@ -196,7 +196,7 @@ function MonogramRig({
       <RoundedBox ref={botSlab} args={[2.6, 0.46, 0.68]} radius={0.12} smoothness={4} position={[0, -0.85, 0]}>
         <meshPhysicalMaterial
           color={baseSlabColor}
-          emissive={isDark ? "#4B3FE0" : "#000000"}
+          emissive={isDark ? "#1D4ED8" : "#000000"}
           emissiveIntensity={isDark ? 0.14 : 0}
           roughness={isDark ? 0.24 : 0.28}
           metalness={0.45}
@@ -358,7 +358,7 @@ export function HeroScene({ active = true }: HeroSceneProps) {
       >
         <ambientLight intensity={isDark ? 0.65 : 1.1} />
         <directionalLight position={[4, 6, 4]} intensity={isDark ? 1.4 : 1.8} />
-        <pointLight position={[-4, -2, 3]} intensity={isDark ? 1.1 : 0.7} color={isDark ? "#7C6CFF" : "#4B3FE0"} />
+        <pointLight position={[-4, -2, 3]} intensity={isDark ? 1.1 : 0.7} color={isDark ? "#3B82F6" : "#1D4ED8"} />
 
         <Environment resolution={128}>
           <group rotation={[-Math.PI / 4, -0.3, 0]}>

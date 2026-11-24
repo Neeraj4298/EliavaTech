@@ -2,7 +2,6 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowRight, List } from "lucide-react";
 import { type BlogPostMeta, type TocHeading } from "@/lib/blog";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 
@@ -33,9 +32,9 @@ export function BlogAuthorCard({ author, authorRole }: BlogAuthorCardProps) {
           />
         </svg>
         <div className="space-y-1">
-          <Badge variant="default" size="sm">
+          <p className="font-mono text-xs text-text-muted">
             Written by
-          </Badge>
+          </p>
           <h3 className="font-heading text-lg font-semibold text-text">
             {author}
           </h3>
@@ -65,7 +64,7 @@ export function BlogSidebar({ toc, relatedPosts }: BlogSidebarProps) {
         <Card variant="default" padding="md" className="space-y-3">
           <div className="flex items-center gap-2 border-b border-border pb-3">
             <List strokeWidth={1.5} className="h-4 w-4 text-primary" />
-            <h2 className="font-heading text-small font-semibold uppercase tracking-wider text-text">
+            <h2 className="font-heading text-small font-semibold text-text">
               Table of Contents
             </h2>
           </div>
@@ -88,7 +87,7 @@ export function BlogSidebar({ toc, relatedPosts }: BlogSidebarProps) {
 
       {relatedPosts.length > 0 && (
         <Card variant="default" padding="md" className="space-y-4">
-          <h2 className="font-heading text-small font-semibold uppercase tracking-wider text-text border-b border-border pb-3">
+          <h2 className="font-heading text-small font-semibold text-text border-b border-border pb-3">
             Related Guides
           </h2>
           <div className="space-y-3">

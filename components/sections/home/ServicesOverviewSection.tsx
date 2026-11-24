@@ -92,7 +92,7 @@ export function ServicesOverviewSection() {
 
         {/* Capabilities Strip per Section 5.4 */}
         <div className="rounded-card border border-border bg-surface p-5">
-          <p className="mb-3 font-mono text-xs uppercase tracking-wider text-text-muted">
+          <p className="mb-3 font-mono text-xs text-text-muted font-normal">
             Core Technology and Automation Tools
           </p>
           <div className="flex flex-wrap items-center gap-3">

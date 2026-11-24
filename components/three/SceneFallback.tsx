@@ -32,8 +32,8 @@ export function SceneFallback({ className }: SceneFallbackProps) {
         className="pointer-events-none absolute inset-0 opacity-35"
         style={{
           backgroundImage:
-            "radial-gradient(circle at 50% 45%, var(--primary) 0%, transparent 62%), linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)",
-          backgroundSize: "100% 100%, 32px 32px, 32px 32px",
+            "linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)",
+          backgroundSize: "32px 32px, 32px 32px",
         }}
       />
 

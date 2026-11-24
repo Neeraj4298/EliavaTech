@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { PRICING_HEADER } from "@/content/pricing";
 import { Section } from "@/components/layout/Section";
-import { Badge } from "@/components/ui/Badge";
 import { SplitHeading } from "@/components/motion/SplitHeading";
 import { PricingPageClient } from "@/components/sections/PricingPageClient";
 import { FAQSection } from "@/components/sections/home/FAQSection";
@@ -36,9 +35,9 @@ export default function PricingPage() {
       <JsonLd data={schemas} />
       <Section className="border-b border-border/60">
         <div className="max-w-3xl space-y-5">
-          <Badge variant="gold" size="md" dot>
+          <p className="font-mono text-xs font-medium text-primary">
             {PRICING_HEADER.badge}
-          </Badge>
+          </p>
           <SplitHeading
             text={PRICING_HEADER.title}
             as="h1"

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Section } from "@/components/layout/Section";
-import { Badge } from "@/components/ui/Badge";
 import { SplitHeading } from "@/components/motion/SplitHeading";
 import { WorkGridClient } from "@/components/sections/WorkGridClient";
 import { CTABandSection } from "@/components/sections/home/CTABandSection";
@@ -26,9 +25,9 @@ export default function WorkPage() {
       <JsonLd data={breadcrumb} />
       <Section className="border-b border-border/60">
         <div className="max-w-3xl space-y-5">
-          <Badge variant="gold" size="md" dot>
+          <p className="font-mono text-xs font-medium text-primary">
             Concept Projects · Proof of Capability
-          </Badge>
+          </p>
           <SplitHeading
             text="Working demos built to real-world standards."
             as="h1"

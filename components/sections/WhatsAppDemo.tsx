@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCheck, Pause, Play, RotateCcw, Sparkles } from "lucide-react";
+import { CheckCheck, Pause, Play, RotateCcw } from "lucide-react";
 import { WHATSAPP_DEMO_MESSAGES } from "@/content/home";
 import { EASE_STANDARD, MOTION_DURATION, usePrefersReducedMotion } from "@/lib/motion";
 import { Badge } from "@/components/ui/Badge";
@@ -104,7 +104,7 @@ export function WhatsAppDemo() {
                   </div>
                   {msg.meta && (
                     <span className="mt-1 inline-flex items-center gap-1 font-mono text-[11px] text-success">
-                      <Sparkles strokeWidth={1.5} className="h-3 w-3" />
+                      <CheckCheck strokeWidth={1.5} className="h-3 w-3" />
                       <span>{msg.meta}</span>
                     </span>
                   )}

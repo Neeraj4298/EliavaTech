@@ -39,11 +39,11 @@ export function LegalPageLayout({
       <Section className="border-b border-border/60">
         <div className="max-w-3xl space-y-5">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="gold" size="md" dot>
+            <span className="font-mono text-xs font-medium text-primary">
               {eyebrow}
-            </Badge>
+            </span>
             <span className="font-mono text-xs text-text-muted">
-              Last Updated: {lastUpdated}
+              · Last Updated: {lastUpdated}
             </span>
           </div>
 

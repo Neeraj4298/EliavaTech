@@ -39,7 +39,7 @@ export function WorkPreviewSection() {
                   <div className="flex h-full flex-col justify-between gap-6">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between gap-2">
-                        <Badge variant="gold" size="sm" dot>
+                        <Badge variant="gold" size="sm">
                           Concept project
                         </Badge>
                         <span className="font-mono text-xs text-text-muted">

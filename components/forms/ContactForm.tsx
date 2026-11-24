@@ -16,7 +16,6 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
 import { WhatsAppButton } from "@/components/overlays/WhatsAppButton";
 import { trackFormSubmission } from "@/lib/analytics";
 import {
@@ -117,10 +116,10 @@ export function ContactForm() {
             <CheckCircle2 strokeWidth={1.5} className="h-6 w-6" />
           </motion.span>
           <div>
-            <Badge variant="success" size="sm" dot>
+            <p className="font-mono text-xs font-medium text-success">
               Enquiry Received
-            </Badge>
-            <h2 className="font-heading text-2xl font-semibold text-text mt-1">
+            </p>
+            <h2 className="font-heading text-2xl font-semibold text-text mt-0.5">
               Thank you, {submittedData.name}.
             </h2>
           </div>
@@ -165,9 +164,9 @@ export function ContactForm() {
     <Card variant="default" padding="lg" className="space-y-6">
       <div className="space-y-1.5 border-b border-border pb-4">
         <div className="flex items-center justify-between gap-2">
-          <Badge variant="primary" size="sm" dot>
+          <span className="font-mono text-xs font-medium text-primary">
             Consultation Request Form
-          </Badge>
+          </span>
           <span className="font-mono text-xs text-success">
             We reply within one business day
           </span>

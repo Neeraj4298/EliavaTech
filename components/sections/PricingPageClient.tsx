@@ -101,7 +101,7 @@ export function PricingPageClient() {
     <div className="space-y-14">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-card border border-border bg-surface p-4">
         <div className="space-y-1">
-          <Badge variant="gold" size="sm" dot>{PRICING_HEADER.badge}</Badge>
+          <p className="font-mono text-xs font-medium text-primary">{PRICING_HEADER.badge}</p>
           <p className="text-xs text-text-muted">{PRICING_HEADER.disclaimer}</p>
         </div>
 
@@ -183,7 +183,7 @@ export function PricingPageClient() {
 
       <Card variant="default" padding="lg" id="custom-quote" className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <div className="lg:col-span-5 space-y-3">
-          <Badge variant="primary" size="sm" dot>Custom Scope</Badge>
+          <p className="font-mono text-xs font-medium text-primary">Custom Scope</p>
           <h2 className="text-h3">Request a custom quote</h2>
           <p className="text-small text-text-muted leading-relaxed">
             Need a combined Website + WhatsApp Automation bundle or a multi-module CRM? Share your requirements and we will reply within one business day.

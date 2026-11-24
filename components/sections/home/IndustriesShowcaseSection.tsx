@@ -5,7 +5,6 @@ import { Check, ArrowRight } from "lucide-react";
 import { INDUSTRY_ITEMS } from "@/content/navigation";
 import { Section } from "@/components/layout/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
@@ -33,11 +32,11 @@ export function IndustriesShowcaseSection() {
           }
         />
 
-        {/* Horizontal Swipe / Tab Bar */}
+        {/* Wrapped Industry Sector Tab Bar (no horizontal scrollbar) */}
         <div
           role="tablist"
           aria-label="Industry sectors"
-          className="flex items-center gap-2 overflow-x-auto pb-2"
+          className="flex flex-wrap items-center gap-2"
         >
           {INDUSTRY_ITEMS.map((item) => {
             const isSelected = item.slug === selectedSlug;
@@ -49,9 +48,9 @@ export function IndustriesShowcaseSection() {
                 aria-selected={isSelected}
                 onClick={() => setSelectedSlug(item.slug)}
                 className={cn(
-                  "shrink-0 rounded-pill border px-4 py-2 text-small font-medium transition-all duration-200",
+                  "rounded-pill border px-4 py-2 text-small font-medium transition-colors duration-200",
                   isSelected
-                    ? "border-primary bg-primary text-white shadow-sm"
+                    ? "border-primary bg-primary text-white shadow-xs"
                     : "border-border bg-surface text-text-muted hover:bg-surface-2 hover:text-text"
                 )}
               >
@@ -64,9 +63,9 @@ export function IndustriesShowcaseSection() {
         {/* Active Industry Detail Card */}
         <Card variant="elevated" padding="lg" className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-7 space-y-4">
-            <Badge variant="gold" size="sm" dot>
+            <p className="font-mono text-xs font-medium text-primary">
               Recommended Sector Bundle
-            </Badge>
+            </p>
             <h3 className="text-h3">{activeIndustry.title}</h3>
             <p className="text-body text-text-muted">
               {activeIndustry.summary}
@@ -82,7 +81,7 @@ export function IndustriesShowcaseSection() {
           </div>
 
           <div className="lg:col-span-5 space-y-3 rounded-card border border-border bg-surface p-5">
-            <p className="font-mono text-xs uppercase tracking-wider text-text-muted">
+            <p className="font-mono text-xs text-text-muted font-normal">
               What&apos;s Included in the Bundle
             </p>
             <ul className="space-y-3">

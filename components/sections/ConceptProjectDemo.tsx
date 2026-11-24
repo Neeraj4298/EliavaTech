@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CheckCircle2, Sparkles } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { DeviceMockup } from "@/components/ui/DeviceMockup";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -27,7 +27,7 @@ export function ConceptProjectDemo({ demoType, demoUrl }: ConceptProjectDemoProp
               <p className="font-heading font-semibold text-text">CarePlus Dental &amp; Family Clinic</p>
               <p className="text-xs text-text-muted">Select a consultation slot with Dr. Rao</p>
             </div>
-            <Badge variant="gold" size="sm" dot>Concept project</Badge>
+            <Badge variant="gold" size="sm">Concept project</Badge>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             {["Tomorrow · 11:00 AM", "Tomorrow · 5:30 PM", "Tomorrow · 6:15 PM"].map((s) => (
@@ -73,7 +73,7 @@ export function ConceptProjectDemo({ demoType, demoUrl }: ConceptProjectDemoProp
               <p className="font-heading font-semibold text-text">Indigo Handloom Storefront</p>
               <p className="text-xs text-text-muted">SKU: IHL-KURTA-M · HSN 6205 · 12% GST</p>
             </div>
-            <Badge variant="gold" size="sm" dot>Concept project</Badge>
+            <Badge variant="gold" size="sm">Concept project</Badge>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-4 rounded-input border border-border bg-surface p-3">
             <div className="flex items-center gap-2">
@@ -103,7 +103,7 @@ export function ConceptProjectDemo({ demoType, demoUrl }: ConceptProjectDemoProp
             </Button>
             {orderPlaced && (
               <span className="inline-flex items-center gap-1.5 font-mono text-xs text-success">
-                <Sparkles strokeWidth={1.5} className="h-4 w-4" />
+                <CheckCircle2 strokeWidth={1.5} className="h-4 w-4" />
                 <span>GST Invoice PDF generated · Stock deducted (-{qty})</span>
               </span>
             )}
@@ -122,7 +122,7 @@ export function ConceptProjectDemo({ demoType, demoUrl }: ConceptProjectDemoProp
             <p className="font-heading font-semibold text-text">Skyline Realty Lead CRM</p>
             <p className="text-xs text-text-muted">Lead #L-104 · 3BHK Whitefield · Budget ₹1.4 Cr</p>
           </div>
-          <Badge variant="gold" size="sm" dot>Concept project</Badge>
+          <Badge variant="gold" size="sm">Concept project</Badge>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {stages.map((st) => (

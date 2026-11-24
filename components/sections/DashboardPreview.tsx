@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, RefreshCw, Sparkles } from "lucide-react";
+import { CheckCircle2, RefreshCw } from "lucide-react";
 import { DeviceMockup } from "@/components/ui/DeviceMockup";
 import { Badge, type BadgeVariant } from "@/components/ui/Badge";
 import { EASE_STANDARD, MOTION_DURATION, usePrefersReducedMotion } from "@/lib/motion";
@@ -102,7 +102,7 @@ export function DashboardPreview({
                   <span className="font-heading text-small font-semibold text-text">{rec.title}</span>
                 </div>
                 <p className="text-xs text-text-muted flex items-center gap-1 mt-0.5">
-                  <Sparkles strokeWidth={1.5} className="h-3 w-3 text-gold shrink-0" />
+                  <CheckCircle2 strokeWidth={1.5} className="h-3 w-3 text-gold shrink-0" />
                   <span>{rec.meta}</span>
                 </p>
               </div>
