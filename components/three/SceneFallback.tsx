@@ -22,21 +22,10 @@ export function SceneFallback({ className }: SceneFallbackProps) {
       role="img"
       aria-label="EliavaTech 3D Monogram Architecture — Websites, Custom Software, and AI Automation layers"
       className={cn(
-        "relative flex h-[420px] sm:h-[480px] lg:h-[540px] w-full items-center justify-center overflow-hidden rounded-card border border-border bg-surface/70 p-6 shadow-[var(--shadow-card)]",
+        "relative flex h-[420px] sm:h-[480px] lg:h-[540px] w-full items-center justify-center bg-transparent p-6",
         className
       )}
     >
-      {/* Subtle architectural background grid */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-35"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)",
-          backgroundSize: "32px 32px, 32px 32px",
-        }}
-      />
-
       {/* Four Orbiting Service Tokens (Static Representation) */}
       <div
         aria-hidden="true"

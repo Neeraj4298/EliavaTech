@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { SplitHeading } from "@/components/motion/SplitHeading";
 import { MagneticButton } from "@/components/motion/MagneticButton";
 import { HeroSceneLoader } from "@/components/three/HeroSceneLoader";
+import { ParticleField } from "@/components/three/ParticleField";
 import { usePrefersReducedMotion } from "@/lib/motion";
 
 /**
@@ -29,11 +30,12 @@ export function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden py-8 md:py-24 lg:py-28 border-b border-border/60"
+      className="relative flex min-h-[calc(100svh-4rem)] md:min-h-[calc(100svh-5rem)] items-center overflow-hidden py-8 md:py-12 border-b border-border/60"
     >
-      {/* Background Section Container */}
+      {/* Full-Hero Floating Particle Field Background */}
+      <ParticleField />
 
-      <div className="container-max relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-7 lg:gap-12 items-center">
+      <div className="container-max relative z-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-7 lg:gap-12 items-center">
         {/* Left Column */}
         <div className="lg:col-span-6 space-y-4 md:space-y-6">
           <p className="font-mono text-xs sm:text-small font-medium text-primary">

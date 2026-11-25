@@ -6,7 +6,6 @@ import { RoundedBox, Environment, Lightformer } from "@react-three/drei";
 import { useTheme } from "next-themes";
 import { Code2, MessageSquare, ShoppingCart, BarChart3 } from "lucide-react";
 import * as THREE from "three";
-import { ParticleField } from "./ParticleField";
 
 if (typeof window !== "undefined") {
   const origWarn = console.warn;
@@ -22,10 +21,10 @@ if (typeof window !== "undefined") {
 }
 
 const ORBIT_TOKENS = [
-  { id: "code", label: "Websites", Icon: Code2, angle: 0, radius: 2.25, yOffset: 0.85 },
-  { id: "chat", label: "WhatsApp AI", Icon: MessageSquare, angle: Math.PI * 0.5, radius: 2.35, yOffset: 0.25 },
-  { id: "cart", label: "E-commerce", Icon: ShoppingCart, angle: Math.PI, radius: 2.25, yOffset: -0.4 },
-  { id: "chart", label: "CRM & ERP", Icon: BarChart3, angle: Math.PI * 1.5, radius: 2.35, yOffset: -0.9 },
+  { id: "code", label: "Websites", Icon: Code2, angle: 0, radius: 1.85, yOffset: 0.85 },
+  { id: "chat", label: "WhatsApp AI", Icon: MessageSquare, angle: Math.PI * 0.5, radius: 1.9, yOffset: 0.25 },
+  { id: "cart", label: "E-commerce", Icon: ShoppingCart, angle: Math.PI, radius: 1.85, yOffset: -0.4 },
+  { id: "chart", label: "CRM & ERP", Icon: BarChart3, angle: Math.PI * 1.5, radius: 1.9, yOffset: -0.9 },
 ] as const;
 
 const LAYER_LABELS = [
@@ -316,8 +315,8 @@ export function HeroScene({ active = true }: HeroSceneProps) {
       height: number
     ) => {
       const padX = width < 440 ? 58 : 68;
-      const padTop = 44;
-      const padBottom = 44;
+      const padTop = 48;
+      const padBottom = 58;
 
       for (let i = 0; i < tokens.length; i++) {
         const el = tokenElRefs.current[i];
@@ -348,7 +347,7 @@ export function HeroScene({ active = true }: HeroSceneProps) {
       onPointerDown={handleContainerPointerDown}
       onMouseEnter={() => setExploded(true)}
       onMouseLeave={() => setExploded(false)}
-      className="relative h-[300px] sm:h-[460px] lg:h-[540px] w-full overflow-hidden select-none touch-pan-y cursor-grab active:cursor-grabbing rounded-card border border-border/60 bg-surface/35"
+      className="relative h-[300px] sm:h-[460px] lg:h-[540px] w-full select-none touch-pan-y cursor-grab active:cursor-grabbing bg-transparent"
     >
       <Canvas
         dpr={[1, 1.75]}
@@ -368,7 +367,6 @@ export function HeroScene({ active = true }: HeroSceneProps) {
           </group>
         </Environment>
 
-        <ParticleField isDark={isDark} />
         <MonogramRig
           isDark={isDark}
           exploded={exploded}
