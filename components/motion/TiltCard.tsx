@@ -32,6 +32,7 @@ export function TiltCard({
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   const [tilt, setTilt] = React.useState({ rotateX: 0, rotateY: 0 });
+  const [glow, setGlow] = React.useState({ x: 0, y: 0, active: false });
 
   const isEnabled = !prefersReducedMotion && isFinePointer;
 
@@ -48,10 +49,16 @@ export function TiltCard({
       rotateX: -normY * clampedTilt * 2,
       rotateY: normX * clampedTilt * 2,
     });
+    setGlow({
+      x: relX - rect.width / 2,
+      y: relY - rect.height / 2,
+      active: true,
+    });
   };
 
   const handleMouseLeave = () => {
     setTilt({ rotateX: 0, rotateY: 0 });
+    setGlow((prev) => ({ ...prev, active: false }));
   };
 
   return (
@@ -74,7 +81,19 @@ export function TiltCard({
         style={{ transformStyle: "preserve-3d" }}
         className="relative h-full overflow-hidden rounded-card border border-border bg-surface p-4 md:p-6 shadow-[var(--shadow-card)] transition-colors duration-250 hover:border-primary/50 will-change-transform"
       >
-        {/* Cursor-following subtle surface highlight */}
+        {/* Cursor-following glow translated via transform only */}
+        {isEnabled && (
+          <div
+            aria-hidden="true"
+            style={{
+              transform: `translate3d(${glow.x}px, ${glow.y}px, 0)`,
+              opacity: glow.active ? 1 : 0,
+            }}
+            className="pointer-events-none absolute inset-0 flex items-center justify-center transition-opacity duration-250"
+          >
+            <div className="h-56 w-56 rounded-full bg-primary/15 blur-2xl" />
+          </div>
+        )}
         <div className="relative z-10 h-full">{children}</div>
       </motion.div>
     </div>

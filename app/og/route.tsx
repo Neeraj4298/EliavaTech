@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
           padding: "64px 72px",
           fontFamily: "sans-serif",
           backgroundImage:
-            "radial-gradient(circle at 85% 18%, rgba(37, 99, 235, 0.25) 0%, transparent 55%), radial-gradient(circle at 15% 88%, rgba(242, 184, 75, 0.14) 0%, transparent 45%)",
+            "radial-gradient(circle at 85% 18%, rgba(124, 108, 255, 0.28) 0%, transparent 55%), radial-gradient(circle at 15% 88%, rgba(242, 184, 75, 0.14) 0%, transparent 45%)",
         }}
       >
         {/* Top Row: Monogram + Wordmark + Tag Pill */}
@@ -93,9 +93,9 @@ export async function GET(req: NextRequest) {
               gap: "8px",
               padding: "8px 18px",
               borderRadius: "999px",
-              backgroundColor: "rgba(37, 99, 235, 0.14)",
-              border: "1px solid rgba(37, 99, 235, 0.4)",
-              color: "#60A5FA",
+              backgroundColor: "rgba(124, 108, 255, 0.14)",
+              border: "1px solid rgba(124, 108, 255, 0.4)",
+              color: "#9A8DFF",
               fontSize: "18px",
               fontWeight: 600,
             }}

@@ -32,6 +32,16 @@ export function HeroSection() {
       ref={sectionRef}
       className="relative flex min-h-[calc(100svh-4rem)] md:min-h-[calc(100svh-5rem)] items-center overflow-hidden py-8 md:py-12 border-b border-border/60"
     >
+      {/* Subtle architectural background radial glow */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-30"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 20% 25%, var(--primary) 0%, transparent 45%)",
+        }}
+      />
+
       {/* Full-Hero Floating Particle Field Background */}
       <ParticleField />
 

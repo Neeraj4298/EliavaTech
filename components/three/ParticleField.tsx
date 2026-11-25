@@ -118,10 +118,10 @@ export function ParticleField({
       const cosX = Math.cos(rotX);
       const sinX = Math.sin(rotX);
 
-      ctx.fillStyle = isDark ? "#93C5FD" : "#2563EB";
+      ctx.fillStyle = isDark ? "#9A8DFF" : "#4B3FE0";
       ctx.shadowColor = isDark
-        ? "rgba(59, 130, 246, 0.95)"
-        : "rgba(37, 99, 235, 0.65)";
+        ? "rgba(124, 108, 255, 0.95)"
+        : "rgba(75, 63, 224, 0.65)";
       ctx.shadowBlur = isDark ? 14 : 9;
 
       const halfW = width * 0.5;
