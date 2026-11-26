@@ -5,6 +5,8 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronDown, ArrowRight } from "lucide-react";
 import { MAIN_NAV_LINKS, SERVICE_ITEMS } from "@/content/navigation";
+import { getSocialLinks } from "@/content/site";
+import { SocialPlatformIcon } from "./Footer";
 import { Logo } from "@/components/brand/Logo";
 import { ThemeToggle } from "@/components/brand/ThemeToggle";
 import { Button } from "@/components/ui/Button";
@@ -25,6 +27,7 @@ export interface MobileMenuProps {
 export function MobileMenu({ open, onClose, currentPath }: MobileMenuProps) {
   const reduced = usePrefersReducedMotion();
   const [subOpen, setSubOpen] = React.useState(false);
+  const socialLinks = getSocialLinks();
 
   React.useEffect(() => {
     if (!open) return;
@@ -140,7 +143,27 @@ export function MobileMenu({ open, onClose, currentPath }: MobileMenuProps) {
             })}
           </motion.nav>
 
-          <div className="border-t border-border pt-6">
+          <div className="border-t border-border pt-5 space-y-4">
+            {socialLinks.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-pill border border-border bg-surface px-4 py-2 text-xs font-medium text-text hover:border-primary/50 hover:text-primary"
+                  >
+                    <SocialPlatformIcon
+                      platform={social.id}
+                      className="h-4 w-4 text-primary"
+                    />
+                    <span>{social.name}</span>
+                  </a>
+                ))}
+              </div>
+            )}
+
             <Button
               href="/contact"
               onClick={onClose}

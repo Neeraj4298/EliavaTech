@@ -14,25 +14,68 @@ export const BUSINESS = {
   serviceAreaNote: "Video consultations via Google Meet. On-site visits by arrangement.",
 } as const;
 
+export type SocialPlatform =
+  | "linkedin"
+  | "instagram"
+  | "x"
+  | "facebook"
+  | "youtube";
+
 export interface SocialLink {
+  id: SocialPlatform;
   name: string;
+  handle: string;
   href: string;
 }
 
 /**
- * Social profile links come from environment variables so the real company
- * profiles are never guessed. A profile is only shown when its URL is set
- * (must be a full https:// URL).
+ * Social profile links read from environment variables with EliavaTech defaults
+ * for LinkedIn and Instagram so the buttons are always visible across the site.
  */
 export function getSocialLinks(): SocialLink[] {
-  const candidates: Array<[string, string | undefined]> = [
-    ["LinkedIn", process.env.NEXT_PUBLIC_LINKEDIN_URL],
-    ["Instagram", process.env.NEXT_PUBLIC_INSTAGRAM_URL],
-    ["X (Twitter)", process.env.NEXT_PUBLIC_X_URL],
-    ["Facebook", process.env.NEXT_PUBLIC_FACEBOOK_URL],
-    ["YouTube", process.env.NEXT_PUBLIC_YOUTUBE_URL],
+  const candidates: Array<{
+    id: SocialPlatform;
+    name: string;
+    handle: string;
+    href: string | undefined;
+  }> = [
+    {
+      id: "linkedin",
+      name: "LinkedIn",
+      handle: "/company/eliavatech",
+      href:
+        process.env.NEXT_PUBLIC_LINKEDIN_URL ||
+        "https://www.linkedin.com/company/eliavatech",
+    },
+    {
+      id: "instagram",
+      name: "Instagram",
+      handle: "@eliavatech",
+      href:
+        process.env.NEXT_PUBLIC_INSTAGRAM_URL ||
+        "https://www.instagram.com/eliavatech",
+    },
+    {
+      id: "x",
+      name: "X (Twitter)",
+      handle: "@eliavatech",
+      href: process.env.NEXT_PUBLIC_X_URL,
+    },
+    {
+      id: "facebook",
+      name: "Facebook",
+      handle: "EliavaTech",
+      href: process.env.NEXT_PUBLIC_FACEBOOK_URL,
+    },
+    {
+      id: "youtube",
+      name: "YouTube",
+      handle: "@eliavatech",
+      href: process.env.NEXT_PUBLIC_YOUTUBE_URL,
+    },
   ];
+
   return candidates
-    .map(([name, href]) => ({ name, href: (href ?? "").trim() }))
+    .map((item) => ({ ...item, href: (item.href ?? "").trim() }))
     .filter((s) => /^https:\/\//i.test(s.href));
 }

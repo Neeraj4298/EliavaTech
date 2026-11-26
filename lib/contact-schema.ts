@@ -32,7 +32,7 @@ export const PRICING_BUDGET_OPTIONS = [
   { value: "1L+", label: "₹1,00,000+" },
 ] as const;
 
-const SERVICE_VALUES = [
+export const SERVICE_VALUES = [
   ...SERVICE_OPTIONS.map((o) => o.value),
   ...PRICING_SERVICE_OPTIONS.map((o) => o.value),
 ] as unknown as [string, ...string[]];

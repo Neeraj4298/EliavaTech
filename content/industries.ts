@@ -172,7 +172,7 @@ export const INDUSTRIES_DATA: IndustryDetailData[] = [
     ],
     bundle: [
       { item: "Authority Website & Insights", description: "Practice area pages, partner profiles, and SEO-ready advisory articles." },
-      { item: "Cal.com Consultation Booking", description: "Real-time calendar booking synced with Google Calendar and Google Meet." },
+      { item: "Google Calendar & Meet Booking", description: "Real-time calendar booking synced with Google Calendar and Google Meet." },
       { item: "Automated Intake & Reminders", description: "Pre-call questionnaire and WhatsApp reminder two hours before the meeting." },
     ],
     workflowDiagram: [

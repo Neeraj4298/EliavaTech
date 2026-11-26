@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { ABOUT_CONTENT } from "@/content/about";
+import { getSocialLinks } from "@/content/site";
+import { SocialPlatformIcon } from "@/components/layout/Footer";
 import { Section } from "@/components/layout/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Badge } from "@/components/ui/Badge";
@@ -20,6 +22,7 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default function AboutPage() {
+  const socialLinks = getSocialLinks();
   const breadcrumb = buildBreadcrumbSchema([
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
@@ -33,6 +36,25 @@ export default function AboutPage() {
           <p className="font-mono text-xs font-medium text-primary">{ABOUT_CONTENT.hero.eyebrow}</p>
           <SplitHeading text={ABOUT_CONTENT.hero.title} as="h1" className="text-h1 block" />
           <p className="text-body text-text-muted">{ABOUT_CONTENT.hero.subtext}</p>
+          {socialLinks.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2.5 pt-1">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.name}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-pill border border-border bg-surface px-4 py-2 text-xs font-medium text-text transition-colors hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+                >
+                  <SocialPlatformIcon
+                    platform={social.id}
+                    className="h-3.5 w-3.5 text-primary"
+                  />
+                  <span>Follow on {social.name}</span>
+                </a>
+              ))}
+            </div>
+          )}
         </div>
       </Section>
 

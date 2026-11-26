@@ -1,13 +1,59 @@
 import * as React from "react";
 import Link from "next/link";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
 import {
   SERVICE_ITEMS,
   INDUSTRY_ITEMS,
   LEGAL_NAV_LINKS,
 } from "@/content/navigation";
 import { Logo } from "@/components/brand/Logo";
-import { BUSINESS, getSocialLinks } from "@/content/site";
+import { BUSINESS, getSocialLinks, type SocialPlatform } from "@/content/site";
+
+export function SocialPlatformIcon({
+  platform,
+  className = "h-4 w-4",
+}: {
+  platform: SocialPlatform;
+  className?: string;
+}) {
+  if (platform === "linkedin") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+        aria-hidden="true"
+      >
+        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+        <rect width="4" height="12" x="2" y="9" />
+        <circle cx="4" cy="4" r="2" />
+      </svg>
+    );
+  }
+  if (platform === "instagram") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+        aria-hidden="true"
+      >
+        <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+        <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+      </svg>
+    );
+  }
+  return <ArrowUpRight strokeWidth={1.75} className={className} aria-hidden="true" />;
+}
 
 const COMPANY_LINKS = [
   { label: "Work & Demos", href: "/work" },
@@ -51,6 +97,27 @@ export function Footer() {
                 <span>{BUSINESS.serviceAreaLine}</span>
               </li>
             </ul>
+
+            {socialLinks.length > 0 && (
+              <div className="pt-2 flex flex-wrap items-center gap-2">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.name}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Follow EliavaTech on ${social.name}`}
+                    className="inline-flex items-center gap-2 rounded-pill border border-border bg-surface-2 px-3.5 py-1.5 text-xs font-medium text-text transition-colors hover:border-primary/50 hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  >
+                    <SocialPlatformIcon
+                      platform={social.id}
+                      className="h-3.5 w-3.5 text-primary shrink-0"
+                    />
+                    <span>{social.name}</span>
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="lg:col-span-3 space-y-3">

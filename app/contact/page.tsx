@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { SplitHeading } from "@/components/motion/SplitHeading";
 import { ContactForm } from "@/components/forms/ContactForm";
 import { BookingEmbed } from "@/components/forms/BookingEmbed";
+import { SocialPlatformIcon } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/overlays/WhatsAppButton";
 import { buildBreadcrumbSchema, buildPageMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -124,25 +125,43 @@ export default function ContactPage() {
             </Card>
 
             {socialLinks.length > 0 && (
-            <Card variant="default" padding="md" className="space-y-3">
-              <p className="font-mono text-xs text-text-muted font-normal">
-                Follow Us
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                {socialLinks.map((social) => (
-                  <a
-                    key={social.name}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between rounded-input border border-border bg-surface-2 px-4 py-2.5 text-small font-medium text-text hover:border-primary/50 hover:text-primary"
-                  >
-                    <span>{social.name}</span>
-                    <ArrowUpRight strokeWidth={1.5} className="h-4 w-4 text-text-muted" />
-                  </a>
-                ))}
-              </div>
-            </Card>
+              <Card variant="default" padding="md" className="space-y-3">
+                <p className="font-mono text-xs text-text-muted font-normal">
+                  Connect on Social
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {socialLinks.map((social) => (
+                    <a
+                      key={social.name}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex items-center justify-between gap-2 rounded-input border border-border bg-surface-2 px-3.5 py-3 text-small font-medium text-text transition-colors hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+                    >
+                      <span className="flex items-center gap-2.5 min-w-0">
+                        <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-input border border-border bg-surface text-primary group-hover:border-primary/40">
+                          <SocialPlatformIcon
+                            platform={social.id}
+                            className="h-4 w-4"
+                          />
+                        </span>
+                        <span className="truncate">
+                          <span className="block font-heading text-small font-semibold leading-tight">
+                            {social.name}
+                          </span>
+                          <span className="block font-mono text-[11px] text-text-muted truncate">
+                            {social.handle}
+                          </span>
+                        </span>
+                      </span>
+                      <ArrowUpRight
+                        strokeWidth={1.5}
+                        className="h-4 w-4 shrink-0 text-text-muted transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-primary"
+                      />
+                    </a>
+                  ))}
+                </div>
+              </Card>
             )}
           </div>
         </div>

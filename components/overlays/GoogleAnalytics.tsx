@@ -26,7 +26,8 @@ export function GoogleAnalytics() {
       if (
         href === "/contact" ||
         href.startsWith("/contact#") ||
-        href.includes("cal.com")
+        href.includes("meet.google.com") ||
+        href.includes("calendar.google.com")
       ) {
         trackBookingClick(anchor.textContent?.trim() || href);
       }

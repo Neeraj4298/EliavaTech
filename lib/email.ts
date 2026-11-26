@@ -91,7 +91,7 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
-function formatServiceLabel(service?: string): string {
+export function formatServiceLabel(service?: string): string {
   if (!service) return "Not specified";
   return SERVICE_LABELS[service] || service;
 }
@@ -362,4 +362,47 @@ export async function sendLeadNotificationEmail(
       `Email setup error: ${err instanceof Error ? err.message : "Unknown error"}`
     );
   }
+}
+
+export interface BookingEmailPayload {
+  leadId?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  service?: string;
+  notes?: string;
+  formattedDate: string;
+  formattedTimeIst: string;
+  meetLink: string | null;
+  addToGoogleCalendarUrl: string;
+}
+
+export async function sendBookingConfirmationEmail(
+  payload: BookingEmailPayload
+): Promise<LeadEmailResult> {
+  const serviceLabel = formatServiceLabel(payload.service);
+  const meetSection = payload.meetLink
+    ? `Google Meet Link: ${payload.meetLink}`
+    : "Google Meet Link: Will be shared in your Google Calendar invite.";
+
+  const combinedMessage = [
+    `Scheduled Date: ${payload.formattedDate}`,
+    `Scheduled Time: ${payload.formattedTimeIst}`,
+    meetSection,
+    `Add to Google Calendar: ${payload.addToGoogleCalendarUrl}`,
+    payload.notes ? `Notes: ${payload.notes}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  return sendLeadNotificationEmail({
+    leadId: payload.leadId,
+    name: payload.name,
+    email: payload.email,
+    phone: payload.phone,
+    service: serviceLabel,
+    budgetRange: `${payload.formattedDate} · ${payload.formattedTimeIst}`,
+    message: combinedMessage,
+    source: "booking",
+  });
 }

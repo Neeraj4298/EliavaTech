@@ -64,7 +64,7 @@ export const SERVICES_DATA: ServiceDetailData[] = [
       "Modern Next.js build for fast page loads",
       "Lead capture forms with spam protection and instant email or WhatsApp alerts",
       "On-page SEO setup (clean URLs, sitemap, structured data, social sharing previews)",
-      "Cal.com consultation booking or custom enquiry integration",
+      "Google Calendar & Google Meet consultation booking or custom enquiry integration",
       "Google Analytics 4 setup with cookie consent",
     ],
     process: [
@@ -73,7 +73,7 @@ export const SERVICES_DATA: ServiceDetailData[] = [
       { step: "03", title: "Build", detail: "Build the site, connect forms and booking, and test on real phones." },
       { step: "04", title: "Support", detail: "Connect your domain, submit the site to Google Search Console and hand everything over." },
     ],
-    techUsed: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Cloudflare DNS", "Cal.com", "Google Analytics 4"],
+    techUsed: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Cloudflare DNS", "Google Calendar API", "Google Analytics 4"],
     sampleDeliverables: [
       { title: "5 to 10 Page Business Website", format: "Next.js Web App", summary: "Home, Services, About, Work or Catalogue, and Contact pages with booking." },
       { title: "Search and Metadata Setup", format: "SEO Setup", summary: "Sitemap, robots.txt and local business structured data." },

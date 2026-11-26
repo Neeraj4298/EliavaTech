@@ -20,7 +20,7 @@ const cspHeader = [
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   `connect-src 'self'${isProd ? "" : " ws: wss:"} https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://challenges.cloudflare.com`,
-  "frame-src 'self' https://cal.com https://app.cal.com https://challenges.cloudflare.com",
+  "frame-src 'self' https://challenges.cloudflare.com",
   "frame-ancestors 'self'",
   "worker-src 'self' blob:",
   "object-src 'none'",

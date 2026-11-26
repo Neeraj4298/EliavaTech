@@ -27,7 +27,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     bullets: [
       "Contact and pricing forms: your name, email address, phone or WhatsApp number (optional), company name (optional), selected service, estimated budget and project details.",
       "AI chat assistant: the questions you type. If you ask for a quote, or type your email address in the chat, we also keep your name, email address and project need. Chat messages are sent to Google's Gemini service to produce replies.",
-      "Consultation booking (Cal.com): your name, email address and preferred meeting time, collected by Cal.com when you book a video call.",
+      "Consultation booking (Google Calendar & Google Meet): your name, email address, optional phone number and selected meeting slot, used to schedule a Google Calendar event and generate a Google Meet link.",
       "Analytics (only with your consent): anonymous page-view and interaction data through Google Analytics 4. It loads only after you click \"Accept Analytics\" on our cookie banner.",
     ],
   },
@@ -52,7 +52,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
       "Google (Gmail) and Resend: delivery of notification and confirmation emails.",
       "n8n: an automation tool that can pass new enquiries to our internal workflows.",
       "Google Gemini: generates AI assistant replies from the messages you type.",
-      "Cal.com: consultation booking.",
+      "Google Calendar & Google Meet: consultation slot availability, meeting invites and video calls.",
       "Google Analytics 4: usage statistics, only after you accept analytics.",
     ],
   },
@@ -131,8 +131,7 @@ export const COOKIE_SECTIONS: LegalSection[] = [
       "eliavatech-theme (localStorage): remembers whether you chose light or dark mode.",
       "eliavatech-cookie-consent (localStorage): remembers whether you accepted or declined analytics.",
       "eliavatech-chat-nudge-shown (sessionStorage): makes sure the assistant's welcome prompt appears at most once per visit.",
-      "Cloudflare Turnstile (cookie or token): protects our contact and pricing forms from automated spam.",
-      "Cal.com booking calendar: the embedded calendar on the contact page is run by Cal.com and may set its own cookies. See Cal.com's own policy for details.",
+      "Cloudflare Turnstile (cookie or token): protects our contact, booking and pricing forms from automated spam.",
     ],
   },
   {
